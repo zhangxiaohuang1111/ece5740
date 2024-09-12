@@ -9,7 +9,7 @@
 `include "vc/arithmetic.v"
 `include "vc/trace.v"
 `include "vc/counters.v"
-`include "wshw/vc/regs.v"
+`include "vc/regs.v"
 
 
 // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
