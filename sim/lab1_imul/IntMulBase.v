@@ -192,6 +192,10 @@ vc_ZeroComparator#(1) b0_zero
   .out (is_b0_zero)
 );
 
+  // Connect to output port
+
+  assign ostream_msg = result_reg_out;
+
 endmodule
 
 module lab1_imul_IntMulBaseCtl
@@ -252,6 +256,10 @@ module lab1_imul_IntMulBaseCtl
   //----------------------------------------------------------------------
   // State Transitions
   //----------------------------------------------------------------------
+  logic req_go;
+  logic resp_go;
+  logic is_calc_done;
+
   assign req_go       = istream_val && istream_rdy;
   assign resp_go      = ostream_val && ostream_rdy;
   assign is_calc_done = is_counter_max;
@@ -333,7 +341,7 @@ module lab1_imul_IntMulBaseCtl
 //cs(istream_rdy, ostream_val, a_mux_sel, a_reg_en, b_mux_sel, b_reg_en, result_mux_sel, result_reg_en, add_mux_sel, counter_clear);
       STATE_IDLE:                     cs( 1,   0,   a_ld,   1, b_ld,   1, result_clear,  1, add_x,      1);
       STATE_CALC: if ( do_add_shift ) cs( 0,   0,   a_shift,1, b_shift,1, result_add,    1, add_mux,    0);
-             else if ( do_shift  )    cs( 0,   0,   a_shift,1, b_shift,0, result_add,    0, add_result, 0);
+             else if ( do_shift  )    cs( 0,   0,   a_shift,1, b_shift,1, result_add,    0, add_result, 0);
       STATE_DONE:                     cs( 0,   1,   a_x,    0, b_x,    0, result_x,      0, add_x,      0);
       default                         cs('x,  'x,   a_x,   'x, b_x,   'x, result_x,     'x, add_x,     'x);
 
@@ -429,6 +437,10 @@ module lab1_imul_IntMulBase
     vc_trace.append_str( trace_str, " " );
 
     $sformat( str, "%x", dpath.b_reg_out );
+    vc_trace.append_str( trace_str, str );
+    vc_trace.append_str( trace_str, " " );
+
+    $sformat( str, "%x", dpath.result_reg_out );
     vc_trace.append_str( trace_str, str );
     vc_trace.append_str( trace_str, " " );
 
