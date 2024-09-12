@@ -63,6 +63,45 @@ small_pos_pos_msgs = [
   mk_imsg(  8,  7 ), mk_omsg(  56 ),
 ]
 
+combine_zero_one_neg_msgs = [
+  mk_imsg(  0,  3 ), mk_omsg(   0 ),
+  mk_imsg(  4,  0 ), mk_omsg(   0 ),
+  mk_imsg(  3, -4 ), mk_omsg( -12 ),
+  mk_imsg( 2 , -13), mk_omsg(-26  ),
+  mk_imsg( -1,  3 ), mk_omsg( -3  ),
+  mk_imsg(  1, -7 ), mk_omsg(  -7 ),
+  mk_imsg(  1, 23 ), mk_omsg(   23),
+  mk_imsg(  1, 0  ), mk_omsg(   0 ),
+  mk_imsg( -31, 0 ), mk_omsg(   0 ),
+
+]
+
+large_pos_neg_msgs = [
+    mk_imsg( 23498934, -498230 ), mk_omsg( 23498934 * -498230),
+    mk_imsg( 723945, -9812345  ), mk_omsg( 723945 * -9812345 ),
+    mk_imsg( 398472, -9342     ), mk_omsg( 398472 * -9342    ),
+    mk_imsg( -29384, 748923    ), mk_omsg( -29384 * 748923   ),
+    mk_imsg( 92384, -2837      ), mk_omsg( 92384 * -2837     ),
+]
+
+masked_low_bits_msgs = [
+    mk_imsg( 0xFFFFFFA3, 0x0000001C ), mk_omsg( 0xFFFFFFA3 * 0x0000001C ),
+    mk_imsg( 0x00000092, 0xF1234567 ), mk_omsg( 0x00000092 * 0xF1234567 ),
+]
+masked_high_bits_msgs = [
+    mk_imsg( 0x00123456, 0xF9876543 ), mk_omsg( 0x00123456 * 0xF9876543 ),
+    mk_imsg( 0xF2345678, 0x00123456 ), mk_omsg( 0xF2345678 * 0x00123456 ),
+]
+sparse_number_msgs = [
+    mk_imsg( 0b1000000000000100, 0b00000001 ), mk_omsg( 0b1000000000000100 * 0b00000001 ),
+    mk_imsg( 0b1000000000010000, 0b00000010 ), mk_omsg( 0b1000000000010000 * 0b00000010 ),
+]
+dense_number_msgs = [
+    mk_imsg( 0b1111111111111101, 0b00000010 ), mk_omsg( 0b1111111111111101 * 0b00000010 ),
+    mk_imsg( 0b1111111111111111, 0b00000001 ), mk_omsg( 0b1111111111111111 * 0b00000001 ),
+]
+
+
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional lists of input/output messages to create
 # additional directed and random test cases.
@@ -73,8 +112,14 @@ small_pos_pos_msgs = [
 #-------------------------------------------------------------------------
 
 test_case_table = mk_test_case_table([
-  (                      "msgs                   src_delay sink_delay"),
-  [ "small_pos_pos",     small_pos_pos_msgs,     0,        0          ],
+  (                      "msgs                            src_delay sink_delay"),
+  [ "small_pos_pos",        small_pos_pos_msgs,           2,        0          ],
+  [ "combine_zero_one_neg", combine_zero_one_neg_msgs,    0,        0          ],
+  [ "large_pos_neg",        large_pos_neg_msgs,           4,        0          ],
+  [ "masked_low_bits",      masked_low_bits_msgs,         0,        0          ],
+  [ "masked_high_bits",     masked_high_bits_msgs,        5,        3          ],
+  [ "sparse_number",        sparse_number_msgs,           0,        0          ],
+  [ "dense_number",         dense_number_msgs,            0,        3          ],
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
