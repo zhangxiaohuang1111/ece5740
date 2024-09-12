@@ -3,6 +3,7 @@
 #=========================================================================
 
 import pytest
+import random
 
 from random import randint
 
@@ -11,6 +12,7 @@ from pymtl3.stdlib.test_utils import mk_test_case_table, run_sim
 from pymtl3.stdlib.stream import StreamSourceFL, StreamSinkFL
 
 from lab1_imul.IntMulFL import IntMulFL
+random.seed(0xdeadbeef)
 
 #-------------------------------------------------------------------------
 # TestHarness
@@ -102,6 +104,86 @@ dense_number_msgs = [
 ]
 
 
+random_cases = []
+for i in range(30):
+  sign_a = random.choice([-1, 1, 0])  
+  sign_b = random.choice([-1, 1, 0])  
+
+  if sign_a == 0:
+      a = 0
+  else:
+      a = sign_a * random.randint(1, 0xffff)  
+
+  if sign_b == 0:
+      b = 0
+  else:
+      b = sign_b * random.randint(1, 0xffff)
+  c = a * b
+  
+  random_cases.append( ( a, b, c ) )
+
+
+random_msgs = []
+for a, b, result in random_cases:
+  random_msgs.extend( [ concat(Bits32(a),Bits32(b)), Bits32(result) ] )
+
+
+random_with_zeros_ones_cases = []
+
+# Helper function to mask off bits
+def mask_low_bits(n, bits_to_mask):
+    return n & (~((1 << bits_to_mask) - 1))
+
+def mask_middle_bits(n, total_bits=16):
+    mask = ((1 << (total_bits//2)) - 1) << (total_bits//4)
+    return n & ~mask
+
+def sparse_number(bits=16):
+    # Generate a sparse number with a few ones
+    sparse = 0
+    for _ in range(random.randint(1, 3)):  # 1 to 3 ones
+        sparse |= 1 << random.randint(0, bits-1)
+    return sparse
+
+def dense_number(bits=16):
+    # Generate a dense number with a few zeros
+    dense = (1 << bits) - 1  # All ones
+    for _ in range(random.randint(1, 3)):  # 1 to 3 zeros
+        dense &= ~(1 << random.randint(0, bits-1))
+    return dense
+
+for i in range(5):
+    # Low order bits masked off
+    a = mask_low_bits(random.randint(0, 0xffff), random.randint(4, 8))
+    b = mask_low_bits(random.randint(0, 0xffff), random.randint(4, 8))
+    c = a * b
+    random_with_zeros_ones_cases.append((a, b, c))
+
+for i in range(5):
+    # Middle bits masked off
+    a = mask_middle_bits(random.randint(0, 0xffff))
+    b = mask_middle_bits(random.randint(0, 0xffff))
+    c = a * b
+    random_with_zeros_ones_cases.append((a, b, c))
+
+for i in range(5):
+    # Sparse numbers with many zeros but few ones
+    a = sparse_number()
+    b = sparse_number()
+    c = a * b
+    random_with_zeros_ones_cases.append((a, b, c))
+
+for i in range(5):
+    # Dense numbers with many ones but few zeros
+    a = dense_number()
+    b = dense_number()
+    c = a * b
+    random_with_zeros_ones_cases.append((a, b, c))
+
+random_with_zeros_ones_msgs = []
+for a, b, result in random_with_zeros_ones_cases:
+  random_with_zeros_ones_msgs.extend( [ concat(Bits32(a),Bits32(b)), Bits32(result) ] )
+
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional lists of input/output messages to create
 # additional directed and random test cases.
@@ -113,13 +195,15 @@ dense_number_msgs = [
 
 test_case_table = mk_test_case_table([
   (                      "msgs                            src_delay sink_delay"),
-  [ "small_pos_pos",        small_pos_pos_msgs,           2,        0          ],
-  [ "combine_zero_one_neg", combine_zero_one_neg_msgs,    0,        0          ],
-  [ "large_pos_neg",        large_pos_neg_msgs,           4,        0          ],
-  [ "masked_low_bits",      masked_low_bits_msgs,         0,        0          ],
-  [ "masked_high_bits",     masked_high_bits_msgs,        5,        3          ],
-  [ "sparse_number",        sparse_number_msgs,           0,        0          ],
-  [ "dense_number",         dense_number_msgs,            0,        3          ],
+  [ "small_pos_pos",          small_pos_pos_msgs,           2,        0          ],
+  [ "combine_zero_one_neg",   combine_zero_one_neg_msgs,    0,        0          ],
+  [ "large_pos_neg",          large_pos_neg_msgs,           4,        0          ],
+  [ "masked_low_bits",        masked_low_bits_msgs,         0,        0          ],
+  [ "masked_high_bits",       masked_high_bits_msgs,        5,        3          ],
+  [ "sparse_number",          sparse_number_msgs,           0,        0          ],
+  [ "dense_number",           dense_number_msgs,            0,        3          ],
+  [ "random",                 random_msgs,                  3,        4          ],
+  [ "random_with_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
