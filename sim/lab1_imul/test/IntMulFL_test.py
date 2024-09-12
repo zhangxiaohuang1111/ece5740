@@ -203,7 +203,7 @@ test_case_table = mk_test_case_table([
   [ "sparse_number",          sparse_number_msgs,           0,        0          ],
   [ "dense_number",           dense_number_msgs,            0,        3          ],
   [ "random",                 random_msgs,                  3,        4          ],
-  [ "random_with_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
+  [ "random_masked_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
