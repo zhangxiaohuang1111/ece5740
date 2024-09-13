@@ -87,13 +87,21 @@ large_pos_neg_msgs = [
 ]
 
 masked_low_bits_msgs = [
-    mk_imsg( 0xFFFFFFA3, 0x0000001C ), mk_omsg( 0xFFFFFFA3 * 0x0000001C ),
-    mk_imsg( 0x00000092, 0xF1234567 ), mk_omsg( 0x00000092 * 0xF1234567 ),
+    mk_imsg( 0xFFFFFFA3 & 0xFFFFFF00, 0x0000001C ), 
+    mk_omsg( (0xFFFFFFA3 & 0xFFFFFF00) * 0x0000001C ),
+
+    mk_imsg( 0x00000092 & 0xFFFFFF00, 0xF1234567 ), 
+    mk_omsg( (0x00000092 & 0xFFFFFF00) * 0xF1234567 ),
 ]
+
 masked_high_bits_msgs = [
-    mk_imsg( 0x00123456, 0xF9876543 ), mk_omsg( 0x00123456 * 0xF9876543 ),
-    mk_imsg( 0xF2345678, 0x00123456 ), mk_omsg( 0xF2345678 * 0x00123456 ),
+    mk_imsg( 0x00123456 & 0x000000FF, 0xF9876543 ), 
+    mk_omsg( (0x00123456 & 0x000000FF) * 0xF9876543 ),
+
+    mk_imsg( 0xF2345678 & 0x000000FF, 0x00123456 ), 
+    mk_omsg( (0xF2345678 & 0x000000FF) * 0x00123456 ),
 ]
+
 sparse_number_msgs = [
     mk_imsg( 0b1000000000000100, 0b00000001 ), mk_omsg( 0b1000000000000100 * 0b00000001 ),
     mk_imsg( 0b1000000000010000, 0b00000010 ), mk_omsg( 0b1000000000010000 * 0b00000010 ),
