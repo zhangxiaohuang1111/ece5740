@@ -455,6 +455,8 @@ module lab1_imul_IntMulBase
           vc_trace.append_str( trace_str, "add-shift" );
         else if ( ctrl.do_shift )
           vc_trace.append_str( trace_str, "shift" );
+        else
+          vc_trace.append_str( trace_str, "C" );
       end
 
       ctrl.STATE_DONE:

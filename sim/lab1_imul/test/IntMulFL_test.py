@@ -195,14 +195,14 @@ for a, b, result in random_with_zeros_ones_cases:
 
 test_case_table = mk_test_case_table([
   (                      "msgs                            src_delay sink_delay"),
-  [ "small_pos_pos",          small_pos_pos_msgs,           2,        0          ],
-  [ "combine_zero_one_neg",   combine_zero_one_neg_msgs,    0,        0          ],
-  [ "large_pos_neg",          large_pos_neg_msgs,           4,        0          ],
-  [ "masked_low_bits",        masked_low_bits_msgs,         0,        0          ],
-  [ "masked_high_bits",       masked_high_bits_msgs,        5,        3          ],
-  [ "sparse_number",          sparse_number_msgs,           0,        0          ],
-  [ "dense_number",           dense_number_msgs,            0,        3          ],
-  [ "random",                 random_msgs,                  3,        4          ],
+  [ "small_pos_pos",          small_pos_pos_msgs,             2,        0          ],
+  [ "combine_zero_one_neg",   combine_zero_one_neg_msgs,      0,        0          ],
+  [ "large_pos_neg",          large_pos_neg_msgs,             4,        0          ],
+  [ "masked_low_bits",        masked_low_bits_msgs,           0,        0          ],
+  [ "masked_high_bits",       masked_high_bits_msgs,          5,        3          ],
+  [ "sparse_number",          sparse_number_msgs,             0,        0          ],
+  [ "dense_number",           dense_number_msgs,              0,        3          ],
+  [ "random",                 random_msgs,                    3,        4          ],
   [ "random_masked_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
