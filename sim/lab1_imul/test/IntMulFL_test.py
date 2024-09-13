@@ -133,7 +133,7 @@ for i in range(30):
 
 random_msgs = []
 for a, b, result in random_cases:
-  random_msgs.extend( [ concat(Bits32(a),Bits32(b)), Bits32(result) ] )
+  random_msgs.extend( [ mk_imsg(a,b), mk_omsg(result) ] )
 
 
 random_with_zeros_ones_cases = []
@@ -190,7 +190,9 @@ for i in range(5):
 
 random_with_zeros_ones_msgs = []
 for a, b, result in random_with_zeros_ones_cases:
-  random_with_zeros_ones_msgs.extend( [ concat(Bits32(a),Bits32(b)), Bits32(result) ] )
+  random_with_zeros_ones_msgs.extend( [ mk_imsg(a,b), mk_omsg(result) ] )
+
+overflow_msgs =  [mk_imsg(  0x80000001,  2 ), mk_omsg(   0x80000001*2 )] 
 
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional lists of input/output messages to create
@@ -212,6 +214,7 @@ test_case_table = mk_test_case_table([
   [ "dense_number",           dense_number_msgs,              0,        3          ],
   [ "random",                 random_msgs,                    3,        4          ],
   [ "random_masked_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
+  [ "overflow",               overflow_msgs,                  0,        0          ],
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
