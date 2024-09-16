@@ -16,7 +16,7 @@
 #
 
 # Hack to add project root to python path
-
+import random
 import os
 import sys
 
@@ -68,6 +68,29 @@ for i in range(50):
   b = randint(0,100)
   random_small_msgs.extend([ mk_imsg( a, b ), mk_omsg( a * b ) ])
 
+random_cases = []
+for i in range(30):
+  sign_a = random.choice([-1, 1, 0])  
+  sign_b = random.choice([-1, 1, 0])  
+
+  if sign_a == 0:
+      a = 0
+  else:
+      a = sign_a * random.randint(1, 0xffff)  
+
+  if sign_b == 0:
+      b = 0
+  else:
+      b = sign_b * random.randint(1, 0xffff)
+  c = a * b
+  
+  random_cases.append( ( a, b, c ) )
+
+
+random_msgs = []
+for a, b, result in random_cases:
+  random_msgs.extend( [ mk_imsg(a,b), mk_omsg(result) ] )
+
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # You should add more datasets for evaluation. Remember these datasets
 # are not for testing; your design should already be thoroughly tested
@@ -105,7 +128,7 @@ def parse_cmdline():
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   p.add_argument( "--input", default="small",
-    choices=["small"] )
+    choices=["small", "random"] )
 
   p.add_argument( "--trace",     action="store_true" )
   p.add_argument( "--stats",     action="store_true" )
@@ -134,6 +157,8 @@ def main():
 
   if opts.input == "small":
     inputs = random_small_msgs
+  elif opts.input == "random":
+    inputs = random_msgs
 
   ninputs = len(inputs[::2])
 

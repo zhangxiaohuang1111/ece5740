@@ -65,11 +65,34 @@ small_pos_pos_msgs = [
   mk_imsg(  8,  7 ), mk_omsg(  56 ),
 ]
 
-combine_zero_one_neg_msgs = [
+small_neg_neg_msgs = [
+  mk_imsg( -2, -3 ), mk_omsg(   6 ),
+  mk_imsg( -4, -5 ), mk_omsg(  20 ),
+  mk_imsg( -3, -4 ), mk_omsg(  12 ),
+  mk_imsg(-10,-13 ), mk_omsg( 130 ),
+  mk_imsg( -8, -7 ), mk_omsg(  56 ),
+]
+
+large_pos_pos_msgs = [
+  mk_imsg( 23498934, 498230 ), mk_omsg( 23498934 * 498230 ),
+  mk_imsg( 723945,  9812345 ), mk_omsg( 723945 * 9812345  ),
+  mk_imsg( 398472,  9342    ), mk_omsg( 398472 * 9342     ),
+  mk_imsg( 29384,   748923  ), mk_omsg( 29384 * 748923    ),
+]
+
+large_neg_neg_msgs = [
+  mk_imsg( -23493934, -498230 ), mk_omsg( -23493934 * -498230 ),
+  mk_imsg( -723945,  -983225 ), mk_omsg( -723945 * -983225    ),
+  mk_imsg( -398472,  -9342    ), mk_omsg( -398472 * -9342      ),
+  mk_imsg( -29384,   -748923  ), mk_omsg( -29384 * -748923     ),
+]
+
+combined_zero_one_neg_msgs = [
   mk_imsg(  0,  3 ), mk_omsg(   0 ),
   mk_imsg(  4,  0 ), mk_omsg(   0 ),
   mk_imsg(  3, -4 ), mk_omsg( -12 ),
   mk_imsg( 2 , -13), mk_omsg(-26  ),
+  mk_imsg( -8, 3 ), mk_omsg(  -24 ),
   mk_imsg( -1,  3 ), mk_omsg( -3  ),
   mk_imsg(  1, -7 ), mk_omsg(  -7 ),
   mk_imsg(  1, 23 ), mk_omsg(   23),
@@ -87,13 +110,21 @@ large_pos_neg_msgs = [
 ]
 
 masked_low_bits_msgs = [
-    mk_imsg( 0xFFFFFFA3, 0x0000001C ), mk_omsg( 0xFFFFFFA3 * 0x0000001C ),
-    mk_imsg( 0x00000092, 0xF1234567 ), mk_omsg( 0x00000092 * 0xF1234567 ),
+    mk_imsg( 0xFFFFFFA3 & 0xFFFFFF00, 0x0000001C ), 
+    mk_omsg( (0xFFFFFFA3 & 0xFFFFFF00) * 0x0000001C ),
+
+    mk_imsg( 0x00000092 & 0xFFFFFF00, 0xF1234567 ), 
+    mk_omsg( (0x00000092 & 0xFFFFFF00) * 0xF1234567 ),
 ]
+
 masked_high_bits_msgs = [
-    mk_imsg( 0x00123456, 0xF9876543 ), mk_omsg( 0x00123456 * 0xF9876543 ),
-    mk_imsg( 0xF2345678, 0x00123456 ), mk_omsg( 0xF2345678 * 0x00123456 ),
+    mk_imsg( 0x00123456 & 0x000000FF, 0xF9876543 ), 
+    mk_omsg( (0x00123456 & 0x000000FF) * 0xF9876543 ),
+
+    mk_imsg( 0xF2345678 & 0x000000FF, 0x00123456 ), 
+    mk_omsg( (0xF2345678 & 0x000000FF) * 0x00123456 ),
 ]
+
 sparse_number_msgs = [
     mk_imsg( 0b1000000000000100, 0b00000001 ), mk_omsg( 0b1000000000000100 * 0b00000001 ),
     mk_imsg( 0b1000000000010000, 0b00000010 ), mk_omsg( 0b1000000000010000 * 0b00000010 ),
@@ -125,7 +156,7 @@ for i in range(30):
 
 random_msgs = []
 for a, b, result in random_cases:
-  random_msgs.extend( [ concat(Bits32(a),Bits32(b)), Bits32(result) ] )
+  random_msgs.extend( [ mk_imsg(a,b), mk_omsg(result) ] )
 
 
 random_with_zeros_ones_cases = []
@@ -182,7 +213,10 @@ for i in range(5):
 
 random_with_zeros_ones_msgs = []
 for a, b, result in random_with_zeros_ones_cases:
-  random_with_zeros_ones_msgs.extend( [ concat(Bits32(a),Bits32(b)), Bits32(result) ] )
+  random_with_zeros_ones_msgs.extend( [ mk_imsg(a,b), mk_omsg(result) ] )
+
+overflow_msgs =  [
+   mk_imsg(  0x80000001,  2 ), mk_omsg(   0x80000001*2 )   ] 
 
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional lists of input/output messages to create
@@ -195,15 +229,19 @@ for a, b, result in random_with_zeros_ones_cases:
 
 test_case_table = mk_test_case_table([
   (                      "msgs                            src_delay sink_delay"),
-  [ "small_pos_pos",          small_pos_pos_msgs,           2,        0          ],
-  [ "combine_zero_one_neg",   combine_zero_one_neg_msgs,    0,        0          ],
-  [ "large_pos_neg",          large_pos_neg_msgs,           4,        0          ],
-  [ "masked_low_bits",        masked_low_bits_msgs,         0,        0          ],
-  [ "masked_high_bits",       masked_high_bits_msgs,        5,        3          ],
-  [ "sparse_number",          sparse_number_msgs,           0,        0          ],
-  [ "dense_number",           dense_number_msgs,            0,        3          ],
-  [ "random",                 random_msgs,                  3,        4          ],
+  [ "small_pos_pos",          small_pos_pos_msgs,             2,        0          ],
+  [ "small_neg_neg",          small_neg_neg_msgs,             0,        0          ],
+  [ "large_pos_pos",          large_pos_pos_msgs,             0,        0          ],
+  [ "large_neg_neg",          large_neg_neg_msgs,             0,        0          ],
+  [ "combine_zero_one_neg",   combined_zero_one_neg_msgs,     0,        0          ],
+  [ "large_pos_neg",          large_pos_neg_msgs,             4,        0          ],
+  [ "masked_low_bits",        masked_low_bits_msgs,           0,        0          ],
+  [ "masked_high_bits",       masked_high_bits_msgs,          5,        3          ],
+  [ "sparse_number",          sparse_number_msgs,             0,        0          ],
+  [ "dense_number",           dense_number_msgs,              0,        3          ],
+  [ "random",                 random_msgs,                    3,        4          ],
   [ "random_masked_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
+  [ "overflow",               overflow_msgs,                  0,        0          ],
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
