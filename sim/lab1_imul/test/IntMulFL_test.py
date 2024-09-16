@@ -65,11 +65,34 @@ small_pos_pos_msgs = [
   mk_imsg(  8,  7 ), mk_omsg(  56 ),
 ]
 
-combine_zero_one_neg_msgs = [
+small_neg_neg_msgs = [
+  mk_imsg( -2, -3 ), mk_omsg(   6 ),
+  mk_imsg( -4, -5 ), mk_omsg(  20 ),
+  mk_imsg( -3, -4 ), mk_omsg(  12 ),
+  mk_imsg(-10,-13 ), mk_omsg( 130 ),
+  mk_imsg( -8, -7 ), mk_omsg(  56 ),
+]
+
+large_pos_pos_msgs = [
+  mk_imsg( 23498934, 498230 ), mk_omsg( 23498934 * 498230 ),
+  mk_imsg( 723945,  9812345 ), mk_omsg( 723945 * 9812345  ),
+  mk_imsg( 398472,  9342    ), mk_omsg( 398472 * 9342     ),
+  mk_imsg( 29384,   748923  ), mk_omsg( 29384 * 748923    ),
+]
+
+large_neg_neg_msgs = [
+  mk_imsg( -23493934, -498230 ), mk_omsg( -23493934 * -498230 ),
+  mk_imsg( -723945,  -983225 ), mk_omsg( -723945 * -983225    ),
+  mk_imsg( -398472,  -9342    ), mk_omsg( -398472 * -9342      ),
+  mk_imsg( -29384,   -748923  ), mk_omsg( -29384 * -748923     ),
+]
+
+combined_zero_one_neg_msgs = [
   mk_imsg(  0,  3 ), mk_omsg(   0 ),
   mk_imsg(  4,  0 ), mk_omsg(   0 ),
   mk_imsg(  3, -4 ), mk_omsg( -12 ),
   mk_imsg( 2 , -13), mk_omsg(-26  ),
+  mk_imsg( -8, 3 ), mk_omsg(  -24 ),
   mk_imsg( -1,  3 ), mk_omsg( -3  ),
   mk_imsg(  1, -7 ), mk_omsg(  -7 ),
   mk_imsg(  1, 23 ), mk_omsg(   23),
@@ -192,7 +215,8 @@ random_with_zeros_ones_msgs = []
 for a, b, result in random_with_zeros_ones_cases:
   random_with_zeros_ones_msgs.extend( [ mk_imsg(a,b), mk_omsg(result) ] )
 
-overflow_msgs =  [mk_imsg(  0x80000001,  2 ), mk_omsg(   0x80000001*2 )] 
+overflow_msgs =  [
+   mk_imsg(  0x80000001,  2 ), mk_omsg(   0x80000001*2 )   ] 
 
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional lists of input/output messages to create
@@ -206,7 +230,10 @@ overflow_msgs =  [mk_imsg(  0x80000001,  2 ), mk_omsg(   0x80000001*2 )]
 test_case_table = mk_test_case_table([
   (                      "msgs                            src_delay sink_delay"),
   [ "small_pos_pos",          small_pos_pos_msgs,             2,        0          ],
-  [ "combine_zero_one_neg",   combine_zero_one_neg_msgs,      0,        0          ],
+  [ "small_neg_neg",          small_neg_neg_msgs,             0,        0          ],
+  [ "large_pos_pos",          large_pos_pos_msgs,             0,        0          ],
+  [ "large_neg_neg",          large_neg_neg_msgs,             0,        0          ],
+  [ "combine_zero_one_neg",   combined_zero_one_neg_msgs,     0,        0          ],
   [ "large_pos_neg",          large_pos_neg_msgs,             4,        0          ],
   [ "masked_low_bits",        masked_low_bits_msgs,           0,        0          ],
   [ "masked_high_bits",       masked_high_bits_msgs,          5,        3          ],
