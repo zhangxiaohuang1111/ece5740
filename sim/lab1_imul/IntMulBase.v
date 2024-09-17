@@ -12,9 +12,6 @@
 `include "vc/regs.v"
 
 
-// ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// Define datapath and control unit here.
-// '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 //datapath
 module lab1_imul_IntMulBaseDpath
@@ -23,12 +20,10 @@ module lab1_imul_IntMulBaseDpath
   input  logic        reset,
 
   // Data signals
-
   input  logic [63:0] istream_msg,
   output logic [31:0] ostream_msg,
 
   // Control signals
-
   input  logic        a_reg_en,   // Enable for A register
   input  logic        b_reg_en,   // Enable for B register
   input  logic        result_reg_en,  // Enable for result register
@@ -41,13 +36,11 @@ module lab1_imul_IntMulBaseDpath
   // Status signals
   output logic       is_b0_one,  // Output of one comparator
   output logic       is_counter_max // Output of counter comparator
-
 );
 
  localparam c_nbits = 32;
 
 // Split out the a and b operands
-
   logic [c_nbits-1:0] istream_msg_a;
   assign istream_msg_a = istream_msg[63:32];
 
@@ -55,7 +48,6 @@ module lab1_imul_IntMulBaseDpath
   assign istream_msg_b = istream_msg[31:0];
 
 // A Mux
-
   logic [c_nbits-1:0] left_shift_out;
   logic [c_nbits-1:0] a_mux_out;
 
@@ -68,7 +60,6 @@ module lab1_imul_IntMulBaseDpath
   );
 
 // A register
-
   logic [c_nbits-1:0] a_reg_out;
 
   vc_EnReg#(c_nbits) a_reg
@@ -81,7 +72,6 @@ module lab1_imul_IntMulBaseDpath
   );
 
 // B Mux
-
   logic [c_nbits-1:0] b_mux_out;
   logic [c_nbits-1:0] right_shift_out;
 
@@ -94,7 +84,6 @@ module lab1_imul_IntMulBaseDpath
   );
 
 // B register
-
   logic [c_nbits-1:0] b_reg_out;
   vc_EnReg#(c_nbits) b_reg
   (
@@ -106,7 +95,6 @@ module lab1_imul_IntMulBaseDpath
   );
 
 // add Mux 
-
   logic [c_nbits-1:0] add_mux_out;
 
   vc_Mux2#(c_nbits) add_mux //0=adder, 1=result
@@ -128,7 +116,6 @@ module lab1_imul_IntMulBaseDpath
   );
 
 // result register
-
  logic [c_nbits-1:0] result_reg_out;
 
   vc_EnReg#(c_nbits) result_reg
@@ -157,7 +144,6 @@ module lab1_imul_IntMulBaseDpath
   );
 
 //simple adder
-
   logic [c_nbits-1:0] adder_out;
   vc_SimpleAdder#(c_nbits) adder
   (
@@ -183,7 +169,6 @@ module lab1_imul_IntMulBaseDpath
   );
 
 //comparators
-
   vc_EqComparator#(1) b0_one
   (
     .in0 (b_reg_out[0]),
@@ -191,12 +176,12 @@ module lab1_imul_IntMulBaseDpath
     .out (is_b0_one)
   );
 
-
 // Connect to output port
-
   assign ostream_msg = result_reg_out;
 
 endmodule
+
+
 
 //control unit
 module lab1_imul_IntMulBaseCtl
@@ -205,14 +190,12 @@ module lab1_imul_IntMulBaseCtl
   input  logic        reset,
 
   // Dataflow signals
-
   input  logic        istream_val,
   output logic        istream_rdy,
   output logic        ostream_val,
   input  logic        ostream_rdy,
 
   // Control signals
-
   output logic        a_reg_en,   // Enable for A register
   output logic        b_reg_en,   // Enable for B register
   output logic        result_reg_en,  // Enable for result register
@@ -223,7 +206,6 @@ module lab1_imul_IntMulBaseCtl
   output logic        counter_clear,  // Clear for counter
 
   // Data signals
-
   input  logic        is_b0_one,  // Output of one comparator
   input  logic        is_counter_max // Output of counter
 
@@ -253,9 +235,9 @@ module lab1_imul_IntMulBaseCtl
     end
   end
 
-//----------------------------------------------------------------------
-// State Transitions
-//----------------------------------------------------------------------
+  //----------------------------------------------------------------------
+  // State Transitions
+  //----------------------------------------------------------------------
   logic req_go;
   logic resp_go;
   logic is_calc_done;
@@ -278,6 +260,7 @@ module lab1_imul_IntMulBaseCtl
     endcase
 
   end
+
 //----------------------------------------------------------------------
 // State Outputs
 //----------------------------------------------------------------------
@@ -295,8 +278,8 @@ module lab1_imul_IntMulBaseCtl
   localparam result_add= 1'd1;
 
   localparam add_x        = 1'dx;
-  localparam add_mux      = 1'd0;//add mux out
-  localparam add_result   = 1'd1;//result reg out
+  localparam add_mux      = 1'd0; //add mux out
+  localparam add_result   = 1'd1; //result reg out
 
   function automatic void cs
   (
@@ -348,13 +331,9 @@ module lab1_imul_IntMulBaseCtl
     endcase
 
   end
-
-
 endmodule
 
-  // Data signals
 
-  // ''' LAB TASK
 
 //========================================================================
 // Integer Multiplier Fixed-Latency Implementation
@@ -374,17 +353,13 @@ module lab1_imul_IntMulBase
   output logic [31:0] ostream_msg
 );
 
-  // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Instantiate datapath and control models here and then connect them
-  // together.
-  // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   //----------------------------------------------------------------------
   // Connect Control Unit and Datapath
   //----------------------------------------------------------------------
-
-// Control signals
-
+  
+  // Control signals
+  
   logic        a_reg_en;
   logic        b_reg_en;
   logic        a_mux_sel;
@@ -393,29 +368,28 @@ module lab1_imul_IntMulBase
   logic        add_mux_sel;
   logic        counter_clear;
   logic        result_reg_en;
-
+  
   // Data signals
-
   logic        is_b0_one;
   logic        is_counter_max;
-
+  
   // Control unit
-
+  
   lab1_imul_IntMulBaseCtl ctrl
   (
     .*
   );
-
+  
   // Datapath
-
+  
   lab1_imul_IntMulBaseDpath dpath
   (
     .*
   );
-  
-//----------------------------------------------------------------------
-// Line Tracing
-//----------------------------------------------------------------------
+    
+  //----------------------------------------------------------------------
+  // Line Tracing
+  //----------------------------------------------------------------------
 
   `ifndef SYNTHESIS
 
@@ -480,4 +454,3 @@ module lab1_imul_IntMulBase
 endmodule
 
 `endif /* LAB1_IMUL_INT_MUL_BASE_V */
-
