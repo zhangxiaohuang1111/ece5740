@@ -5,7 +5,6 @@
 `ifndef LAB1_IMUL_INT_MUL_ALT_V
 `define LAB1_IMUL_INT_MUL_ALT_V
 
-
 `include "vc/muxes.v"
 `include "vc/arithmetic.v"
 `include "vc/counters.v"
@@ -49,39 +48,21 @@ module ModifiedShifter_b
       shift_num = 1;
     end
   end
-  // // More area option
-  // always_comb begin
-  //   if (in[0] == 0) begin  // shiftmode 1
-  //     casez (in[p_nbits-1:0])
-  //       
-  //       4'b???1: shift_count = 3;
-  //       4'b??10: shift_count = 2;
-  //       4'b?100: shift_count = 1;
-  //       4'b1000: shift_count = 0;
-  //       default: shift_count = 4; 
-  //     endcase
-  //     out = in >> shift_count;
-  //     shift = shift_count;
-  //   end else begin               // shiftmode 0
-  //     out = in >> 1;
-  //     shift = 1;
-  //   end
-  // end
 endmodule
 
 
 // Complex left shifter used on a that could shift multiple bits
-module ModifiedShifter_a
-#(
-  parameter p_nbits = 1
-)(
-  input  logic       [p_nbits-1:0] in,
-  input  logic       [$clog2(p_nbits+1)-1:0] shift_num,
-  output logic       [p_nbits-1:0] out
-);
+// module ModifiedShifter_a
+// #(
+//   parameter p_nbits = 1
+// )(
+//   input  logic       [p_nbits-1:0] in,
+//   input  logic       [$clog2(p_nbits+1)-1:0] shift_num,
+//   output logic       [p_nbits-1:0] out
+// );
 
-  assign out = ( in << shift_num );
-endmodule
+//   assign out = ( in << shift_num );
+// endmodule
 
 
 // Counter in the vc folder with modification of add more than 1
@@ -294,10 +275,10 @@ module lab1_imul_IntMulBaseDpath
 
 
   //a left shift
-  ModifiedShifter_a#(c_nbits) left_shifter
+  vc_LeftLogicalShifter#(c_nbits, $clog2(c_nbits+1)) left_shifter
   (
     .in    (a_reg_out),
-    .shift_num(shift_num),
+    .shamt(shift_num),
     .out   (left_shift_out)
   );
 
