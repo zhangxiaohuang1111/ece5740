@@ -15,48 +15,13 @@
 // Modified Unit Declearation
 //=========================================================================
 
-// // Complex right shifter used on b
-// module ModifiedShifter_b
-// #(
-//   parameter p_nbits = 1
-// )(
-//   input  logic       [p_nbits-1:0] in,
-//   input  logic       [$clog2(p_nbits+1)-1:0] max_shift,
-//   output logic       [p_nbits-1:0] out,
-//   output logic       [$clog2(p_nbits+1)-1:0] shift_num      // How many bits we shift
-// );
-//   logic [p_nbits-1:0] temp;
-//   logic [$clog2(p_nbits+1)-1:0] shift_count;
-
-//   integer i;
-//   always_comb begin
-//     temp = '0;
-//     shift_count = '0;
-    
-//     if (in[0] == 0) begin  // shiftmode 1
-//       temp = in;
-//       shift_count = 0;
-
-//       for (i = 0; (i < max_shift) && (temp[0] == 0); i = i + 1) begin
-//         temp = temp >> 1;
-//         shift_count = shift_count + 1;
-//       end
-//       out = temp;
-//       shift_num = shift_count;
-//     end else begin               // shiftmode 0
-//       out = in >> 1;
-//       shift_num = 1;
-//     end
-//   end
-// endmodule
-
 // Complex right shifter used on b
 module ModifiedShifter_b
 #(
   parameter p_nbits = 1
 )(
   input  logic       [p_nbits-1:0] in,
-  input  logic       [$clog2(p_nbits+1)-1:0] max_shift,
+  input  logic       [$clog2(p_nbits+1)-1:0] max_shift,     // Max shift number 
   output logic       [p_nbits-1:0] out,
   output logic       [$clog2(p_nbits+1)-1:0] shift_num      // How many bits we shift
 );
@@ -64,10 +29,10 @@ module ModifiedShifter_b
   logic [$clog2(p_nbits+1)-1:0] shift_count;  
 
   always_comb begin
-    temp = in;
-    shift_count = '0;
+    temp = in;          // temporary variable
+    shift_count = '0;   // shift number reset to 0
 
-    if (in[0] == 0) begin  // shiftmode 1
+    if (in[0] == 0) begin  // if last bit is 0 we only do shift
 
       if (temp[0] == 0 && shift_count < max_shift) begin // 1
         temp = temp >> 1;
@@ -92,10 +57,10 @@ module ModifiedShifter_b
                 if (temp[0] == 0 && shift_count < max_shift) begin // 6
                   temp = temp >> 1;
                   shift_count = shift_count + 1;
-                  if (temp[0] == 0 && shift_count < max_shift) begin // 6
+                  if (temp[0] == 0 && shift_count < max_shift) begin // 7
                     temp = temp >> 1;
                     shift_count = shift_count + 1;
-                    if (temp[0] == 0 && shift_count < max_shift) begin // 6
+                    if (temp[0] == 0 && shift_count < max_shift) begin // 8
                       temp = temp >> 1;
                       shift_count = shift_count + 1;
                     end
@@ -110,28 +75,13 @@ module ModifiedShifter_b
       out = temp;
       shift_num = shift_count;
       
-    end else begin  // shiftmode 0
+    end else begin  // if last bit is 1 we do shift and add
       out = in >> 1;
       shift_num = 1;
     end 
   end
-  
+
 endmodule
-
-
-// Complex left shifter used on a that could shift multiple bits
-// module ModifiedShifter_a
-// #(
-//   parameter p_nbits = 1
-// )(
-//   input  logic       [p_nbits-1:0] in,
-//   input  logic       [$clog2(p_nbits+1)-1:0] shift_num,
-//   output logic       [p_nbits-1:0] out
-// );
-
-//   assign out = ( in << shift_num );
-// endmodule
-
 
 // Counter in the vc folder with modification of add more than 1
 module ModifiedCounter
@@ -144,22 +94,18 @@ module ModifiedCounter
   input  logic                     reset,
 
   // Operations
-
   input  logic                     clear,
   input  logic                     increment,
   input  logic                     decrement,
 
   // Input
-
   input logic  [$clog2(p_count_nbits+1)-1:0] add_mul,
 
   // Outputs
-
   output logic [p_count_nbits-1:0] count,
   output logic                     count_is_zero,
   output logic                     count_is_max,
   output logic [p_count_nbits-1:0] max_shift
-
 );
 
   //----------------------------------------------------------------------
@@ -217,18 +163,18 @@ module lab1_imul_IntMulBaseDpath
   output logic [31:0] ostream_msg,
 
   // Control signals
-  input  logic        a_reg_en,   // Enable for A register
-  input  logic        b_reg_en,   // Enable for B register
+  input  logic        a_reg_en,       // Enable for A register
+  input  logic        b_reg_en,       // Enable for B register
   input  logic        result_reg_en,  // Enable for result register
-  input  logic        a_mux_sel,  // Sel for mux in front of A reg
-  input  logic        b_mux_sel,  // sel for mux in front of B reg
-  input  logic        result_mux_sel,  // sel for mux in front of result reg
-  input  logic        add_mux_sel,  // sel for mux in front of adder
+  input  logic        a_mux_sel,      // Sel for mux in front of A reg
+  input  logic        b_mux_sel,      // sel for mux in front of B reg
+  input  logic        result_mux_sel, // sel for mux in front of result reg
+  input  logic        add_mux_sel,    // sel for mux in front of adder
   input  logic        counter_clear,  // Clear for counter
 
   // Status signals
-  output logic       is_b0_one,  // Output of one comparator
-  output logic       is_counter_max // Output of counter comparator
+  output logic       is_b0_one,       // Output of one comparator
+  output logic       is_counter_max   // Output of counter comparator
 );
 
  localparam c_nbits = 32;
@@ -252,7 +198,7 @@ module lab1_imul_IntMulBaseDpath
     .in0   (istream_msg_a),
     .in1   (left_shift_out),
     .out   (a_mux_out)
-  ); // 0=id, 1=left shift
+  ); 
 
 
   // A register
@@ -428,7 +374,6 @@ module lab1_imul_IntMulBaseCtl
   //----------------------------------------------------------------------
   // State Definitions
   //----------------------------------------------------------------------
-  
   localparam STATE_IDLE = 2'd0;
   localparam STATE_CALC = 2'd1;
   localparam STATE_DONE = 2'd2;
@@ -436,7 +381,6 @@ module lab1_imul_IntMulBaseCtl
   //----------------------------------------------------------------------
   // State
   //----------------------------------------------------------------------
-  
   logic [1:0] state_reg;
   logic [1:0] state_next;
 
@@ -452,7 +396,6 @@ module lab1_imul_IntMulBaseCtl
   //----------------------------------------------------------------------
   // State Transitions
   //----------------------------------------------------------------------
-  
   logic req_go;
   logic resp_go;
   logic is_calc_done;
@@ -474,7 +417,6 @@ module lab1_imul_IntMulBaseCtl
 //----------------------------------------------------------------------
 // State Outputs
 //----------------------------------------------------------------------
-
   localparam a_x       = 1'dx;
   localparam a_ld      = 1'd0;
   localparam a_shift   = 1'd1;
@@ -517,8 +459,8 @@ module lab1_imul_IntMulBaseCtl
     counter_clear = cs_counter_clear;
   end
   endfunction
-  // Labels for Mealy transistions
 
+  // Labels for Mealy transistions
   logic do_add_shift;
   logic do_shift;
 
@@ -526,7 +468,6 @@ module lab1_imul_IntMulBaseCtl
   assign do_shift  = (~is_b0_one)&&!is_counter_max;
 
   // Set outputs using a control signal "table"
-
   always_comb begin
   //cs(is_istream_rdy, is_ostream_val, a_mux_sel, a_reg_en, b_mux_sel, b_reg_en, result_mux_sel, result_reg_en, add_mux_sel, counter_clear);
     cs( 0, 0, a_x, 0, b_x, 0,result_x, 0, add_x, 0);
@@ -539,7 +480,6 @@ module lab1_imul_IntMulBaseCtl
       default                         cs('x,  'x,   a_x,   'x, b_x,   'x, result_x,     'x, add_x,     'x);
 
     endcase
-
   end
 endmodule
 
@@ -562,16 +502,11 @@ module lab1_imul_IntMulAlt
   output logic [31:0] ostream_msg
 );
 
-  // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Instantiate datapath and control models here and then connect them
-  // together.
-  // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   //----------------------------------------------------------------------
   // Connect Control Unit and Datapath
   //----------------------------------------------------------------------
   
   // Control signals
-  
   logic        a_reg_en;
   logic        b_reg_en;
   logic        a_mux_sel;
@@ -586,14 +521,12 @@ module lab1_imul_IntMulAlt
   logic        is_counter_max;
   
   // Control unit
-  
   lab1_imul_IntMulBaseCtl ctrl
   (
     .*
   );
   
   // Datapath
-  
   lab1_imul_IntMulBaseDpath dpath
   (
     .*
