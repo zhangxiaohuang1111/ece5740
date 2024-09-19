@@ -73,6 +73,22 @@ small_neg_neg_msgs = [
   mk_imsg( -8, -7 ), mk_omsg(  56 ),
 ]
 
+small_pos_neg_msgs = [
+  mk_imsg(  2, -3 ), mk_omsg(  -6 ),
+  mk_imsg(  4, -5 ), mk_omsg( -20 ),
+  mk_imsg(  3, -4 ), mk_omsg( -12 ),
+  mk_imsg( 10,-13 ), mk_omsg(-130 ),
+  mk_imsg(  8, -7 ), mk_omsg( -56 ),
+]
+
+small_neg_pos_msgs = [
+  mk_imsg( -2,  3 ), mk_omsg(  -6 ),
+  mk_imsg( -4,  5 ), mk_omsg( -20 ),
+  mk_imsg( -3,  4 ), mk_omsg( -12 ),
+  mk_imsg(-10, 13 ), mk_omsg(-130 ),
+  mk_imsg( -8,  7 ), mk_omsg( -56 ),
+]
+
 large_pos_pos_msgs = [
   mk_imsg( 23498934, 498230 ), mk_omsg( 23498934 * 498230 ),
   mk_imsg( 723945,  9812345 ), mk_omsg( 723945 * 9812345  ),
@@ -105,8 +121,16 @@ large_pos_neg_msgs = [
     mk_imsg( 23498934, -498230 ), mk_omsg( 23498934 * -498230),
     mk_imsg( 723945, -9812345  ), mk_omsg( 723945 * -9812345 ),
     mk_imsg( 398472, -9342     ), mk_omsg( 398472 * -9342    ),
-    mk_imsg( -29384, 748923    ), mk_omsg( -29384 * 748923   ),
+    mk_imsg( 29384, 748923     ), mk_omsg( 29384 * 748923   ),
     mk_imsg( 92384, -2837      ), mk_omsg( 92384 * -2837     ),
+]
+
+large_neg_pos_msgs = [
+    mk_imsg( -23498934, 498230 ), mk_omsg( -23498934 * 498230),
+    mk_imsg( -723945,  9812345 ), mk_omsg( -723945 * 9812345 ),
+    mk_imsg( -398472,  9342    ), mk_omsg( -398472 * 9342    ),
+    mk_imsg( -29384,  748923   ), mk_omsg( -29384 * 748923   ),
+    mk_imsg( -92384,  2837     ), mk_omsg( -92384 * 2837     ),
 ]
 
 masked_low_bits_msgs = [
@@ -231,13 +255,16 @@ test_case_table = mk_test_case_table([
   (                      "msgs                            src_delay sink_delay"),
   [ "small_pos_pos",          small_pos_pos_msgs,             2,        0          ],
   [ "small_neg_neg",          small_neg_neg_msgs,             0,        0          ],
+  [ "small_pos_neg",          small_pos_neg_msgs,             0,        0          ],
+  [ "small_neg_pos",          small_neg_pos_msgs,             0,        0          ],
   [ "large_pos_pos",          large_pos_pos_msgs,             0,        0          ],
   [ "large_neg_neg",          large_neg_neg_msgs,             0,        0          ],
-  [ "combine_zero_one_neg",   combined_zero_one_neg_msgs,     0,        0          ],
-  [ "large_pos_neg",          large_pos_neg_msgs,             4,        0          ],
+  [ "large_pos_neg",          large_pos_neg_msgs,             0,        0          ],
+  [ "large_neg_pos",          large_neg_pos_msgs,             0,        0          ],
+  [ "combine_zero_one_neg",   combined_zero_one_neg_msgs,     0,        3          ],
   [ "masked_low_bits",        masked_low_bits_msgs,           0,        0          ],
   [ "masked_high_bits",       masked_high_bits_msgs,          5,        3          ],
-  [ "sparse_number",          sparse_number_msgs,             0,        0          ],
+  [ "sparse_number",          sparse_number_msgs,             4,        0          ],
   [ "dense_number",           dense_number_msgs,              0,        3          ],
   [ "random",                 random_msgs,                    3,        4          ],
   [ "random_masked_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
