@@ -634,25 +634,6 @@ module lab1_imul_IntMulBaseCtl
 endmodule
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //=========================================================================
 // Integer Multiplier Variable-Latency Implementation
 //=========================================================================
@@ -707,6 +688,7 @@ module lab1_imul_IntMulAlt
   (
     .*
   );
+ 
   //----------------------------------------------------------------------
   // Line Tracing
   //----------------------------------------------------------------------
@@ -717,7 +699,7 @@ module lab1_imul_IntMulAlt
   `VC_TRACE_BEGIN
   begin
 
-    $sformat( str, "%x", istream_msg );
+    $sformat( str, "%x:%x", istream_msg[63:32], istream_msg[31:0] );
     vc_trace.append_val_rdy_str( trace_str, istream_val, istream_rdy, str );
 
     vc_trace.append_str( trace_str, "(" );
@@ -726,6 +708,40 @@ module lab1_imul_IntMulAlt
     // Add additional line tracing using the helper tasks for
     // internal state including the current FSM state.
     // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    $sformat( str, "%x", dpath.a_reg_out );
+    vc_trace.append_str( trace_str, str );
+    vc_trace.append_str( trace_str, " " );
+
+    $sformat( str, "%x", dpath.b_reg_out );
+    vc_trace.append_str( trace_str, str );
+    vc_trace.append_str( trace_str, " " );
+
+    $sformat( str, "%x", dpath.result_reg_out );
+    vc_trace.append_str( trace_str, str );
+    vc_trace.append_str( trace_str, " " );
+
+    case ( ctrl.state_reg )
+
+      ctrl.STATE_IDLE:
+        vc_trace.append_str( trace_str, "I " );
+
+      ctrl.STATE_CALC:
+      begin
+        if ( ctrl.do_add_shift )
+          vc_trace.append_str( trace_str, "add-shift" );
+        else if ( ctrl.do_shift )
+          vc_trace.append_str( trace_str, "shift" );
+        else
+          vc_trace.append_str( trace_str, "C" );
+      end
+
+      ctrl.STATE_DONE:
+        vc_trace.append_str( trace_str, "D " );
+
+      default:
+        vc_trace.append_str( trace_str, "? " );
+
+    endcase
 
     vc_trace.append_str( trace_str, ")" );
 
@@ -736,7 +752,6 @@ module lab1_imul_IntMulAlt
   `VC_TRACE_END
 
   `endif /* SYNTHESIS */
-
 endmodule
 
 `endif /* LAB1_IMUL_INT_MUL_ALT_V */
