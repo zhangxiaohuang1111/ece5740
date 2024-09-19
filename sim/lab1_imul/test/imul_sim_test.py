@@ -9,8 +9,8 @@ import os
 from subprocess import check_call, CalledProcessError
 from itertools  import product
 
-impls  = [ "fl" ]
-inputs = [ "small" ]
+impls  = [ "fl" ,"base", "alt" ]
+inputs = [ "small","random" ]
 
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Once you get your baseline and alternative design passing all of your
