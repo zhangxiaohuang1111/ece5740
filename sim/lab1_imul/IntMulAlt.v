@@ -64,49 +64,147 @@ module ModifiedShifter_b
   logic [$clog2(p_nbits+1)-1:0] shift_count;
 
   always_comb begin
-    temp = in;
-    shift_count = 0;
+    shift_num = 0;
+    
+    // // Code store for another design strategy
+    // if (in[0] == 0) begin  // shiftmode 1
 
-    if (in[0] == 0) begin  // shiftmode 1
+    //   if (temp[0] == 0 && shift_count < max_shift) begin // 1
+    //     temp = temp >> 1;
+    //     shift_count = shift_count + 1;
 
-      if (temp[0] == 0 && shift_count < max_shift) begin // 1
-        temp = temp >> 1;
-        shift_count = shift_count + 1;
+    //     if (temp[0] == 0 && shift_count < max_shift) begin // 2
+    //       temp = temp >> 1;
+    //       shift_count = shift_count + 1;
 
-        if (temp[0] == 0 && shift_count < max_shift) begin // 2
-          temp = temp >> 1;
-          shift_count = shift_count + 1;
+    //       if (temp[0] == 0 && shift_count < max_shift) begin // 3
+    //         temp = temp >> 1;
+    //         shift_count = shift_count + 1;
 
-          if (temp[0] == 0 && shift_count < max_shift) begin // 3
-            temp = temp >> 1;
-            shift_count = shift_count + 1;
+    //         if (temp[0] == 0 && shift_count < max_shift) begin // 4
+    //           temp = temp >> 1;
+    //           shift_count = shift_count + 1;
 
-            if (temp[0] == 0 && shift_count < max_shift) begin // 4
-              temp = temp >> 1;
-              shift_count = shift_count + 1;
+    //           if (temp[0] == 0 && shift_count < max_shift) begin // 5
+    //             temp = temp >> 1;
+    //             shift_count = shift_count + 1;
 
-              if (temp[0] == 0 && shift_count < max_shift) begin // 5
-                temp = temp >> 1;
-                shift_count = shift_count + 1;
+    //             if (temp[0] == 0 && shift_count < max_shift) begin // 6
+    //               temp = temp >> 1;
+    //               shift_count = shift_count + 1;
 
-                if (temp[0] == 0 && shift_count < max_shift) begin // 6
-                  temp = temp >> 1;
-                  shift_count = shift_count + 1;
+    //             end
+    //           end
+    //         end
+    //       end
+    //     end
+    //   end
 
-                end
-              end
-            end
-          end
-        end
-      end
-
-      out = temp;
-      shift_num = shift_count;
+    //   out = temp;
+    //   shift_num = shift_count;
       
-    end else begin  // shiftmode 0
+    // end else begin  // shiftmode 0
+    //   out = in >> 1;
+    //   shift_num = 1;
+    // end 
+    
+    if (in == 32'h80000000 && shift_count < max_shift) begin
+      out = in >> 31;
+      shift_num = 31;
+    end else if (in == 32'h40000000 && shift_count < max_shift) begin
+      out = in >> 30;
+      shift_num = 30;
+    end else if (in == 32'h20000000 && shift_count < max_shift) begin 
+      out = in >> 29;
+      shift_num = 29;
+    end else if (in == 32'h10000000 && shift_count < max_shift) begin 
+      out = in >> 28;
+      shift_num = 28;
+    end else if (in == 32'h08000000 && shift_count < max_shift) begin 
+      out = in >> 27;
+      shift_num = 27;
+    end else if (in == 32'h04000000 && shift_count < max_shift) begin 
+      out = in >> 26;
+      shift_num = 26;
+    end else if (in == 32'h02000000 && shift_count < max_shift) begin 
+      out = in >> 25;
+      shift_num = 25;
+    end else if (in == 32'h01000000 && shift_count < max_shift) begin 
+      out = in >> 24;
+      shift_num = 24;
+    end else if (in == 32'h00800000 && shift_count < max_shift) begin 
+      out = in >> 23;
+      shift_num = 23;
+    end else if (in == 32'h00400000 && shift_count < max_shift) begin 
+      out = in >> 22;
+      shift_num = 22;
+    end else if (in == 32'h00200000 && shift_count < max_shift) begin 
+      out = in >> 21;
+      shift_num = 21;
+    end else if (in == 32'h00100000 && shift_count < max_shift) begin 
+      out = in >> 20;
+      shift_num = 20;
+    end else if (in == 32'h00080000 && shift_count < max_shift) begin 
+      out = in >> 19;
+      shift_num = 19;
+    end else if (in == 32'h00040000 && shift_count < max_shift) begin 
+      out = in >> 18;
+      shift_num = 18;
+    end else if (in == 32'h00020000 && shift_count < max_shift) begin 
+      out = in >> 17;
+      shift_num = 17;
+    end else if (in == 32'h00010000 && shift_count < max_shift) begin 
+      out = in >> 16;
+      shift_num = 16;
+    end else if (in == 32'h00008000 && shift_count < max_shift) begin 
+      out = in >> 15;
+      shift_num = 15;
+    end else if (in == 32'h00004000 && shift_count < max_shift) begin 
+      out = in >> 14;
+      shift_num = 14;
+    end else if (in == 32'h00002000 && shift_count < max_shift) begin 
+      out = in >> 13;
+      shift_num = 13;
+    end else if (in == 32'h00001000 && shift_count < max_shift) begin 
+      out = in >> 12;
+      shift_num = 12;
+    end else if (in == 32'h00000800 && shift_count < max_shift) begin 
+      out = in >> 11;
+      shift_num = 11;
+    end else if (in == 32'h00000400 && shift_count < max_shift) begin 
+      out = in >> 10;
+      shift_num = 10;
+    end else if (in == 32'h00000200 && shift_count < max_shift) begin 
+      out = in >> 9;
+      shift_num = 9;
+    end else if (in == 32'h00000100 && shift_count < max_shift) begin 
+      out = in >> 8;
+      shift_num = 8;
+    end else if (in == 32'h00000080 && shift_count < max_shift) begin 
+      out = in >> 7;
+      shift_num = 7;
+    end else if (in == 32'h00000040 && shift_count < max_shift) begin 
+      out = in >> 6;
+      shift_num = 6;
+    end else if (in == 32'h00000020 && shift_count < max_shift) begin 
+      out = in >> 5;
+      shift_num = 5;
+    end else if (in == 32'h00000010 && shift_count < max_shift) begin 
+      out = in >> 4;
+      shift_num = 4;
+    end else if (in == 32'h00000008 && shift_count < max_shift) begin 
+      out = in >> 3;
+      shift_num = 3;
+    end else if (in == 32'h00000004 && shift_count < max_shift) begin 
+      out = in >> 2;
+      shift_num = 2;
+    end else if (in == 32'h00000002 && shift_count < max_shift) begin 
       out = in >> 1;
       shift_num = 1;
-    end 
+    end else begin
+      out = in >> 1; // Only shift
+      shift_num = 1;
+    end
   end
 endmodule
 
