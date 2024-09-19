@@ -15,6 +15,41 @@
 // Modified Unit Declearation
 //=========================================================================
 
+// // Complex right shifter used on b
+// module ModifiedShifter_b
+// #(
+//   parameter p_nbits = 1
+// )(
+//   input  logic       [p_nbits-1:0] in,
+//   input  logic       [$clog2(p_nbits+1)-1:0] max_shift,
+//   output logic       [p_nbits-1:0] out,
+//   output logic       [$clog2(p_nbits+1)-1:0] shift_num      // How many bits we shift
+// );
+//   logic [p_nbits-1:0] temp;
+//   logic [$clog2(p_nbits+1)-1:0] shift_count;
+
+//   integer i;
+//   always_comb begin
+//     temp = '0;
+//     shift_count = '0;
+    
+//     if (in[0] == 0) begin  // shiftmode 1
+//       temp = in;
+//       shift_count = 0;
+
+//       for (i = 0; (i < max_shift) && (temp[0] == 0); i = i + 1) begin
+//         temp = temp >> 1;
+//         shift_count = shift_count + 1;
+//       end
+//       out = temp;
+//       shift_num = shift_count;
+//     end else begin               // shiftmode 0
+//       out = in >> 1;
+//       shift_num = 1;
+//     end
+//   end
+// endmodule
+
 // Complex right shifter used on b
 module ModifiedShifter_b
 #(
@@ -28,25 +63,50 @@ module ModifiedShifter_b
   logic [p_nbits-1:0] temp;
   logic [$clog2(p_nbits+1)-1:0] shift_count;
 
-  integer i;
   always_comb begin
-    temp = '0;
-    shift_count = '0;
-    
-    if (in[0] == 0) begin  // shiftmode 1
-      temp = in;
-      shift_count = 0;
+    temp = in;
+    shift_count = 0;
 
-      for (i = 0; (i < max_shift) && (temp[0] == 0); i = i + 1) begin
+    if (in[0] == 0) begin  // shiftmode 1
+
+      if (temp[0] == 0 && shift_count < max_shift) begin // 1
         temp = temp >> 1;
         shift_count = shift_count + 1;
+
+        if (temp[0] == 0 && shift_count < max_shift) begin // 2
+          temp = temp >> 1;
+          shift_count = shift_count + 1;
+
+          if (temp[0] == 0 && shift_count < max_shift) begin // 3
+            temp = temp >> 1;
+            shift_count = shift_count + 1;
+
+            if (temp[0] == 0 && shift_count < max_shift) begin // 4
+              temp = temp >> 1;
+              shift_count = shift_count + 1;
+
+              if (temp[0] == 0 && shift_count < max_shift) begin // 5
+                temp = temp >> 1;
+                shift_count = shift_count + 1;
+
+                if (temp[0] == 0 && shift_count < max_shift) begin // 6
+                  temp = temp >> 1;
+                  shift_count = shift_count + 1;
+
+                end
+              end
+            end
+          end
+        end
       end
+
       out = temp;
       shift_num = shift_count;
-    end else begin               // shiftmode 0
+      
+    end else begin  // shiftmode 0
       out = in >> 1;
       shift_num = 1;
-    end
+    end 
   end
 endmodule
 
