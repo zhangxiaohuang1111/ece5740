@@ -68,6 +68,18 @@ for i in range(50):
   b = randint(0,100)
   random_small_msgs.extend([ mk_imsg( a, b ), mk_omsg( a * b ) ])
 
+random_large_msgs = []
+max_32_bit_value = 2**32 - 1
+
+for i in range(50):  # Adjust this for more or fewer messages
+    # Generate large numbers close to or greater than 2^16, as their product can easily exceed 32 bits
+    a = random.randint(2**16, max_32_bit_value)
+    b = random.randint(2**16, max_32_bit_value)
+    
+    # Multiply the two numbers; this will exceed 32-bit range for large inputs
+
+    random_large_msgs.extend([mk_imsg(a, b), mk_omsg(a * b)]) 
+
 all_neg_msgs = []
 for i in range(50):
   a = randint(-100,-1)
@@ -82,12 +94,12 @@ for i in range(50):
   if sign_a == 0:
       a = 0
   else:
-      a = sign_a * random.randint(1, 0xffff)  
+      a = sign_a * random.randint(1, 0xffffffff)  
 
   if sign_b == 0:
       b = 0
   else:
-      b = sign_b * random.randint(1, 0xffff)
+      b = sign_b * random.randint(1, 0xffffffff)
   c = a * b
   
   random_cases.append( ( a, b, c ) )
@@ -190,7 +202,7 @@ def parse_cmdline():
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   p.add_argument( "--input", default="small",
-    choices=["small", "random", "random_with_zeros_ones", "all_neg"] )
+    choices=["small", "random", "random_with_zeros_ones", "all_neg", "large"] )
 
   p.add_argument( "--trace",     action="store_true" )
   p.add_argument( "--stats",     action="store_true" )
@@ -225,6 +237,8 @@ def main():
     inputs = random_with_zeros_ones_msgs
   elif opts.input == "all_neg":
     inputs = all_neg_msgs
+  elif opts.input == "large":
+    inputs = random_large_msgs
 
   ninputs = len(inputs[::2])
 
