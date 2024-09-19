@@ -242,6 +242,15 @@ for a, b, result in random_with_zeros_ones_cases:
 overflow_msgs =  [
    mk_imsg(  0x80000001,  2 ), mk_omsg(   0x80000001*2 )   ] 
 
+corner_cases_msgs = [
+  mk_imsg(  0x80000000,  0 ), mk_omsg(   0x80000000*0 )   ,
+  mk_imsg(  0x80000000,  0x80000000 ), mk_omsg(   0x80000000*0x80000000 )   ,
+  mk_imsg(  0x80000000,  0x7fffffff ), mk_omsg(   0x80000000*0x7fffffff )   ,
+  mk_imsg(  0xffffffff,  1 ), mk_omsg(   0xffffffff*1 )  , 
+  mk_imsg(  0, 0           ), mk_omsg(   0            )   ,
+  mk_imsg(  0x0000ffff,  0xffff0000 ), mk_omsg(   0x0000ffff* 0xffff0000),
+  mk_imsg(  0xffffffff,  0xffffffff ), mk_omsg(   0xffffffff*0xffffffff )]
+
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional lists of input/output messages to create
 # additional directed and random test cases.
@@ -269,6 +278,7 @@ test_case_table = mk_test_case_table([
   [ "random",                 random_msgs,                    3,        4          ],
   [ "random_masked_zeros_ones", random_with_zeros_ones_msgs,  2,        3          ],
   [ "overflow",               overflow_msgs,                  0,        0          ],
+  [ "corner_cases",           corner_cases_msgs,              0,        0          ],
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
