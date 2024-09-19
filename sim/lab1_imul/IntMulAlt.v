@@ -31,12 +31,8 @@ module ModifiedShifter_b
     shift_count = '0;   // shift number reset to 0
 
     if (in[0] == 0) begin  // if last bit is 0 we only do shift
-
-      // if (temp[0] == 0 && shift_count < max_shift) begin // 1
-      //   temp = temp >> 1;
-      //   shift_count = shift_count + 1;
         
-      casez (in)
+      casez (in) // We use casez here to extend the circuits using hardwire compare each bit
         32'b00000000000000000000000000000000: begin
           temp = in >> 0;    // This is zero we don't need actually shift
           shift_count = 32;  // Tell counter we finish
@@ -227,20 +223,20 @@ module ModifiedShifter_b
             shift_count = 1;
           end
         end
-        default: begin // Default do nothing
+        default: begin // Default do nothing but still put it here
           temp = in;  
           shift_count = 0;  
         end
       endcase
 
-      if (shift_count > max_shift) begin
+      if (shift_count > max_shift) begin  // Prevent shift exceed 32 bits which wasting time
         out = in >> max_shift;
         shift_num = max_shift;
       end else begin
         out = temp;
         shift_num = shift_count;
       end
-    end else begin  // Only do shift
+    end else begin  // Last bit of in is 1 so we do add shift
       out = in >> 1;
       shift_num = 1;
     end
@@ -442,7 +438,7 @@ module lab1_imul_IntMulBaseDpath
   logic [$clog2(c_nbits+1)-1:0] max_shift;
 
 
-  //b right shift
+  //b right shift 32bits
   ModifiedShifter_b right_shifter
   (
     .in    (b_reg_out),
@@ -521,18 +517,18 @@ module lab1_imul_IntMulBaseCtl
   input  logic        ostream_rdy,
 
   // Control signals
-  output logic        a_reg_en,   // Enable for A register
-  output logic        b_reg_en,   // Enable for B register
-  output logic        result_reg_en,  // Enable for result register
-  output logic        a_mux_sel,  // Sel for mux in front of A reg
-  output logic        b_mux_sel,  // sel for mux in front of B reg
-  output logic        result_mux_sel,  // sel for mux in front of result reg
-  output logic        add_mux_sel,  // sel for mux in front of adder
-  output logic        counter_clear,  // Clear for counter
+  output logic        a_reg_en,         // Enable for A register
+  output logic        b_reg_en,         // Enable for B register
+  output logic        result_reg_en,    // Enable for result register
+  output logic        a_mux_sel,        // Sel for mux in front of A reg
+  output logic        b_mux_sel,        // sel for mux in front of B reg
+  output logic        result_mux_sel,   // sel for mux in front of result reg
+  output logic        add_mux_sel,      // sel for mux in front of adder
+  output logic        counter_clear,    // Clear for counter
 
   // Data signals
-  input  logic        is_b0_one,  // Output of one comparator
-  input  logic        is_counter_max // Output of counter
+  input  logic        is_b0_one,        // Output of one comparator
+  input  logic        is_counter_max    // Output of counter
 );
 
   //----------------------------------------------------------------------
@@ -594,8 +590,8 @@ module lab1_imul_IntMulBaseCtl
   localparam result_add= 1'd1;
 
   localparam add_x        = 1'dx;
-  localparam add_mux      = 1'd0; //add mux out
-  localparam add_result   = 1'd1; //result reg out
+  localparam add_mux      = 1'd0;  //add mux out
+  localparam add_result   = 1'd1;  //result reg out
 
   function automatic void cs
   (
