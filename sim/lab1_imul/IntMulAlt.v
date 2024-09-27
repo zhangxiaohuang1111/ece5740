@@ -38,190 +38,128 @@ module ModifiedShifter_b
           shift_count = 32;  // Tell counter we finish
         end
         32'b10000000000000000000000000000000: begin
-          if (max_shift >= 31) begin
-            temp = in >> 31;
-            shift_count = 31;
-          end
+          temp = in >> 31;
+          shift_count = 31;
         end
         32'b?1000000000000000000000000000000: begin
-          if (max_shift >= 30) begin
-            temp = in >> 30;
-            shift_count = 30;
-          end
+          temp = in >> 30;
+          shift_count = 30;
         end
         32'b??100000000000000000000000000000: begin
-          if (max_shift >= 29) begin
-            temp = in >> 29;
-            shift_count = 29;
-          end
+          temp = in >> 29;
+          shift_count = 29;
         end
         32'b???10000000000000000000000000000: begin
-          if (max_shift >= 28) begin
-            temp = in >> 28;
-            shift_count = 28;
-          end
+          temp = in >> 28;
+          shift_count = 28;
         end
         32'b????1000000000000000000000000000: begin
-          if (max_shift >= 27) begin
-            temp = in >> 27;
-            shift_count = 27;
-          end
+          temp = in >> 27;
+          shift_count = 27;
         end
         32'b?????100000000000000000000000000: begin
-          if (max_shift >= 26) begin
-            temp = in >> 26;
-            shift_count = 26;
-          end
+          temp = in >> 26;
+          shift_count = 26;
         end
         32'b??????10000000000000000000000000: begin
-          if (max_shift >= 25) begin
-            temp = in >> 25;
-            shift_count = 25;
-          end
+          temp = in >> 25;
+          shift_count = 25;
         end
         32'b???????1000000000000000000000000: begin
-          if (max_shift >= 24) begin
-            temp = in >> 24;
-            shift_count = 24;
-          end
+          temp = in >> 24;
+          shift_count = 24;
         end
         32'b????????100000000000000000000000: begin
-          if (max_shift >= 23) begin
-            temp = in >> 23;
-            shift_count = 23;
-          end
+          temp = in >> 23;
+          shift_count = 23;
         end
         32'b?????????10000000000000000000000: begin
-          if (max_shift >= 22) begin
-            temp = in >> 22;
-            shift_count = 22;
-          end
+          temp = in >> 22;
+          shift_count = 22;
         end
         32'b??????????1000000000000000000000: begin
-          if (max_shift >= 21) begin
-            temp = in >> 21;
-            shift_count = 21;
-          end
+          temp = in >> 21;
+          shift_count = 21;
         end
         32'b???????????100000000000000000000: begin
-          if (max_shift >= 20) begin
-            temp = in >> 20;
-            shift_count = 20;
-          end
+          temp = in >> 20;
+          shift_count = 20;
         end
         32'b????????????10000000000000000000: begin
-          if (max_shift >= 19) begin
-            temp = in >> 19;
-            shift_count = 19;
-          end
+          temp = in >> 19;
+          shift_count = 19;
         end
         32'b?????????????1000000000000000000: begin
-          if (max_shift >= 18) begin
-            temp = in >> 18;
-            shift_count = 18;
-          end
+          temp = in >> 18;
+          shift_count = 18;
         end
         32'b??????????????100000000000000000: begin
-          if (max_shift >= 17) begin
-            temp = in >> 17;
-            shift_count = 17;
-          end
+          temp = in >> 17;
+          shift_count = 17;
         end
         32'b???????????????10000000000000000: begin
-          if (max_shift >= 16) begin
-            temp = in >> 16;
-            shift_count = 16;
-          end
+          temp = in >> 16;
+          shift_count = 16;
         end
         32'b????????????????1000000000000000: begin
-          if (max_shift >= 15) begin
-            temp = in >> 15;
-            shift_count = 15;
-          end
+          temp = in >> 15;
+          shift_count = 15;
         end
         32'b?????????????????100000000000000: begin
-          if (max_shift >= 14) begin
-            temp = in >> 14;
-            shift_count = 14;
-          end
+          temp = in >> 14;
+          shift_count = 14;
         end
         32'b??????????????????10000000000000: begin
-          if (max_shift >= 13) begin
-            temp = in >> 13;
-            shift_count = 13;
-          end
+          temp = in >> 13;
+          shift_count = 13;
         end
         32'b???????????????????1000000000000: begin
-          if (max_shift >= 12) begin
-            temp = in >> 12;
-            shift_count = 12;
-          end
+          temp = in >> 12;
+          shift_count = 12;
         end
         32'b????????????????????100000000000: begin
-          if (max_shift >= 11) begin
-            temp = in >> 11;
-            shift_count = 11;
-          end
+          temp = in >> 11;
+          shift_count = 11;
         end
         32'b?????????????????????10000000000: begin
-          if (max_shift >= 10) begin
-            temp = in >> 10;
-            shift_count = 10;
-          end
+          temp = in >> 10;
+          shift_count = 10;
         end
         32'b??????????????????????1000000000: begin
-          if (max_shift >= 9) begin
-            temp = in >> 9;
-            shift_count = 9;
-          end
+          temp = in >> 9;
+          shift_count = 9;
         end
         32'b???????????????????????100000000: begin
-          if (max_shift >= 8) begin
-            temp = in >> 8;
-            shift_count = 8;
-          end
+          temp = in >> 8;
+          shift_count = 8;
         end
         32'b????????????????????????10000000: begin
-          if (max_shift >= 7) begin
-            temp = in >> 7;
-            shift_count = 7;
-          end
+          temp = in >> 7;
+          shift_count = 7;
         end
         32'b?????????????????????????1000000: begin
-          if (max_shift >= 6) begin
-            temp = in >> 6;
-            shift_count = 6;
-          end
+          temp = in >> 6;
+          shift_count = 6;
         end
         32'b??????????????????????????100000: begin
-          if (max_shift >= 5) begin
-            temp = in >> 5;
-            shift_count = 5;
-          end
+          temp = in >> 5;
+          shift_count = 5;
         end
         32'b???????????????????????????10000: begin
-          if (max_shift >= 4) begin
-            temp = in >> 4;
-            shift_count = 4;
-          end
+          temp = in >> 4;
+          shift_count = 4;
         end
         32'b????????????????????????????1000: begin
-          if (max_shift >= 3) begin
-            temp = in >> 3;
-            shift_count = 3;
-          end
+          temp = in >> 3;
+          shift_count = 3;
         end
         32'b?????????????????????????????100: begin
-          if (max_shift >= 2) begin
-            temp = in >> 2;
-            shift_count = 2;
-          end
+          temp = in >> 2;
+          shift_count = 2;
         end
         32'b??????????????????????????????10: begin
-          if (max_shift >= 1) begin
-            temp = in >> 1;
-            shift_count = 1;
-          end
+          temp = in >> 1;
+          shift_count = 1;
         end
         default: begin // Default do nothing but still put it here
           temp = in;  
@@ -692,6 +630,7 @@ module lab1_imul_IntMulAlt
     .*
   );
  
+ 
   //----------------------------------------------------------------------
   // Line Tracing
   //----------------------------------------------------------------------
@@ -707,10 +646,6 @@ module lab1_imul_IntMulAlt
 
     vc_trace.append_str( trace_str, "(" );
 
-    // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    // Add additional line tracing using the helper tasks for
-    // internal state including the current FSM state.
-    // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     $sformat( str, "%x", dpath.a_reg_out );
     vc_trace.append_str( trace_str, str );
     vc_trace.append_str( trace_str, " " );
