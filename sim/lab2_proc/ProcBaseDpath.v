@@ -164,7 +164,7 @@ module lab2_proc_ProcBaseDpath
   logic [31:0] rf_rdata1_D;
   logic [31:0] rf_wdata_W;
 
-  vc_Regfile_2r1w_zero rf
+  vc_Regfile_2r1w_zero rf   // We used 2r1w_zero as the x0 reg is always 0
   (
     .clk      (clk),
     .reset    (reset),

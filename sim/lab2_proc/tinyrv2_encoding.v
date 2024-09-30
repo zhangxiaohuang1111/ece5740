@@ -359,8 +359,10 @@ module lab2_proc_tinyrv2_encoding_InstTasks();
 
 endmodule
 
+
 //------------------------------------------------------------------------
-// Unpack instruction
+// Unpack instruction 
+// This is the actual decoding unit
 //------------------------------------------------------------------------
 
 module lab2_proc_tinyrv2_encoding_InstUnpack
@@ -397,8 +399,8 @@ endmodule
 
 module lab2_proc_tinyrv2_encoding_InstTrace
 (
-  input                          clk,
-  input                          reset,
+  input                           clk,
+  input                           reset,
   input [`TINYRV2_INST_NBITS-1:0] inst
 );
 
