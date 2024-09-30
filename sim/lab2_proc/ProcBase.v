@@ -13,6 +13,7 @@
 `include "lab2_proc/ProcBaseCtrl.v"
 `include "lab2_proc/ProcBaseDpath.v"
 `include "lab2_proc/DropUnit.v"
+`include "lab1_imul/IntMulAlt.v" // Include Lab1 multiplier
 
 module lab2_proc_ProcBase
 #(
