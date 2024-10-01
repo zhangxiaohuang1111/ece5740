@@ -354,8 +354,7 @@ module lab2_proc_ProcBaseCtrl
       //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
       // Add more instructions to the control signal table
       //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-      `TINYRV2_INST_ADDI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n    );
-      `TINYRV2_INST_SW      :cs( y, br_na,  imm_s, y, bm_imm, y, alu_add,   st, wm_a, n,  n,   n    );
+      //register-register instructions
       `TINYRV2_INST_SUB     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sub,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_AND     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_and,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_OR      :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_or,    nr, wm_a, y,  n,   n    );
@@ -365,6 +364,16 @@ module lab2_proc_ProcBaseCtrl
       `TINYRV2_INST_SRA     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sra,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_SRL     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_srl,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_SLL     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sll,   nr, wm_a, y,  n,   n    );
+
+      //register-immediate instructions
+      `TINYRV2_INST_ADDI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n    );
+
+      //memory instructions
+      `TINYRV2_INST_SW      :cs( y, br_na,  imm_s, y, bm_imm, y, alu_add,   st, wm_a, n,  n,   n    );
+
+      //jump instructions
+
+      //branch instructions
 
       default               :cs( n, br_x,  imm_x, n, bm_x,    n, alu_x,   nr, wm_x, n,  n,   n    );
 
