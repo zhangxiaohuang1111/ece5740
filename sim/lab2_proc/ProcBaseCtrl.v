@@ -26,6 +26,7 @@ module lab2_proc_ProcBaseCtrl
 
   output logic        dmem_reqstream_val,
   input  logic        dmem_reqstream_rdy,
+  output logic[1:0]   dmem_reqstream_type,
   input  logic        dmem_respstream_val,
   output logic        dmem_respstream_rdy,
 
@@ -352,7 +353,7 @@ module lab2_proc_ProcBaseCtrl
       // Add more instructions to the control signal table
       //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
       //register-register instructions
-      `TINYRV2_INST_ADD     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_add, nr, wm_a, y,  n,   n    );
+      `TINYRV2_INST_ADD     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_add,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_SUB     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sub,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_AND     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_and,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_OR      :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_or,    nr, wm_a, y,  n,   n    );
@@ -367,8 +368,10 @@ module lab2_proc_ProcBaseCtrl
       `TINYRV2_INST_ADDI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n    );
 
       //memory instructions
-      `TINYRV2_INST_LW      :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add, ld, wm_m, y,  n,   n    );
-      `TINYRV2_INST_SW      :cs( y, br_na,  imm_s, y, bm_imm, y, alu_add,   st, wm_a, n,  n,   n    );
+      //                             br      imm   rs1 op2    rs2 alu      dmm wbmux rf
+      //                        val  type    type   en muxsel  en fn       typ sel   wen csrr csrw      
+      `TINYRV2_INST_LW      :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add,   ld, wm_m, y,  n,   n    );
+      `TINYRV2_INST_SW      :cs( y, br_na,  imm_s, y, bm_imm, y, alu_add,   st, wm_x, n,  n,   n    );
 
       //jump instructions
 
@@ -542,6 +545,10 @@ module lab2_proc_ProcBaseCtrl
   // set dmem_reqstream_val only if not stalling
 
   assign dmem_reqstream_val = val_X && !stall_X && ( dmem_type_X != nr );
+
+  //set dmem_reqstream_type
+
+  assign dmem_reqstream_type = dmem_type_X;
 
   // Valid signal for the next stage
 
