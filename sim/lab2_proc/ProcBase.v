@@ -66,7 +66,6 @@ module lab2_proc_ProcBase
   input  logic [31:0]  core_id,
   output logic         commit_inst,
   output logic         stats_en
-
 );
 
   //----------------------------------------------------------------------
@@ -140,13 +139,14 @@ module lab2_proc_ProcBase
   logic [31:0] dmem_reqstream_enq_msg_data;
 
   // assign dmem_reqstream_enq_msg.type_  = `VC_MEM_REQ_MSG_TYPE_READ;
-  always_comb begin
-    case (dmem_reqstream_enq_type)
-      1: dmem_reqstream_enq_msg.type_ = `VC_MEM_REQ_MSG_TYPE_READ;
-      2: dmem_reqstream_enq_msg.type_ = `VC_MEM_REQ_MSG_TYPE_WRITE;
-      default: dmem_reqstream_enq_msg.type_ = `VC_MEM_REQ_MSG_TYPE_READ;  // 
-    endcase
-  end
+  // always_comb begin
+  //   case (dmem_reqstream_enq_type)
+  //     1: dmem_reqstream_enq_msg.type_ = `VC_MEM_REQ_MSG_TYPE_READ;
+  //     2: dmem_reqstream_enq_msg.type_ = `VC_MEM_REQ_MSG_TYPE_WRITE;
+  //     default: dmem_reqstream_enq_msg.type_ = `VC_MEM_REQ_MSG_TYPE_READ;
+  //   endcase
+  // end
+  assign dmem_reqstream_enq_msg.type_ = (dmem_reqstream_enq_type == 2'd2)? `VC_MEM_REQ_MSG_TYPE_WRITE : `VC_MEM_REQ_MSG_TYPE_READ;
   assign dmem_reqstream_enq_msg.opaque = 8'b0;
   assign dmem_reqstream_enq_msg.addr   = dmem_reqstream_enq_msg_addr;
   assign dmem_reqstream_enq_msg.len    = 2'd0;

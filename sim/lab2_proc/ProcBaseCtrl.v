@@ -345,17 +345,14 @@ module lab2_proc_ProcBaseCtrl
   always_comb begin
 
     casez ( inst_D )
-
+      // Sample instructions
       //                            br      imm   rs1 op2    rs2 alu      dmm wbmux rf
       //                       val  type    type   en muxsel  en fn       typ sel   wen csrr csrw
       `TINYRV2_INST_NOP     :cs( y, br_na,  imm_x, n, bm_x,   n, alu_x,   nr, wm_a, n,  n,   n    );
       `TINYRV2_INST_CSRR    :cs( y, br_na,  imm_i, n, bm_csr, n, alu_cp1, nr, wm_a, y,  y,   n    );
       `TINYRV2_INST_CSRW    :cs( y, br_na,  imm_i, y, bm_rf,  n, alu_cp0, nr, wm_a, n,  n,   y    );
       
-      //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
-      // Add more instructions to the control signal table
-      //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-      //register-register instructions
+      // register-register instructions
       `TINYRV2_INST_ADD     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_add,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_SUB     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sub,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_AND     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_and,   nr, wm_a, y,  n,   n    );
@@ -367,7 +364,9 @@ module lab2_proc_ProcBaseCtrl
       `TINYRV2_INST_SRL     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_srl,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_SLL     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sll,   nr, wm_a, y,  n,   n    );
 
-      //register-immediate instructions
+      // register-immediate instructions
+      //                             br      imm   rs1 op2    rs2 alu      dmm wbmux rf
+      //                        val  type    type   en muxsel  en fn       typ sel   wen csrr csrw   
       `TINYRV2_INST_ADDI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_ORI     :cs( y, br_na,  imm_i, y, bm_imm, n, alu_or,    nr, wm_a, y,  n,   n    );
       `TINYRV2_INST_ANDI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_and,   nr, wm_a, y,  n,   n    );
@@ -559,7 +558,7 @@ module lab2_proc_ProcBaseCtrl
 
   assign dmem_reqstream_val = val_X && !stall_X && ( dmem_type_X != nr );
 
-  //set dmem_reqstream_type
+  // EXTRA SIGNAL output dmem_reqstream_type
 
   assign dmem_reqstream_type = dmem_type_X;
 
