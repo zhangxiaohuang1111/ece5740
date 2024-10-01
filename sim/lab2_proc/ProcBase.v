@@ -278,6 +278,31 @@ module lab2_proc_ProcBase
   );
 
   //----------------------------------------------------------------------
+  // Lab01 Alternative Multiplier
+  //----------------------------------------------------------------------
+  
+  // Control Signals
+  logic imul_req_val_D;
+  logic imul_req_rdy_D;
+  logic imul_resp_val_X;
+  logic imul_resp_val_X;
+
+  // Data
+  logic imul_req_msg;
+  logic imul_resp_msg;
+
+  lab1_imul_IntMulAlt Mul(
+    .clk (clk),
+    .reset(reset),
+    .istream_val(imul_req_val_D),
+    .istream_rdy(imul_req_rdy_D),
+    .istream_msg(imul_req_msg),
+    .ostream_val(imul_resp_val_X),
+    .ostream_rdy(imul_resp_val_X),
+    .ostream_msg(imul_resp_msg)
+  );
+
+  //----------------------------------------------------------------------
   // Line tracing
   //----------------------------------------------------------------------
 

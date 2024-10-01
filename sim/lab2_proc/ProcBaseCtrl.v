@@ -267,7 +267,7 @@ module lab2_proc_ProcBaseCtrl
   localparam alu_sra  = 4'd7;
   localparam alu_srl  = 4'd8;
   localparam alu_sll  = 4'd9;
-  localparam alu_mul  = 4'd10;// MUL
+  localparam alu_mul  = 4'd10; // MUL
   localparam alu_cp0  = 4'd11;
   localparam alu_cp1  = 4'd12;
   localparam alu_lui  = 4'd13;
