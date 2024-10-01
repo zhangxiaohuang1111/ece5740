@@ -26,6 +26,9 @@ module lab2_proc_ProcDpathImmGen
       //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
       3'd1: // S-type
         imm = { {21{inst[31]}}, inst[30:25], inst[11:7] };
+
+      3'd3: // U-type
+        imm = { inst[31:12], 12'b0 };
       default:
         imm = 32'bx;
 
