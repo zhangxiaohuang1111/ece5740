@@ -48,6 +48,7 @@ module lab2_proc_ProcBaseDpath
   input  logic [1:0]   pc_sel_F,
 
   input  logic         reg_en_D,
+  input  logic         op1_sel_D,
   input  logic [1:0]   op2_sel_D,
   input  logic [1:0]   csrr_sel_D,
   input  logic [2:0]   imm_type_D,
@@ -73,6 +74,8 @@ module lab2_proc_ProcBaseDpath
 
   output logic [31:0]  inst_D,
   output logic         br_cond_eq_X,
+  output logic         br_cond_lt_X,
+  output logic         br_cond_ltu_X,
 
   output logic         imul_req_rdy_D,    // Input ready signal to Controll Unit
   output logic         imul_resp_val_X,   // Output valid signal to Controll Unit
@@ -186,7 +189,7 @@ module lab2_proc_ProcBaseDpath
     .wr_addr  (rf_waddr_W),
     .wr_data  (rf_wdata_W)
   );
-
+  logic [31:0] op1_D;
   logic [31:0] op2_D;
 
   logic [31:0] csrr_data_D;
@@ -202,6 +205,13 @@ module lab2_proc_ProcBaseDpath
    .in2  (core_id),
    .sel  (csrr_sel_D),
    .out  (csrr_data_D)
+  );
+
+  vc_Mux2#(32) op1_sel_mux_D(
+    .in0  (pc_D),
+    .in1  (rf_rdata0_D),
+    .sel  (op1_sel_D),
+    .out  (op1_D)
   );
 
   // op2 select mux
@@ -225,12 +235,13 @@ module lab2_proc_ProcBaseDpath
     .cout ()
   );
 
+  
 
   // #Lab01 Alternative Multiplier#######################################################################
 
   logic [31:0] imul_resp_msg;  // Output data wire
   logic [63:0] combined_data_in;
-  assign combined_data_in = {rf_rdata0_D, op2_D};
+  assign combined_data_in = {op1_D, op2_D};
 
   lab1_imul_IntMulAlt Mul(
     .clk (clk),
@@ -255,7 +266,7 @@ module lab2_proc_ProcBaseDpath
     .clk   (clk),
     .reset (reset),
     .en    (reg_en_X),
-    .d     (rf_rdata0_D),
+    .d     (op1_D),
     .q     (op1_X)
   );
 
@@ -296,8 +307,8 @@ module lab2_proc_ProcBaseDpath
     .fn       (alu_fn_X),
     .out      (alu_result_X),
     .ops_eq   (br_cond_eq_X),
-    .ops_lt   (),
-    .ops_ltu  ()
+    .ops_lt   (br_cond_lt_X),
+    .ops_ltu  (br_cond_ltu_X)
   );
 
   // ex_result_sel_mux_X

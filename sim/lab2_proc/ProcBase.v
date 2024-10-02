@@ -193,6 +193,7 @@ module lab2_proc_ProcBase
   logic [1:0]  pc_sel_F;
 
   logic        reg_en_D;
+  logic        op1_sel_D;
   logic [1:0]  op2_sel_D;
   logic [1:0]  csrr_sel_D;
   logic [2:0]  imm_type_D;
@@ -216,8 +217,11 @@ module lab2_proc_ProcBase
 
   logic [31:0] inst_D;
   logic        br_cond_eq_X;
+  logic        br_cond_lt_X;
+  logic        br_cond_ltu_X;
   logic        imul_req_rdy_D;    // Input ready signal to Controll Unit
   logic        imul_resp_val_X;   // Output valid signal to Controll Unit
+  
   //----------------------------------------------------------------------
   // Control Unit
   //----------------------------------------------------------------------
