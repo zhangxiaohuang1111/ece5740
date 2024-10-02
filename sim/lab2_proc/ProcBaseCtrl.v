@@ -487,7 +487,7 @@ module lab2_proc_ProcBaseCtrl
   
   logic ostall_imul_D;
   assign imul_req_val_D = val_D && !stall_D && !squash_D && (ex_result_sel_D == imul); // We send req_val only no stall/squash
-  assign ostall_imul_D = val_D && imul_req_val_D && !imul_req_rdy_D;                   // Need wait for req_rdy
+  assign ostall_imul_D = val_D && !imul_req_rdy_D;                   // Need wait for req_rdy
 
   // Put together ostall signal due to hazards
 
