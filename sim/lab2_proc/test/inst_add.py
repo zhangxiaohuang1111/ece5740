@@ -53,6 +53,12 @@ def gen_basic_test():
 def gen_dest_dep_test():
   return [
     gen_rr_dest_dep_test( 5, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 4, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 3, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 2, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 1, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 0, "add", 1, 1, 2 ),
+
     gen_rr_dest_dep_test( 4, "add", 2, 1, 3 ),
     gen_rr_dest_dep_test( 3, "add", 3, 1, 4 ),
     gen_rr_dest_dep_test( 2, "add", 4, 1, 5 ),
