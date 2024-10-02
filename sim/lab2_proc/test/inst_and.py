@@ -27,6 +27,7 @@ def gen_basic_test():
     nop
     nop
     and x3, x1, x2
+    and x4, x3, x1
     nop
     nop
     nop

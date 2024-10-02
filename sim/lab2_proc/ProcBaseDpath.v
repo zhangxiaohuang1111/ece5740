@@ -14,6 +14,7 @@
 `include "lab2_proc/tinyrv2_encoding.v"
 `include "lab2_proc/ProcDpathImmGen.v"
 `include "lab2_proc/ProcDpathAlu.v"
+`include "lab1_imul/IntMulAlt.v" // Include Lab1 multiplier with 
 
 module lab2_proc_ProcBaseDpath
 #(
@@ -62,11 +63,19 @@ module lab2_proc_ProcBaseDpath
   input  logic         rf_wen_W,
   input  logic         stats_en_wen_W,
 
+  input  logic         imul_req_val_D,    // Input valid signal to Lab1 Multiplier
+  input  logic         imul_resp_rdy_X,   // Output ready signal to Lab1 Multiplier
+
+  input  logic [1:0]   ex_result_sel_X,   
+  
+
   // status signals (dpath->ctrl)
 
   output logic [31:0]  inst_D,
   output logic         br_cond_eq_X,
 
+  output logic         imul_req_rdy_D,    // Input ready signal to Controll Unit
+  output logic         imul_resp_val_X,   // Output valid signal to Controll Unit
   // extra ports
 
   input  logic [31:0]  core_id,
@@ -216,6 +225,24 @@ module lab2_proc_ProcBaseDpath
     .cout ()
   );
 
+
+  // #Lab01 Alternative Multiplier#######################################################################
+
+  logic [31:0] imul_resp_msg;  // Output data wire
+  logic [63:0] combined_data_in;
+  assign combined_data_in = {rf_rdata0_D, op2_D};
+
+  lab1_imul_IntMulAlt Mul(
+    .clk (clk),
+    .reset(reset),
+    .istream_val(imul_req_val_D),
+    .istream_rdy(imul_req_rdy_D),
+    .istream_msg(combined_data_in), 
+    .ostream_val(imul_resp_val_X),
+    .ostream_rdy(imul_resp_rdy_X),
+    .ostream_msg(imul_resp_msg)
+  );
+
   //--------------------------------------------------------------------
   // X stage
   //--------------------------------------------------------------------
@@ -273,7 +300,15 @@ module lab2_proc_ProcBaseDpath
     .ops_ltu  ()
   );
 
-  assign ex_result_X = alu_result_X;
+  // ex_result_sel_mux_X
+  vc_Mux3#(32) ex_result_sel_mux_X
+  (
+    .in0  (32'd0),          // Temporary 0 FILL OUT HERE
+    .in1  (alu_result_X),   // ALU result
+    .in2  (imul_resp_msg),  // Multiplier
+    .sel  (ex_result_sel_X),
+    .out  (ex_result_X)
+  );
 
   assign dmem_reqstream_msg_addr = alu_result_X;
 

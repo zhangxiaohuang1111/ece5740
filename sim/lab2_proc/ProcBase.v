@@ -13,7 +13,7 @@
 `include "lab2_proc/ProcBaseCtrl.v"
 `include "lab2_proc/ProcBaseDpath.v"
 `include "lab2_proc/DropUnit.v"
-`include "lab1_imul/IntMulAlt.v" // Include Lab1 multiplier
+
 
 module lab2_proc_ProcBase
 #(
@@ -208,11 +208,16 @@ module lab2_proc_ProcBase
   logic        rf_wen_W;
   logic        stats_en_wen_W;
 
+  logic        imul_req_val_D;    // Input valid signal to Lab1 Multiplier
+  logic        imul_resp_rdy_X;   // Output ready signal to Lab1 Multiplier
+
+  logic [1:0]  ex_result_sel_X;
   // status signals (dpath->ctrl)
 
   logic [31:0] inst_D;
   logic        br_cond_eq_X;
-
+  logic        imul_req_rdy_D;    // Input ready signal to Controll Unit
+  logic        imul_resp_val_X;   // Output valid signal to Controll Unit
   //----------------------------------------------------------------------
   // Control Unit
   //----------------------------------------------------------------------
@@ -277,30 +282,6 @@ module lab2_proc_ProcBase
     .*
   );
 
-  //----------------------------------------------------------------------
-  // Lab01 Alternative Multiplier
-  //----------------------------------------------------------------------
-  
-  // Control Signals
-  logic imul_req_val_D;
-  logic imul_req_rdy_D;
-  logic imul_resp_val_X;
-  logic imul_resp_val_X;
-
-  // Data
-  logic imul_req_msg;
-  logic imul_resp_msg;
-
-  lab1_imul_IntMulAlt Mul(
-    .clk (clk),
-    .reset(reset),
-    .istream_val(imul_req_val_D),
-    .istream_rdy(imul_req_rdy_D),
-    .istream_msg(imul_req_msg),
-    .ostream_val(imul_resp_val_X),
-    .ostream_rdy(imul_resp_val_X),
-    .ostream_msg(imul_resp_msg)
-  );
 
   //----------------------------------------------------------------------
   // Line tracing

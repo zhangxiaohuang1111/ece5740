@@ -257,8 +257,7 @@ module lab1_imul_IntMulBaseDpath
   input  logic        reset,
 
   // Data signals
-  input  logic [31:0] istream_msg_a,
-  input  logic [31:0] istream_msg_b,
+  input  logic [63:0] istream_msg,
   output logic [31:0] ostream_msg,
 
   // Control signals
@@ -277,6 +276,15 @@ module lab1_imul_IntMulBaseDpath
 );
 
  localparam c_nbits = 32;
+
+
+  // Split out the a and b operands
+  logic [c_nbits-1:0] istream_msg_a;
+  assign istream_msg_a = istream_msg[63:32];
+
+  logic [c_nbits-1:0] istream_msg_b;
+  assign istream_msg_b = istream_msg[31:0];
+
 
   // A Mux
   logic [c_nbits-1:0] left_shift_out;
@@ -585,8 +593,7 @@ module lab1_imul_IntMulAlt
 
   input  logic        istream_val,
   output logic        istream_rdy,
-  input  logic [31:0] istream_msg_a,
-  input  logic [31:0] istream_msg_b,
+  input  logic [63:0] istream_msg,
 
   output logic        ostream_val,
   input  logic        ostream_rdy,
