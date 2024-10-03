@@ -402,10 +402,7 @@ module lab1_imul_IntMulBase
 
     vc_trace.append_str( trace_str, "(" );
 
-    // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    // Add additional line tracing using the helper tasks for
-    // internal state including the current FSM state.
-    // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
     $sformat( str, "%x", dpath.a_reg_out );
     vc_trace.append_str( trace_str, str );
     vc_trace.append_str( trace_str, " " );

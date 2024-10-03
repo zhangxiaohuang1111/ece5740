@@ -259,10 +259,7 @@ corner_cases_msgs = [
 ]
 
 
-# ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Define additional lists of input/output messages to create
-# additional directed and random test cases.
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 
 #-------------------------------------------------------------------------
 # Test Case Table
@@ -289,11 +286,7 @@ test_case_table = mk_test_case_table([
   [ "corner_cases",           corner_cases_msgs,              0,        0          ],
   
 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # Add more rows to the test case table to leverage the additional lists
-  # of request/response messages defined above, but also to test
-  # different source/sink random delays.
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 
 ])
 
