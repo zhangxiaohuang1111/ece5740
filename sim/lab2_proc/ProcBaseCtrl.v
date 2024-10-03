@@ -172,10 +172,10 @@ module lab2_proc_ProcBaseCtrl
   // PC select logic
 
   always_comb begin
-    if ( pc_redirect_X )   // If a branch is taken in X stage
-      pc_sel_F = pc_sel_X; // Use pc from X
-    else if ( pc_redirect_D )  // If a jump is taken in D stage
+    if ( pc_redirect_D )  // If a jump is taken in D stage
       pc_sel_F = pc_sel_D;     // Use jal
+    else if ( pc_redirect_X )   // If a branch is taken in X stage
+      pc_sel_F = pc_sel_X; // Use pc from X
     else
       pc_sel_F = 2'b0;     // Use pc+4
   end
@@ -225,7 +225,7 @@ module lab2_proc_ProcBaseCtrl
 
   // jump logic redirect PC in F if jump is taken
   always_comb begin
-    if ( val_X && ( jump_type == jump_jal) ) begin
+    if ( val_X && ( jump_type_D == jump_jal) ) begin
       pc_redirect_D = 1'b1;
       pc_sel_D      = 2'b10; // use jal target
     end
@@ -308,7 +308,7 @@ module lab2_proc_ProcBaseCtrl
   localparam alu_sra  = 4'd7;
   localparam alu_srl  = 4'd8;
   localparam alu_sll  = 4'd9;
-  // empty 10
+  localparam alu_jalr = 4'd10;
   localparam alu_cp0  = 4'd11;
   localparam alu_cp1  = 4'd12;
 
@@ -342,7 +342,7 @@ module lab2_proc_ProcBaseCtrl
 
   logic       inst_val_D;
   logic [2:0] br_type_D;
-  logic [1:0] jump_type; // jump
+  logic [1:0] jump_type_D; // jump
   logic       rs1_en_D;
   logic       rs2_en_D;
   logic [3:0] alu_fn_D;
@@ -378,7 +378,7 @@ module lab2_proc_ProcBaseCtrl
   begin
     inst_val_D      = cs_inst_val;
     br_type_D       = cs_br_type;
-    jump_type       = cs_jump_type;
+    jump_type_D     = cs_jump_type;
     imm_type_D      = cs_imm_type;
     rs1_en_D        = cs_rs1_en;
     op1_sel_D       = cs_op1_sel;
@@ -446,7 +446,7 @@ module lab2_proc_ProcBaseCtrl
 
       // jump instructions
       `TINYRV2_INST_JAL     :cs( y, br_na,jump_jal,  imm_j, n,   op1_pc, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n,   pc );
-      `TINYRV2_INST_JALR    :cs( y, br_na,jump_jalr, imm_i, y,   op1_rf, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n,   alu);
+      `TINYRV2_INST_JALR    :cs( y, br_na,jump_jalr, imm_i, y,   op1_rf, bm_imm, n, alu_jalr,  nr, wm_a, y,  n,   n,   pc );
 
       default               :cs( n, br_x, jump_na,   imm_x, n,   op1_rf, bm_x,   n, alu_x,     nr, wm_x, n,  n,   n,   alu);
 
@@ -572,6 +572,7 @@ module lab2_proc_ProcBaseCtrl
   logic        proc2mngr_val_X;
   logic        stats_en_wen_X;
   logic [2:0]  br_type_X;
+  logic [1:0]  jump_type_X;
 
   // Pipeline registers
 
@@ -590,6 +591,7 @@ module lab2_proc_ProcBaseCtrl
       wb_result_sel_X <= wb_result_sel_D;
       stats_en_wen_X  <= stats_en_wen_D;
       br_type_X       <= br_type_D;
+      jump_type_X     <= jump_type_D;
       ex_result_sel_X <= ex_result_sel_D;
     end
 
@@ -619,6 +621,10 @@ module lab2_proc_ProcBaseCtrl
     else if ( val_X && ( br_type_X == br_bltu ) ) begin
       pc_redirect_X = br_cond_ltu_X;
       pc_sel_X      = 2'b1; // use branch target
+    end
+    else if ( val_X && ( jump_type_X == jump_jalr ) ) begin
+      pc_redirect_X = 1'b1;
+      pc_sel_X      = 2'd3; // use jalr target
     end
     else begin
       pc_redirect_X = 1'b0;

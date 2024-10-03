@@ -324,6 +324,8 @@ module lab2_proc_ProcBaseDpath
     .ops_ltu  (br_cond_ltu_X)
   );
 
+  assign jalr_target_X = alu_result_X;
+
     vc_Incrementer#(32, 4) pc_incr_X
   (
     .in   (pc_X),
