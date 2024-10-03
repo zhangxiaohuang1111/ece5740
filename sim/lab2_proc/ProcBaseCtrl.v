@@ -379,6 +379,8 @@ module lab2_proc_ProcBaseCtrl
       `TINYRV2_INST_NOP     :cs( y, br_na,  imm_x, n,   op1_rf, bm_x,   n, alu_x,     nr, wm_a, n,  n,   n,   alu);
       `TINYRV2_INST_CSRR    :cs( y, br_na,  imm_i, n,   op1_rf, bm_csr, n, alu_cp1,   nr, wm_a, y,  y,   n,   alu);
       `TINYRV2_INST_CSRW    :cs( y, br_na,  imm_i, y,   op1_rf, bm_rf,  n, alu_cp0,   nr, wm_a, n,  n,   y,   alu);
+      
+      // register-register ALU instructions
       `TINYRV2_INST_ADD     :cs( y, br_na,  imm_x, y,   op1_rf, bm_rf,  y, alu_add,   nr, wm_a, y,  n,   n,   alu);
       `TINYRV2_INST_SUB     :cs( y, br_na,  imm_x, y,   op1_rf, bm_rf,  y, alu_sub,   nr, wm_a, y,  n,   n,   alu);
       `TINYRV2_INST_AND     :cs( y, br_na,  imm_x, y,   op1_rf, bm_rf,  y, alu_and,   nr, wm_a, y,  n,   n,   alu);
@@ -391,6 +393,7 @@ module lab2_proc_ProcBaseCtrl
       `TINYRV2_INST_SLL     :cs( y, br_na,  imm_x, y,   op1_rf, bm_rf,  y, alu_sll,   nr, wm_a, y,  n,   n,   alu);
       `TINYRV2_INST_MUL     :cs( y, br_na,  imm_x, y,   op1_rf, bm_rf,  y, alu_x,     nr, wm_a, y,  n,   n,   imul);
 
+      // register-immediate ALU instructions
       `TINYRV2_INST_ADDI    :cs( y, br_na,  imm_i, y,   op1_rf, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n,   alu);
       `TINYRV2_INST_ORI     :cs( y, br_na,  imm_i, y,   op1_rf, bm_imm, n, alu_or,    nr, wm_a, y,  n,   n,   alu);
       `TINYRV2_INST_ANDI    :cs( y, br_na,  imm_i, y,   op1_rf, bm_imm, n, alu_and,   nr, wm_a, y,  n,   n,   alu);
@@ -403,16 +406,21 @@ module lab2_proc_ProcBaseCtrl
       `TINYRV2_INST_LUI     :cs( y, br_na,  imm_u, n,   op1_rf, bm_imm, n, alu_cp1,   nr, wm_a, y,  n,   n,   alu);
       `TINYRV2_INST_AUIPC   :cs( y, br_na,  imm_u, n,   op1_pc, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n,   alu);
 
+      // memory instructions
       `TINYRV2_INST_LW      :cs( y, br_na,  imm_i, y,   op1_rf, bm_imm, n, alu_add,   ld, wm_m, y,  n,   n,   alu);
       `TINYRV2_INST_SW      :cs( y, br_na,  imm_s, y,   op1_rf, bm_imm, y, alu_add,   st, wm_x, n,  n,   n,   alu);
 
+      // branch instructions
       `TINYRV2_INST_BNE     :cs( y, br_bne, imm_b, y,   op1_rf, bm_rf,  y, alu_x,     nr, wm_a, n,  n,   n,   alu);
       `TINYRV2_INST_BEQ     :cs( y, br_beq, imm_b, y,   op1_rf, bm_rf,  y, alu_x,     nr, wm_a, n,  n,   n,   alu);
       `TINYRV2_INST_BGE     :cs( y, br_bge, imm_b, y,   op1_rf, bm_rf,  y, alu_x,     nr, wm_a, n,  n,   n,   alu);
       `TINYRV2_INST_BGEU    :cs( y, br_bgeu,imm_b, y,   op1_rf, bm_rf,  y, alu_x,     nr, wm_a, n,  n,   n,   alu);
       `TINYRV2_INST_BLT     :cs( y, br_blt, imm_b, y,   op1_rf, bm_rf,  y, alu_x,     nr, wm_a, n,  n,   n,   alu);
       `TINYRV2_INST_BLTU    :cs( y, br_bltu,imm_b, y,   op1_rf, bm_rf,  y, alu_x,     nr, wm_a, n,  n,   n,   alu);
-      
+
+      // jump instructions
+      `TINYRV2_INST_JAL     :cs( y, br_na,  imm_j, n,   op1_pc, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n,   alu);
+      `TINYRV2_INST_JALR    :cs( y, br_na,  imm_i, y,   op1_rf, bm_imm, n, alu_add,   nr, wm_a, y,  n,   n,   alu);
       default               :cs( n, br_x,   imm_x, n,   op1_rf, bm_x,   n, alu_x,     nr, wm_x, n,  n,   n,   alu);
 
     endcase

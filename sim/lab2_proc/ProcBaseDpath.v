@@ -260,6 +260,8 @@ module lab2_proc_ProcBaseDpath
 
   logic [31:0] op1_X;
   logic [31:0] op2_X;
+  logic [31:0] pc_X;
+  logic [31:0] pc_plus4_X;
 
   vc_EnResetReg#(32, 0) op1_reg_X
   (
@@ -277,6 +279,15 @@ module lab2_proc_ProcBaseDpath
     .en    (reg_en_X),
     .d     (op2_D),
     .q     (op2_X)
+  );
+
+  vc_EnResetReg#(32, 0) pc_reg_X
+  (
+    .clk   (clk),
+    .reset (reset),
+    .en    (reg_en_X),
+    .d     (pc_D),
+    .q     (pc_X)
   );
 
   vc_EnResetReg#(32, 0) dmem_write_data_reg_X
@@ -311,10 +322,16 @@ module lab2_proc_ProcBaseDpath
     .ops_ltu  (br_cond_ltu_X)
   );
 
+    vc_Incrementer#(32, 4) pc_incr_X
+  (
+    .in   (pc_X),
+    .out  (pc_plus4_X)
+  );
+
   // ex_result_sel_mux_X
   vc_Mux3#(32) ex_result_sel_mux_X
   (
-    .in0  (32'd0),          // Temporary 0 FILL OUT HERE
+    .in0  (pc_plus4_X),     // pc + 4
     .in1  (alu_result_X),   // ALU result
     .in2  (imul_resp_msg),  // Multiplier
     .sel  (ex_result_sel_X),
