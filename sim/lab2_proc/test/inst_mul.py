@@ -27,6 +27,7 @@ def gen_basic_test():
     nop
     nop
     mul x3, x1, x2
+    mul x3 ,x3, x1
     nop
     nop
     nop
@@ -35,7 +36,7 @@ def gen_basic_test():
     nop
     nop
     nop
-    csrw proc2mngr, x3 > 20
+    csrw proc2mngr, x3 > 100
     nop
     nop
     nop
