@@ -165,11 +165,6 @@ random_with_zeros_ones_msgs = []
 for a, b, result in random_with_zeros_ones_cases:
   random_with_zeros_ones_msgs.extend( [ mk_imsg(a,b), mk_omsg(result) ] ) 
 
-# ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# You should add more datasets for evaluation. Remember these datasets
-# are not for testing; your design should already be thoroughly tested
-# before you begin your evaluation.
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 #-------------------------------------------------------------------------
 # Command line processing
@@ -196,10 +191,6 @@ def parse_cmdline():
   p.add_argument( "--impl", default="fl",
     choices=["fl","base","alt"] )
 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # Add more choices below for the --input command line option. There
-  # should be one choice for each input dataset that you defined above.
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   p.add_argument( "--input", default="small",
     choices=["small", "random", "random_with_zeros_ones", "all_neg", "large"] )
@@ -224,10 +215,6 @@ def main():
 
   inputs  = None
 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # Use additional if statements to set the inputs appropriately based on
-  # the --input command line option.
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   if opts.input == "small":
     inputs = random_small_msgs
