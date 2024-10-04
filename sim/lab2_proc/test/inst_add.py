@@ -53,6 +53,12 @@ def gen_basic_test():
 def gen_dest_dep_test():
   return [
     gen_rr_dest_dep_test( 5, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 4, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 3, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 2, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 1, "add", 1, 1, 2 ),
+    gen_rr_dest_dep_test( 0, "add", 1, 1, 2 ),
+
     gen_rr_dest_dep_test( 4, "add", 2, 1, 3 ),
     gen_rr_dest_dep_test( 3, "add", 3, 1, 4 ),
     gen_rr_dest_dep_test( 2, "add", 4, 1, 5 ),
@@ -72,6 +78,16 @@ def gen_src0_dep_test():
     gen_rr_src0_dep_test( 2, "add", 10, 1, 11 ),
     gen_rr_src0_dep_test( 1, "add", 11, 1, 12 ),
     gen_rr_src0_dep_test( 0, "add", 12, 1, 13 ),
+
+    gen_rr_src0_dep_test( 6,  "add", 13, 1, 14 ),
+    gen_rr_src0_dep_test( 7,  "add", 14, 1, 15 ),
+    gen_rr_src0_dep_test( 8,  "add", 15, 1, 16 ),
+    gen_rr_src0_dep_test( 9,  "add", 16, 1, 17 ),
+    gen_rr_src0_dep_test( 10, "add", 17, 1, 18 ),
+    gen_rr_src0_dep_test( 11, "add", 18, 1, 19 ),
+    gen_rr_src0_dep_test( 12, "add", 19, 1, 20 ),
+    gen_rr_src0_dep_test( 13, "add", 20, 1, 21 ),
+    gen_rr_src0_dep_test( 14, "add", 21, 1, 22 ),
   ]
 
 #-------------------------------------------------------------------------
@@ -80,12 +96,22 @@ def gen_src0_dep_test():
 
 def gen_src1_dep_test():
   return [
-    gen_rr_src1_dep_test( 5, "add", 1, 13, 14 ),
-    gen_rr_src1_dep_test( 4, "add", 1, 14, 15 ),
-    gen_rr_src1_dep_test( 3, "add", 1, 15, 16 ),
-    gen_rr_src1_dep_test( 2, "add", 1, 16, 17 ),
-    gen_rr_src1_dep_test( 1, "add", 1, 17, 18 ),
-    gen_rr_src1_dep_test( 0, "add", 1, 18, 19 ),
+    gen_rr_src1_dep_test( 5,  "add", 1, 13, 14 ),
+    gen_rr_src1_dep_test( 4,  "add", 1, 14, 15 ),
+    gen_rr_src1_dep_test( 3,  "add", 1, 15, 16 ),
+    gen_rr_src1_dep_test( 2,  "add", 1, 16, 17 ),
+    gen_rr_src1_dep_test( 1,  "add", 1, 17, 18 ),
+    gen_rr_src1_dep_test( 0,  "add", 1, 18, 19 ),
+
+    gen_rr_src1_dep_test( 6,  "add", 1, 19, 20 ),
+    gen_rr_src1_dep_test( 7,  "add", 1, 20, 21 ),
+    gen_rr_src1_dep_test( 8,  "add", 1, 21, 22 ),
+    gen_rr_src1_dep_test( 9,  "add", 1, 22, 23 ),
+    gen_rr_src1_dep_test( 10, "add", 1, 23, 24 ),
+    gen_rr_src1_dep_test( 11, "add", 1, 24, 25 ),
+    gen_rr_src1_dep_test( 12, "add", 1, 25, 26 ),
+    gen_rr_src1_dep_test( 13, "add", 1, 26, 27 ),
+    gen_rr_src1_dep_test( 14, "add", 1, 27, 28 ),
   ]
 
 #-------------------------------------------------------------------------
@@ -100,6 +126,13 @@ def gen_srcs_dep_test():
     gen_rr_srcs_dep_test( 2, "add", 15, 5, 20 ),
     gen_rr_srcs_dep_test( 1, "add", 16, 6, 22 ),
     gen_rr_srcs_dep_test( 0, "add", 17, 7, 24 ),
+
+    gen_rr_srcs_dep_test( 0, "add", 12, 20, 32 ),
+    gen_rr_srcs_dep_test( 0, "add", 13, 21, 34 ),
+    gen_rr_srcs_dep_test( 0, "add", 14, 0, 14 ),
+    gen_rr_srcs_dep_test( 0, "add", 15, 5, 20 ),
+    gen_rr_srcs_dep_test( 0, "add", 16, 16, 32 ),
+    gen_rr_srcs_dep_test( 0, "add", 17, 7, 24 ),
   ]
 
 #-------------------------------------------------------------------------
@@ -112,6 +145,15 @@ def gen_srcs_dest_test():
     gen_rr_src1_eq_dest_test( "add", 26, 1, 27 ),
     gen_rr_src0_eq_src1_test( "add", 27, 54 ),
     gen_rr_srcs_eq_dest_test( "add", 28, 56 ),
+
+    gen_rr_src0_eq_dest_test( "add", 22, 1, 23 ),
+    gen_rr_src1_eq_dest_test( "add", 1, 1, 2 ),
+    gen_rr_src0_eq_src1_test( "add", 30, 60 ),
+    gen_rr_srcs_eq_dest_test( "add", 50, 100 ),
+    gen_rr_src0_eq_dest_test( "add", 100, 1, 101 ),
+    gen_rr_src1_eq_dest_test( "add", 200, 1, 201 ),
+    gen_rr_src0_eq_src1_test( "add", 100, 200 ),
+    gen_rr_srcs_eq_dest_test( "add", 200, 400 ),
   ]
 
 #-------------------------------------------------------------------------
@@ -140,6 +182,27 @@ def gen_value_test():
     gen_rr_value_test( "add", 0xffffffff, 0x00000001, 0x00000000 ),
     gen_rr_value_test( "add", 0xffffffff, 0xffffffff, 0xfffffffe ),
 
+
+
+    gen_rr_value_test( "add", 0x00000002, 0x00000003, 0x00000005 ),
+    gen_rr_value_test( "add", 0x00000004, 0x00000006, 0x0000000a ),
+    gen_rr_value_test( "add", 0x00000010, 0x00000020, 0x00000030 ),
+
+    gen_rr_value_test( "add", 0xffffffff, 0x00000002, 0x00000001 ),
+    gen_rr_value_test( "add", 0xfffffffe, 0x00000002, 0x00000000 ),
+    gen_rr_value_test( "add", 0x80000000, 0x80000000, 0x00000000 ),
+
+    gen_rr_value_test( "add", 0x7fffffff, 0x00000001, 0x80000000 ),
+    gen_rr_value_test( "add", 0x80000000, 0x00000001, 0x80000001 ),
+    gen_rr_value_test( "add", 0x7fffffff, 0x7fffffff, 0xfffffffe ),
+
+    gen_rr_value_test( "add", 0x00000000, 0x12345678, 0x12345678 ),
+    gen_rr_value_test( "add", 0x12345678, 0x87654321, 0x99999999 ),
+    gen_rr_value_test( "add", 0xabcdef01, 0x12345678, 0xbe024579 ),
+
+    gen_rr_value_test( "add", 0x80000000, 0xffffffff, 0x7fffffff ),
+    gen_rr_value_test( "add", 0x00000000, 0xfffffffe, 0xfffffffe ),
+    gen_rr_value_test( "add", 0xffffffff, 0xfffffffe, 0xfffffffd ),
   ]
 
 #-------------------------------------------------------------------------
