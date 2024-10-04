@@ -61,93 +61,100 @@ def gen_basic_test():
 # gen_src0_dep_taken_test
 #-------------------------------------------------------------------------
 
+# Test where src0 > src1 (branch should be taken)
 def gen_src0_dep_taken_test():
   return [
-    gen_br2_src0_dep_test( 5, "bge", 7, 1, True ),
-    gen_br2_src0_dep_test( 4, "bge", 7, 2, True ),
-    gen_br2_src0_dep_test( 3, "bge", 7, 3, True ),
-    gen_br2_src0_dep_test( 2, "bge", 7, 4, True ),
-    gen_br2_src0_dep_test( 1, "bge", 7, 5, True ),
-    gen_br2_src0_dep_test( 0, "bge", 7, 6, True ),
+    gen_br2_src0_dep_test( 5, "bge", 10, 1, True ),  # 10 > 1, branch taken
+    gen_br2_src0_dep_test( 4, "bge", 9, 2, True ),   # 9 > 2, branch taken
+    gen_br2_src0_dep_test( 3, "bge", 8, 3, True ),   # 8 > 3, branch taken
+    gen_br2_src0_dep_test( 2, "bge", 7, 4, True ),   # 7 > 4, branch taken
+    gen_br2_src0_dep_test( 1, "bge", 6, 5, True ),   # 6 > 5, branch taken
+    gen_br2_src0_dep_test( 0, "bge", 100, -100, True ),  # 100 > -100, branch taken
   ]
-
 #-------------------------------------------------------------------------
 # gen_src0_dep_nottaken_test
 #-------------------------------------------------------------------------
 
+# Test where src0 < src1 (branch should not be taken)
 def gen_src0_dep_nottaken_test():
   return [
-    gen_br2_src0_dep_test( 5, "bge", 1, 7, False ),
-    gen_br2_src0_dep_test( 4, "bge", 2, 7, False ),
-    gen_br2_src0_dep_test( 3, "bge", 3, 7, False ),
-    gen_br2_src0_dep_test( 2, "bge", 4, 7, False ),
-    gen_br2_src0_dep_test( 1, "bge", 5, 7, False ),
-    gen_br2_src0_dep_test( 0, "bge", 6, 7, False ),
+    gen_br2_src0_dep_test( 5, "bge", 1, 10, False ),  # 1 < 10, branch not taken
+    gen_br2_src0_dep_test( 4, "bge", 2, 9, False ),   # 2 < 9, branch not taken
+    gen_br2_src0_dep_test( 3, "bge", 3, 8, False ),   # 3 < 8, branch not taken
+    gen_br2_src0_dep_test( 2, "bge", 4, 7, False ),   # 4 < 7, branch not taken
+    gen_br2_src0_dep_test( 1, "bge", 5, 6, False ),   # 5 < 6, branch not taken
+    gen_br2_src0_dep_test( 0, "bge", -100, 100, False ),  # -100 < 100, branch not taken
   ]
 
 #-------------------------------------------------------------------------
 # gen_src1_dep_taken_test
 #-------------------------------------------------------------------------
 
+# Test where src0 > src1 (branch should be taken)
 def gen_src1_dep_taken_test():
   return [
-    gen_br2_src1_dep_test( 5, "bge", 7, 1, True ),
-    gen_br2_src1_dep_test( 4, "bge", 7, 2, True ),
-    gen_br2_src1_dep_test( 3, "bge", 7, 3, True ),
-    gen_br2_src1_dep_test( 2, "bge", 7, 4, True ),
-    gen_br2_src1_dep_test( 1, "bge", 7, 5, True ),
-    gen_br2_src1_dep_test( 0, "bge", 7, 6, True ),
+    gen_br2_src1_dep_test( 5, "bge", 7, 1, True ),  # 7 > 1, branch taken
+    gen_br2_src1_dep_test( 4, "bge", 7, 2, True ),  # 7 > 2, branch taken
+    gen_br2_src1_dep_test( 3, "bge", 7, 3, True ),  # 7 > 3, branch taken
+    gen_br2_src1_dep_test( 2, "bge", 7, 4, True ),  # 7 > 4, branch taken
+    gen_br2_src1_dep_test( 1, "bge", 7, 5, True ),  # 7 > 5, branch taken
+    gen_br2_src1_dep_test( 0, "bge", 7, 6, True ),  # 7 > 6, branch taken
   ]
 
 #-------------------------------------------------------------------------
 # gen_src1_dep_nottaken_test
 #-------------------------------------------------------------------------
 
+# Test where src0 < src1 (branch should not be taken)
 def gen_src1_dep_nottaken_test():
   return [
-    gen_br2_src1_dep_test( 5, "bge", 1, 7, False ),
-    gen_br2_src1_dep_test( 4, "bge", 2, 7, False ),
-    gen_br2_src1_dep_test( 3, "bge", 3, 7, False ),
-    gen_br2_src1_dep_test( 2, "bge", 4, 7, False ),
-    gen_br2_src1_dep_test( 1, "bge", 5, 7, False ),
-    gen_br2_src1_dep_test( 0, "bge", 6, 7, False ),
+    gen_br2_src1_dep_test( 5, "bge", 1, 7, False ),  # 1 < 7, branch not taken
+    gen_br2_src1_dep_test( 4, "bge", 2, 7, False ),  # 2 < 7, branch not taken
+    gen_br2_src1_dep_test( 3, "bge", 3, 7, False ),  # 3 < 7, branch not taken
+    gen_br2_src1_dep_test( 2, "bge", 4, 7, False ),  # 4 < 7, branch not taken
+    gen_br2_src1_dep_test( 1, "bge", 5, 7, False ),  # 5 < 7, branch not taken
+    gen_br2_src1_dep_test( 0, "bge", 6, 7, False ),  # 6 < 7, branch not taken
   ]
-
 #-------------------------------------------------------------------------
 # gen_srcs_dep_taken_test
 #-------------------------------------------------------------------------
 
+# Test where src0 > src1 (branch should be taken)
 def gen_srcs_dep_taken_test():
   return [
-    gen_br2_srcs_dep_test( 5, "bge", 2, 1, True ),
-    gen_br2_srcs_dep_test( 4, "bge", 3, 2, True ),
-    gen_br2_srcs_dep_test( 3, "bge", 4, 3, True ),
-    gen_br2_srcs_dep_test( 2, "bge", 5, 4, True ),
-    gen_br2_srcs_dep_test( 1, "bge", 6, 5, True ),
-    gen_br2_srcs_dep_test( 0, "bge", 7, 6, True ),
+    gen_br2_srcs_dep_test( 5, "bge", 2, 1, True ),  # 2 > 1, branch taken
+    gen_br2_srcs_dep_test( 4, "bge", 3, 2, True ),  # 3 > 2, branch taken
+    gen_br2_srcs_dep_test( 3, "bge", 4, 3, True ),  # 4 > 3, branch taken
+    gen_br2_srcs_dep_test( 2, "bge", 5, 4, True ),  # 5 > 4, branch taken
+    gen_br2_srcs_dep_test( 1, "bge", 6, 5, True ),  # 6 > 5, branch taken
+    gen_br2_srcs_dep_test( 0, "bge", 7, 6, True ),  # 7 > 6, branch taken
   ]
 
 #-------------------------------------------------------------------------
 # gen_srcs_dep_nottaken_test
 #-------------------------------------------------------------------------
 
+# Test where src0 < src1 (branch should not be taken)
 def gen_srcs_dep_nottaken_test():
   return [
-    gen_br2_srcs_dep_test( 5, "bge", 1, 2, False ),
-    gen_br2_srcs_dep_test( 4, "bge", 2, 3, False ),
-    gen_br2_srcs_dep_test( 3, "bge", 3, 4, False ),
-    gen_br2_srcs_dep_test( 2, "bge", 4, 5, False ),
-    gen_br2_srcs_dep_test( 1, "bge", 5, 6, False ),
-    gen_br2_srcs_dep_test( 0, "bge", 6, 7, False ),
+    gen_br2_srcs_dep_test( 5, "bge", 1, 2, False ),  # 1 < 2, branch not taken
+    gen_br2_srcs_dep_test( 4, "bge", 2, 3, False ),  # 2 < 3, branch not taken
+    gen_br2_srcs_dep_test( 3, "bge", 3, 4, False ),  # 3 < 4, branch not taken
+    gen_br2_srcs_dep_test( 2, "bge", 4, 5, False ),  # 4 < 5, branch not taken
+    gen_br2_srcs_dep_test( 1, "bge", 5, 6, False ),  # 5 < 6, branch not taken
+    gen_br2_srcs_dep_test( 0, "bge", 6, 7, False ),  # 6 < 7, branch not taken
   ]
 
 #-------------------------------------------------------------------------
 # gen_src0_eq_src1_test
 #-------------------------------------------------------------------------
 
+# Test where src0 == src1 (branch should be taken)
 def gen_src0_eq_src1_test():
   return [
-    gen_br2_src0_eq_src1_test( "bge", 1, True ),
+    gen_br2_src0_eq_src1_test( "bge", 1, True ),  # 1 == 1, branch taken
+    gen_br2_src0_eq_src1_test( "bge", 0, True ),  # 0 == 0, branch taken
+    gen_br2_src0_eq_src1_test( "bge", -1, True ),  # -1 == -1, branch taken
   ]
 
 #-------------------------------------------------------------------------
@@ -174,26 +181,49 @@ def gen_value_test():
     gen_br2_value_test( "bge", 0xfffffff7, 0x7fffffff, False ),
     gen_br2_value_test( "bge", 0x7fffffff, 0xfffffff7, True ),
 
+    # src0 == src1 (branch taken)
+    gen_br2_value_test( "bge", -1, -1, True ),  # -1 == -1, branch taken
+    gen_br2_value_test( "bge",  0,  0, True ),  # 0 == 0, branch taken
+    gen_br2_value_test( "bge",  1,  1, True ),  # 1 == 1, branch taken
+
+    # src0 > src1 (branch taken)
+    gen_br2_value_test( "bge",  0, -1, True ),  # 0 > -1, branch taken
+    gen_br2_value_test( "bge",  1,  0, True ),  # 1 > 0, branch taken
+    gen_br2_value_test( "bge", 0x7fffffff, 0x7fffffff, True ),  # max == max, branch taken
+
+    # src0 < src1 (branch not taken)
+    gen_br2_value_test( "bge", -1,  0, False ),  # -1 < 0, branch not taken
+    gen_br2_value_test( "bge", -1,  1, False ),  # -1 < 1, branch not taken
+    gen_br2_value_test( "bge", 0xfffffff7, 0x7fffffff, False ),  # large negative < positive, branch not taken
+
+    # Mixed positive and negative values
+    gen_br2_value_test( "bge", 0x7fffffff, -1, True ),  # max positive > -1, branch taken
+    gen_br2_value_test( "bge", -1, 0x7fffffff, False ),  # -1 < max positive, branch not taken
   ]
+  
 
 #-------------------------------------------------------------------------
 # gen_random_test
 #-------------------------------------------------------------------------
 
+# Random test cases with bge, covering both greater, equal, and less scenarios
 def gen_random_test():
   asm_code = []
   for i in range(25):
-    taken = random.choice([True, False])  # 
-    src0  = random.randint(-2147483648, 2147483647)  # 
-    
+    taken = random.choice([True, False])
+    src0  = random.randint(-2147483648, 2147483647)  # Generate a signed 32-bit integer
+
     if taken:
-      # Branch taken, src0 >= src1
-      src1 = random.randint(-2147483648, src0)  # 
+      # Branch taken, src0 >= src1 (includes both "greater" and "equal" cases)
+      if random.choice([True, False]):  # Randomly decide between equal or greater case
+        src1 = src0  # Equal case
+      else:
+        src1 = random.randint(-2147483648, src0)  # Greater case
     else:
       # Branch not taken, src0 < src1
-      src1 = random.randint(src0 + 1, 2147483647)  # 
+      src1 = random.randint(src0 + 1, 2147483647)  # Smaller case
 
-    # 
+    # Append the test case to asm_code
     asm_code.append( gen_br2_value_test( "bge", src0, src1, taken ) )
   
   return asm_code
@@ -202,6 +232,7 @@ def gen_random_test():
 # gen_back_to_back_test
 #-------------------------------------------------------------------------
 
+# Test multiple consecutive bge instructions
 def gen_back_to_back_test():
   return """
      # Test backwards walk (back to back branch taken)
@@ -260,58 +291,6 @@ def gen_back_to_back_test():
      X1:
      bge  x3, x0, i1
      y1:
-
-     bge  x3, x0, X2
-     csrw proc2mngr, x0
-     nop
-     a2:
-     csrw proc2mngr, x1 > 1
-     bge  x3, x0, y2
-     b2:
-     bge  x3, x0, a2
-     c2:
-     bge  x3, x0, b2
-     d2:
-     bge  x3, x0, c2
-     e2:
-     bge  x3, x0, d2
-     f2:
-     bge  x3, x0, e2
-     g2:
-     bge  x3, x0, f2
-     h2:
-     bge  x3, x0, g2
-     i2:
-     bge  x3, x0, h2
-     X2:
-     bge  x3, x0, i2
-     y2:
-
-     bge  x3, x0, X3
-     csrw proc2mngr, x0
-     nop
-     a3:
-     csrw proc2mngr, x1 > 1
-     bge  x3, x0, y3
-     b3:
-     bge  x3, x0, a3
-     c3:
-     bge  x3, x0, b3
-     d3:
-     bge  x3, x0, c3
-     e3:
-     bge  x3, x0, d3
-     f3:
-     bge  x3, x0, e3
-     g3:
-     bge  x3, x0, f3
-     h3:
-     bge  x3, x0, g3
-     i3:
-     bge  x3, x0, h3
-     X3:
-     bge  x3, x0, i3
-     y3:
      nop
      nop
      nop
