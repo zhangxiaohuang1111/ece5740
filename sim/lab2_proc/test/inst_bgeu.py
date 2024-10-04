@@ -198,7 +198,7 @@ def gen_back_to_back_test():
   return """
      # Test backwards walk (back to back branch taken with unsigned comparison)
 
-     csrr x3, mngr2proc < 1      # Load unsigned value into x3
+     csrr x3, mngr2proc < -1      # Load unsigned value into x3
      csrr x1, mngr2proc < 1      # Load unsigned value into x1
 
      bgeu  x3, x0, X0           # If x3 >= x0 (unsigned comparison), branch to X0
