@@ -49,7 +49,7 @@ class Tests:
     asm_test( inst_add.gen_value_test     ),
     asm_test( inst_add.gen_random_test    ),
   ])
-  
+
   def test_add( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 

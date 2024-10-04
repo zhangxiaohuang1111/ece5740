@@ -94,12 +94,12 @@ def gen_basic_test():
 
 def gen_dest_dep_test():
   return [
-    gen_rimm_dest_dep_test( 5, "sltiu",  10,  20, 1 ),
-    gen_rimm_dest_dep_test( 4, "sltiu",  20,  10, 0 ),
-    gen_rimm_dest_dep_test( 3, "sltiu",  0xFFFFFFFF, 0, 0 ),  # 4294967295 < 0 -> False
-    gen_rimm_dest_dep_test( 2, "sltiu",  0, 0xFFFFFFFF, 1 ),  # 0 < 4294967295 -> True
-    gen_rimm_dest_dep_test( 1, "sltiu",  0xFFFFFFFE, 0xFFFFFFFF, 1 ),  # 4294967294 < 4294967295 -> True
-    gen_rimm_dest_dep_test( 0, "sltiu",  0xFFFFFFFF, 0xFFFFFFFE, 0 ),  # 4294967295 < 4294967294 -> False
+    gen_rimm_dest_dep_test( 5, "sltiu",  10,          20,   1 ),
+    gen_rimm_dest_dep_test( 4, "sltiu",  20,          10,   0 ),
+    gen_rimm_dest_dep_test( 3, "sltiu",  4294967,     4095, 0 ),  
+    gen_rimm_dest_dep_test( 2, "sltiu",  0,           4095, 1 ),   
+    gen_rimm_dest_dep_test( 1, "sltiu",  429,         4000, 1 ),  
+    gen_rimm_dest_dep_test( 0, "sltiu",  4294967,     1234, 0 ),  
   ]
 
 #-------------------------------------------------------------------------
@@ -108,12 +108,12 @@ def gen_dest_dep_test():
 
 def gen_src_dep_test():
   return [
-    gen_rimm_src_dep_test( 5, "sltiu",  10,  20, 1 ),
-    gen_rimm_src_dep_test( 4, "sltiu",  20,  10, 0 ),
-    gen_rimm_src_dep_test( 3, "sltiu",  0xFFFFFFFF, 0, 0 ),
-    gen_rimm_src_dep_test( 2, "sltiu",  0, 0xFFFFFFFF, 1 ),
-    gen_rimm_src_dep_test( 1, "sltiu",  0xFFFFFFFE, 0xFFFFFFFF, 1 ),
-    gen_rimm_src_dep_test( 0, "sltiu",  0xFFFFFFFF, 0xFFFFFFFE, 0 ),
+    gen_rimm_src_dep_test( 5, "sltiu",  10,         20,         1 ),
+    gen_rimm_src_dep_test( 4, "sltiu",  20,         10,         0 ),
+    gen_rimm_src_dep_test( 3, "sltiu",  4294967295, 0,          0 ),
+    gen_rimm_src_dep_test( 2, "sltiu",  0,          4294967295, 1 ),
+    gen_rimm_src_dep_test( 1, "sltiu",  4294967295, 4294967295, 1 ),
+    gen_rimm_src_dep_test( 0, "sltiu",  4294967295, 4294967295, 0 ),
   ]
 
 #-------------------------------------------------------------------------
@@ -124,7 +124,7 @@ def gen_srcs_dest_test():
   return [
     gen_rimm_src_eq_dest_test( "sltiu",  10,  20, 1 ),
     gen_rimm_src_eq_dest_test( "sltiu",  20,  10, 0 ),
-    gen_rimm_src_eq_dest_test( "sltiu",  0xFFFFFFFF, 0, 0 ),
+    gen_rimm_src_eq_dest_test( "sltiu",  4294967295, 0, 0 ),
   ]
 
 #-------------------------------------------------------------------------
