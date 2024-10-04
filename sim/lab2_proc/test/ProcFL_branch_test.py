@@ -69,9 +69,9 @@ class Tests:
   def test_bne( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # random stall and delay
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  def test_bne_delays( s ):
+    run_test( s.ProcType, inst_bne.gen_random_test, delays=True,
+              cmdline_opts=s.__class__.cmdline_opts )
   #-----------------------------------------------------------------------
   # bge
   #-----------------------------------------------------------------------
