@@ -69,7 +69,7 @@ def gen_src_dep_test():
     gen_rimm_src_dep_test( 5, "addi", 0x00000f0f, 0x0ff, 0x0000100e ),
     gen_rimm_src_dep_test( 4, "addi", 0x0000f0f0, 0xff0, 0x0000f0e0 ),
     gen_rimm_src_dep_test( 3, "addi", 0x00000f0f, 0xf00, 0x00000e0f ),
-    gen_rimm_src_dep_test( 2, "addi", 0x0000f0f0, 0xf0f, 0x0000f00f ),
+    gen_rimm_src_dep_test( 2, "addi", 0x0000f0f0, 0xf0f, 0x0000efff ),
     gen_rimm_src_dep_test( 1, "addi", 0x00000f0f, 0xfff, 0x00000f0e ),
     gen_rimm_src_dep_test( 0, "addi", 0x0000f0f0, 0x0f0, 0x0000f1e0 ),
   ]
@@ -92,7 +92,7 @@ def gen_value_test():
     gen_rimm_value_test( "addi", 0xff00ff00, 0xf0f, 0xff00fe0f ),
     gen_rimm_value_test( "addi", 0x0ff00ff0, 0x0f0, 0x0ff010e0 ),
     gen_rimm_value_test( "addi", 0x00ff00ff, 0x00f, 0x00ff010e ),
-    gen_rimm_value_test( "addi", 0xf00ff00f, 0xff0, 0xf00ff000 ),
+    gen_rimm_value_test( "addi", 0xf00ff00f, 0xff0, 0xf00fefff ),
   ]
 
 #-------------------------------------------------------------------------

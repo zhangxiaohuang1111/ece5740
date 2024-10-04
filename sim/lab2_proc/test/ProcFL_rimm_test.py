@@ -50,13 +50,9 @@ class Tests:
   def test_addi( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 
-  def test_andi_delays( s ):
+  def test_addi_delays( s ):
     run_test( s.ProcType, inst_andi.gen_random_test, delays=True,
               cmdline_opts=s.__class__.cmdline_opts )
-    
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # random stall and delay
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   #-----------------------------------------------------------------------
   # andi
