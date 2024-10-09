@@ -141,11 +141,11 @@ class Tests:
 
   @pytest.mark.parametrize( "name,test", [
     asm_test( inst_sltiu.gen_basic_test     ) ,
-    # asm_test( inst_sltiu.gen_dest_dep_test  ) ,
-    # asm_test( inst_sltiu.gen_src_dep_test   ) ,
-    # asm_test( inst_sltiu.gen_srcs_dest_test ) ,
-    # asm_test( inst_sltiu.gen_value_test     ) ,
-    # asm_test( inst_sltiu.gen_random_test    ) ,
+    asm_test( inst_sltiu.gen_dest_dep_test  ) ,
+    asm_test( inst_sltiu.gen_src_dep_test   ) ,
+    asm_test( inst_sltiu.gen_srcs_dest_test ) ,
+    asm_test( inst_sltiu.gen_value_test     ) ,
+    asm_test( inst_sltiu.gen_random_test    ) ,
   ])
 
   def test_sltiu( s, name, test ):

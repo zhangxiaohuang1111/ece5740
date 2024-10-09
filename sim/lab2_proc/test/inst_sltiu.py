@@ -94,12 +94,12 @@ def gen_basic_test():
 
 def gen_dest_dep_test():
   return [
-    gen_rimm_dest_dep_test( 5, "sltiu",  10,          20,   1 ),
-    gen_rimm_dest_dep_test( 4, "sltiu",  20,          10,   0 ),
-    gen_rimm_dest_dep_test( 3, "sltiu",  4294967,     4095, 0 ),  
-    gen_rimm_dest_dep_test( 2, "sltiu",  0,           4095, 1 ),   
-    gen_rimm_dest_dep_test( 1, "sltiu",  429,         4000, 1 ),  
-    gen_rimm_dest_dep_test( 0, "sltiu",  4294967,     1234, 0 ),  
+    gen_rimm_dest_dep_test( 5, "sltiu",  10,  20, 1 ),               # 10 is less than 20, should return 1
+    gen_rimm_dest_dep_test( 4, "sltiu",  20,  10, 0 ),               # 20 is greater than 10, should return 0
+    gen_rimm_dest_dep_test( 3, "sltiu",  4294967295,  0, 0 ),        # Max unsigned value (0xFFFFFFFF) compared to 0, should return 0
+    gen_rimm_dest_dep_test( 2, "sltiu",  0,  4091, 1 ),              # 0 is less than 4091, should return 1
+    gen_rimm_dest_dep_test( 1, "sltiu",  4294967295,  4091, 0 ),     # Max unsigned value (0xFFFFFFFF) compared to 4091, should return 0
+    gen_rimm_dest_dep_test( 0, "sltiu",  4294967295,  4084, 0 ),     # Max unsigned value (0xFFFFFFFF) compared to 4084, should return 0
   ]
 
 #-------------------------------------------------------------------------
@@ -108,12 +108,12 @@ def gen_dest_dep_test():
 
 def gen_src_dep_test():
   return [
-    gen_rimm_src_dep_test( 5, "sltiu",  10,         20,         1 ),
-    gen_rimm_src_dep_test( 4, "sltiu",  20,         10,         0 ),
-    gen_rimm_src_dep_test( 3, "sltiu",  4294967295, 0,          0 ),
-    gen_rimm_src_dep_test( 2, "sltiu",  0,          4294967295, 1 ),
-    gen_rimm_src_dep_test( 1, "sltiu",  4294967295, 4294967295, 1 ),
-    gen_rimm_src_dep_test( 0, "sltiu",  4294967295, 4294967295, 0 ),
+    gen_rimm_src_dep_test( 5, "sltiu",  10,  20, 1 ),               # 10 is less than 20, should return 1
+    gen_rimm_src_dep_test( 4, "sltiu",  20,  10, 0 ),               # 20 is greater than 10, should return 0
+    gen_rimm_src_dep_test( 3, "sltiu",  4294967286,  0, 0 ),        # Large unsigned number compared to 0, should return 0
+    gen_rimm_src_dep_test( 2, "sltiu",  0,  4091, 1 ),              # 0 is less than 4091, should return 1
+    gen_rimm_src_dep_test( 1, "sltiu",  4294967286,  4084, 0 ),     # Large unsigned number compared to 4086, should return 0
+    gen_rimm_src_dep_test( 0, "sltiu",  4294967284,  4084, 0 ),     # Large unsigned number compared to 4084, should return 0
   ]
 
 #-------------------------------------------------------------------------
