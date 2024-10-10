@@ -1,5 +1,5 @@
 //=========================================================================
-// 5-Stage Simple Pipelined Processor Datapath 
+// 5-Stage Simple Pipelined Processor Datapath
 //=========================================================================
 
 `ifndef LAB2_PROC_PROC_ALT_DPATH_V
@@ -16,7 +16,7 @@
 `include "lab2_proc/ProcDpathAlu.v"
 `include "lab1_imul/IntMulAlt.v" // Include Lab1 multiplier with 
 
-module lab2_proc_ProcBaseDpath
+module lab2_proc_ProcAltDpath
 #(
   parameter p_num_cores = 1
 )

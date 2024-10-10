@@ -1,5 +1,5 @@
 //=========================================================================
-// 5-Stage Fully Bypassed Pipelined Processor
+// 5-Stage Simple Pipelined Processor with fully bypassing
 //=========================================================================
 
 `ifndef LAB2_PROC_PROC_ALT_V
@@ -8,6 +8,12 @@
 `include "vc/mem-msgs.v"
 `include "vc/queues.v"
 `include "vc/trace.v"
+
+`include "lab2_proc/tinyrv2_encoding.v"
+`include "lab2_proc/ProcBaseCtrl.v"
+`include "lab2_proc/ProcBaseDpath.v"
+`include "lab2_proc/DropUnit.v"
+
 
 module lab2_proc_ProcAlt
 #(
@@ -286,7 +292,7 @@ module lab2_proc_ProcAlt
   
   
   //----------------------------------------------------------------------
-  // Line tracing
+  // Line tracing for alternative design
   //----------------------------------------------------------------------
 
   `ifndef SYNTHESIS
