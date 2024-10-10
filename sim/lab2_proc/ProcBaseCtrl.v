@@ -225,7 +225,7 @@ module lab2_proc_ProcBaseCtrl
 
   // jump logic redirect PC in F if jump is taken
   always_comb begin
-    if ( val_X && ( jump_type_D == jump_jal) ) begin
+    if ( val_D && ( jump_type_D == jump_jal) ) begin
       pc_redirect_D = 1'b1;
       pc_sel_D      = 2'b10; // use jal target
     end
