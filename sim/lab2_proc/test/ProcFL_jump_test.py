@@ -45,6 +45,9 @@ class Tests:
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # random stall and delay
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  def test_jal_delays( s ):
+    run_test( s.ProcType, inst_jal.gen_basic_test, delays=True,
+              cmdline_opts=s.__class__.cmdline_opts )
 
   #-----------------------------------------------------------------------
   # jalr
