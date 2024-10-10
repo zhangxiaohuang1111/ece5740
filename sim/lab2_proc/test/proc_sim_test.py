@@ -8,7 +8,7 @@ import os
 
 from subprocess import check_call, CalledProcessError
 
-impls  = [ "fl" ]
+impls  = [ "fl", "base" ]
 inputs = [ "vvadd-unopt", "vvadd-opt", "cmult", "mfilt", "bsearch" ]
 
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
