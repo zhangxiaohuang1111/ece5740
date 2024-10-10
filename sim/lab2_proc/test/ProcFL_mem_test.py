@@ -51,17 +51,17 @@ class Tests:
 
   @pytest.mark.parametrize( "name,test", [
     asm_test( inst_sw.gen_basic_test     ),
-    # asm_test( inst_sw.gen_dest_dep_test  ) ,
-    # asm_test( inst_sw.gen_base_dep_test  ) ,
-    # asm_test( inst_sw.gen_srcs_dest_test ) ,
-    # asm_test( inst_sw.gen_addr_test      ) ,
-    # asm_test( inst_sw.gen_random_test    ) ,
+    asm_test( inst_sw.gen_dest_dep_test  ) ,
+    asm_test( inst_sw.gen_base_dep_test  ) ,
+    asm_test( inst_sw.gen_srcs_dest_test ) ,
+    asm_test( inst_sw.gen_addr_test      ) ,
+    asm_test( inst_sw.gen_random_test    ) ,
   ])
 
   def test_sw( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 
-  # def test_sw_delays( s ):
-  #   run_test( s.ProcType, inst_sw.gen_random_test, delays=True,
-  #             cmdline_opts=s.__class__.cmdline_opts )
+  def test_sw_delays( s ):
+    run_test( s.ProcType, inst_sw.gen_random_test, delays=True,
+              cmdline_opts=s.__class__.cmdline_opts )
 

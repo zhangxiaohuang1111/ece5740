@@ -578,26 +578,29 @@ def gen_ld_value_test( inst, offset, base, result ):
 #-------------------------------------------------------------------------
 # gen_st_template
 #-------------------------------------------------------------------------
+# reg_base:   Which reg that store the sw base address
+# reg_value:  What value to store into reg
+# inst:       Instructions
+
 def gen_st_template(
   num_nops_base, num_nops_dest,
-  reg_base, reg_value,
-  inst, offset, base, result
+  reg_base, base, reg_value, offset, result
 ):
   return """
 
     # Move base value into register
-    csrr {reg_base}, mngr2proc < {base}
-    {nops_base}
+    csrr {reg_base}, mngr2proc < {base}  
     csrr x3, mngr2proc < {reg_value}
+    
     {nops_base}
 
     # Instruction under test
-    {inst} x3, {offset}({reg_base})    
-    lw x3, {offset}({reg_base})
-    {nops_dest}
-
-    # Check the result
-    csrw proc2mngr, x3 > {result}
+    sw x3, {offset}({reg_base})
+    
+    {nops_dest}    
+    
+    lw x5, {offset}({reg_base})
+    csrw proc2mngr, x5 > {result}
 
   """.format(
     nops_base = gen_nops(num_nops_base),
@@ -612,33 +615,33 @@ def gen_st_template(
 # inserted between the instruction under test and reading the destination
 # register with a csrr instruction.
 
-def gen_st_dest_dep_test( num_nops, inst, base, result ):
-  return gen_st_template( 8, num_nops, "x1", result, inst, 0, base, result )
+def gen_st_dest_dep_test( num_nops, base, reg_value, result ):
+  return gen_st_template( 8, num_nops, "x1", base, reg_value, 0, result )
 
 # #-------------------------------------------------------------------------
-# # gen_ld_base_dep_test
+# # gen_st_base_dep_test
 # #-------------------------------------------------------------------------
 # # Test the base register bypass paths by varying how many nops are
 # # inserted between writing the base register and reading this register in
 # # the instruction under test.
 
-# def gen_st_base_dep_test( num_nops, inst, base, result ):
-#   return gen_ld_template( num_nops, 0, "x1", result, inst, 0, base, result )
+def gen_st_base_dep_test( num_nops, base, reg_value, result ):
+  return gen_st_template( num_nops, 0, "x1", base, reg_value, 0, result )
 
 # #-------------------------------------------------------------------------
-# # gen_ld_base_eq_dest_test
+# # gen_st_base_eq_dest_test
 # #-------------------------------------------------------------------------
 # # Test situation where the base register specifier is the same as the
 # # destination register specifier.
 
-# def gen_st_base_eq_dest_test( inst, base, result ):
-#   return gen_ld_template( 0, 0, "x3", result, inst, 0, base, result )
+def gen_st_base_eq_dep_test( base ):
+  return gen_st_template( 0, 0, "x3", base, base, 0, base )
 
 # #-------------------------------------------------------------------------
-# # gen_ld_value_test
+# # gen_st_value_test
 # #-------------------------------------------------------------------------
 # # Test the actual operation of a register-register instruction under
 # # test. We assume that bypassing has already been tested.
 
-# def gen_st_value_test( inst, offset, base, result ):
-#   return gen_ld_template( 0, 0, "x1", result, inst, offset, base, result )
+def gen_st_value_test( offset, base, reg_value, result ):
+  return gen_st_template( 0, 0, "x1", base, reg_value, offset, result )
