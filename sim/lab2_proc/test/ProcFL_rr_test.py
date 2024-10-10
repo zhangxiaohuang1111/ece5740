@@ -75,7 +75,7 @@ class Tests:
   def test_sub( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 
-  def test_add_delays( s ):
+  def test_sub_delays( s ):
     run_test( s.ProcType, inst_sub.gen_random_test, delays=True,
               cmdline_opts=s.__class__.cmdline_opts )
   
@@ -97,7 +97,7 @@ class Tests:
   def test_mul( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 
-  def test_add_delays( s ):
+  def test_mul_delays( s ):
     run_test( s.ProcType, inst_sub.gen_random_test, delays=True,
               cmdline_opts=s.__class__.cmdline_opts )
     
