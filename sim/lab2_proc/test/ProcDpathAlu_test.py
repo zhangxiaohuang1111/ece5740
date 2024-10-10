@@ -398,3 +398,64 @@ def test_alu_fn_equality( cmdline_opts ):
     [ 0xfeeeeaa3,   0xf4650000,  13,  0x00000000,   0,        '?',       '?'      ],
   ], cmdline_opts )
 
+def test_alu_fn_lt( cmdline_opts ):
+  dut = ProcDpathAlu()
+
+  run_test_vector_sim( dut, [
+    ('in0           in1           fn  out*          ops_eq*   ops_lt*  ops_ltu*'),
+    # Positive < Positive
+    [ 0x00000001,   0x00000002,  14,  0x00000000,   '?',      1,        '?'      ],
+    [ 0x12345678,   0x12345679,  14,  0x00000000,   '?',      1,        '?'      ],  # Similar positive values
+    [ 0x7FFFFFFE,   0x7FFFFFFF,  14,  0x00000000,   '?',      1,        '?'      ],  # Maximum positive values
+
+    # Positive > Positive
+    [ 0x00000002,   0x00000001,  14,  0x00000000,   '?',      0,        '?'      ],
+    [ 0x12345679,   0x12345678,  14,  0x00000000,   '?',      0,        '?'      ],
+    [ 0x7FFFFFFF,   0x7FFFFFFE,  14,  0x00000000,   '?',      0,        '?'      ],
+
+    # Negative < Positive
+    [ 0xFFFFFFFF,   0x00000001,  14,  0x00000000,   '?',      1,        '?'      ],
+    [ 0xFFFFFFFE,   0x00000002,  14,  0x00000000,   '?',      1,        '?'      ],
+    [ 0x80000000,   0x7FFFFFFF,  14,  0x00000000,   '?',      1,        '?'      ],
+
+    # Negative > Negative
+    [ 0xFFFFFFFE,   0xFFFFFFFF,  14,  0x00000000,   '?',      1,        '?'      ],
+    [ 0xFFFFFFFD,   0xFFFFFFFE,  14,  0x00000000,   '?',      1,        '?'      ],
+    [ 0x80000001,   0x80000000,  14,  0x00000000,   '?',      0,        '?'      ],
+
+    # Positive < Negative
+    [ 0x00000001,   0xFFFFFFFF,  14,  0x00000000,   '?',      0,        '?'      ],
+    [ 0x00000002,   0xFFFFFFFE,  14,  0x00000000,   '?',      0,        '?'      ],
+    [ 0x7FFFFFFF,   0x80000000,  14,  0x00000000,   '?',      0,        '?'      ],
+
+    # Equal numbers
+    [ 0x80000000,   0x80000000,  14,  0x00000000,   '?',      0,        '?'      ],
+    [ 0x00000000,   0x00000000,  14,  0x00000000,   '?',      0,        '?'      ],
+    [ 0xFFFFFFFF,   0xFFFFFFFF,  14,  0x00000000,   '?',      0,        '?'      ],
+  ], cmdline_opts )
+
+def test_alu_fn_ltu( cmdline_opts ):
+  dut = ProcDpathAlu()
+
+  run_test_vector_sim( dut, [
+    ('in0           in1           fn  out*          ops_eq*   ops_lt*  ops_ltu*'),
+    # Unsigned Positive < Unsigned Positive
+    [ 0x00000001,   0x00000002,  15,  0x00000000,   '?',      '?',      1        ],
+    [ 0x12345678,   0xFFFFFFFF,  15,  0x00000000,   '?',      '?',      1        ],
+
+    # Unsigned Positive > Unsigned Positive
+    [ 0x00000002,   0x00000001,  15,  0x00000000,   '?',      '?',      0        ],
+    [ 0xFFFFFFFF,   0x12345678,  15,  0x00000000,   '?',      '?',      0        ],
+
+    # Unsigned Equal
+    [ 0x00000001,   0x00000001,  15,  0x00000000,   '?',      '?',      0        ],
+    [ 0xFFFFFFFF,   0xFFFFFFFF,  15,  0x00000000,   '?',      '?',      0        ],
+
+    # Zero < Unsigned Positive
+    [ 0x00000000,   0x00000001,  15,  0x00000000,   '?',      '?',      1        ],
+    [ 0x00000000,   0xFFFFFFFF,  15,  0x00000000,   '?',      '?',      1        ],
+
+    # Maximum Unsigned vs. Zero
+    [ 0xFFFFFFFF,   0x00000000,  15,  0x00000000,   '?',      '?',      0        ],
+    [ 0x00000000,   0xFFFFFFFF,  15,  0x00000000,   '?',      '?',      1        ],
+  ], cmdline_opts )
