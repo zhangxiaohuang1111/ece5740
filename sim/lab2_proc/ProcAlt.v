@@ -10,8 +10,8 @@
 `include "vc/trace.v"
 
 `include "lab2_proc/tinyrv2_encoding.v"
-`include "lab2_proc/ProcBaseCtrl.v"
-`include "lab2_proc/ProcBaseDpath.v"
+`include "lab2_proc/ProcAltCtrl.v"
+`include "lab2_proc/ProcAltDpath.v"
 `include "lab2_proc/DropUnit.v"
 
 
@@ -197,8 +197,8 @@ module lab2_proc_ProcAlt
   logic [1:0]  op2_sel_D;
   logic [1:0]  csrr_sel_D;
   logic [2:0]  imm_type_D;
-  logic        op1_byp_sel_D;
-  logic        op2_byp_sel_D;
+  logic [1:0]  op1_byp_sel_D;
+  logic [1:0]  op2_byp_sel_D;
 
   logic        reg_en_X;
   logic [3:0]  alu_fn_X;
@@ -228,7 +228,7 @@ module lab2_proc_ProcAlt
   // Control Unit
   //----------------------------------------------------------------------
 
-  lab2_proc_ProcBaseCtrl ctrl
+  lab2_proc_ProcAltCtrl ctrl
   (
     // Instruction Memory Port
 
@@ -261,7 +261,7 @@ module lab2_proc_ProcAlt
   // Datapath
   //----------------------------------------------------------------------
 
-  lab2_proc_ProcBaseDpath
+  lab2_proc_ProcAltDpath
   #(
     .p_num_cores              (p_num_cores)
   )

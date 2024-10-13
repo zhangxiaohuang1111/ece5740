@@ -9,7 +9,7 @@
 
 `include "lab2_proc/tinyrv2_encoding.v"
 
-module lab2_proc_ProcBaseCtrl
+module lab2_proc_ProcAltCtrl
 (
   input  logic        clk,
   input  logic        reset,
@@ -47,8 +47,8 @@ module lab2_proc_ProcBaseCtrl
   output logic [1:0]  op2_sel_D,      // operand 2 select
   output logic [1:0]  csrr_sel_D,
   output logic [2:0]  imm_type_D,
-  output logic        op1_byp_sel_D,  // bypass select for operand 1
-  output logic        op2_byp_sel_D,  // bypass select for operand 2
+  output logic [1:0]  op1_byp_sel_D,  // bypass select for operand 1
+  output logic [1:0]  op2_byp_sel_D,  // bypass select for operand 2
 
   output logic        reg_en_X,
   output logic [3:0]  alu_fn_X,
@@ -496,22 +496,41 @@ module lab2_proc_ProcBaseCtrl
   logic ostall_load_using_X_rs2_D;
 
   assign ostall_load_using_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
-    && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_D == ld );
+    && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_X == ld );
 
   assign ostall_load_using_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
-    && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_D == ld );
+    && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_X == ld );
 
   // Bypassing logic
   logic bypass_waddr_X_rs1_D;
   logic bypass_waddr_X_rs2_D;
+  logic bypass_waddr_X_rs1_M;
+  logic bypass_waddr_X_rs2_M;
+  logic bypass_waddr_X_rs1_W;
+  logic bypass_waddr_X_rs2_W;
 
-  bypass_waddr_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
-    && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_D != ld);
+  assign bypass_waddr_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
+    && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_X != ld);
 
-  bypass_waddr_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
-    && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_D != ld);
+  assign bypass_waddr_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
+    && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_X != ld);
 
-  assign op1_byp_sel_D = (bypass_waddr_X_rs1_D) ? 2'b01 : 2'b00;
+
+  assign bypass_waddr_M_rs1_D = val_D && rs1_en_D && val_M && rf_wen_M
+    && ( inst_rs1_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 );
+
+  assign bypass_waddr_M_rs2_D = val_D && rs2_en_D && val_M && rf_wen_M
+    && ( inst_rs2_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 );
+
+
+  assign bypass_waddr_W_rs1_D = val_D && rs1_en_D && val_W && rf_wen_W
+    && ( inst_rs1_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 );
+  
+  assign bypass_waddr_W_rs2_D = val_D && rs2_en_D && val_W && rf_wen_W
+    && ( inst_rs2_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 );
+  
+  assign op1_byp_sel_D = (bypass_waddr_X_rs1_D) ? 2'b01 : (bypass_waddr_M_rs1_D) ? 2'b10 : (bypass_waddr_W_rs1_D) ? 2'b11 : 2'b00;
+  assign op2_byp_sel_D = (bypass_waddr_X_rs2_D) ? 2'b01 : (bypass_waddr_M_rs2_D) ? 2'b10 : (bypass_waddr_W_rs2_D) ? 2'b11 : 2'b00;
   
   // Put together ostall signal due to hazards
 
