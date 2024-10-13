@@ -330,7 +330,7 @@ module lab2_proc_ProcAltDpath
     .clk   (clk),
     .reset (reset),
     .en    (reg_en_X),
-    .d     (rf_rdata1_D),
+    .d     (op2_byp_mux_out),
     .q     (dmem_reqstream_msg_data)
   );
 
@@ -446,5 +446,5 @@ module lab2_proc_ProcAltDpath
 
 endmodule
 
-`endif /* LAB2_PROC_PROC_BASE_DPATH_V */
+`endif /* LAB2_PROC_PROC_ALT_DPATH_V */
 

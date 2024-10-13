@@ -501,13 +501,14 @@ module lab2_proc_ProcAltCtrl
   assign ostall_load_using_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
     && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_X == ld );
 
+
   // Bypassing logic
   logic bypass_waddr_X_rs1_D;
   logic bypass_waddr_X_rs2_D;
-  logic bypass_waddr_X_rs1_M;
-  logic bypass_waddr_X_rs2_M;
-  logic bypass_waddr_X_rs1_W;
-  logic bypass_waddr_X_rs2_W;
+  logic bypass_waddr_M_rs1_D;
+  logic bypass_waddr_M_rs2_D;
+  logic bypass_waddr_W_rs1_D;
+  logic bypass_waddr_W_rs2_D;
 
   assign bypass_waddr_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
     && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_X != ld);
@@ -765,4 +766,4 @@ module lab2_proc_ProcAltCtrl
 
 endmodule
 
-`endif /* LAB2_PROC_PROC_BASE_CTRL_V */
+`endif /* LAB2_PROC_PROC_ALT_CTRL_V */
