@@ -197,6 +197,8 @@ module lab2_proc_ProcAlt
   logic [1:0]  op2_sel_D;
   logic [1:0]  csrr_sel_D;
   logic [2:0]  imm_type_D;
+  logic        op1_byp_sel_D;
+  logic        op2_byp_sel_D;
 
   logic        reg_en_X;
   logic [3:0]  alu_fn_X;

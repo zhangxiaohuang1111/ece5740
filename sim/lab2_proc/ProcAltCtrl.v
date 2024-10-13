@@ -43,10 +43,12 @@ module lab2_proc_ProcBaseCtrl
   output logic [1:0]  pc_sel_F,
 
   output logic        reg_en_D,
-  output logic        op1_sel_D,
-  output logic [1:0]  op2_sel_D,
+  output logic        op1_sel_D,      // operand 1 select
+  output logic [1:0]  op2_sel_D,      // operand 2 select
   output logic [1:0]  csrr_sel_D,
   output logic [2:0]  imm_type_D,
+  output logic        op1_byp_sel_D,  // bypass select for operand 1
+  output logic        op2_byp_sel_D,  // bypass select for operand 2
 
   output logic        reg_en_X,
   output logic [3:0]  alu_fn_X,
@@ -483,60 +485,39 @@ module lab2_proc_ProcBaseCtrl
   logic  ostall_mngr2proc_D;
   assign ostall_mngr2proc_D = val_D && mngr2proc_rdy_D && !mngr2proc_val;
 
-  // ostall if write address in X matches rs1 in D
-
-  logic  ostall_waddr_X_rs1_D;
-  assign ostall_waddr_X_rs1_D
-    = rs1_en_D && val_X && rf_wen_X
-      && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 );
-
-  // ostall if write address in M matches rs1 in D
-
-  logic  ostall_waddr_M_rs1_D;
-  assign ostall_waddr_M_rs1_D
-    = rs1_en_D && val_M && rf_wen_M
-      && ( inst_rs1_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 );
-
-  // ostall if write address in W matches rs1 in D
-
-  logic  ostall_waddr_W_rs1_D;
-  assign ostall_waddr_W_rs1_D
-    = rs1_en_D && val_W && rf_wen_W
-      && ( inst_rs1_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 );
-
-  // ostall if write address in X matches rs2 in D
-
-  logic  ostall_waddr_X_rs2_D;
-  assign ostall_waddr_X_rs2_D
-    = rs2_en_D && val_X && rf_wen_X
-      && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 );
-
-  // ostall if write address in M matches rs2 in D
-
-  logic  ostall_waddr_M_rs2_D;
-  assign ostall_waddr_M_rs2_D
-    = rs2_en_D && val_M && rf_wen_M
-      && ( inst_rs2_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 );
-
-  // ostall if write address in W matches rs2 in D
-
-  logic  ostall_waddr_W_rs2_D;
-  assign ostall_waddr_W_rs2_D
-    = rs2_en_D && val_W && rf_wen_W
-      && ( inst_rs2_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 );
-
   // ostall_imul_D
   
   logic ostall_imul_D;
-  assign imul_req_val_D = val_D && !stall_D && !squash_D && (ex_result_sel_D == imul); // We send req_val only no stall/squash
-  assign ostall_imul_D = val_D && !imul_req_rdy_D;                   // Need wait for req_rdy
+  assign imul_req_val_D = val_D && !stall_D && !squash_D && (ex_result_sel_D == imul);  // We send req_val only no stall/squash
+  assign ostall_imul_D = val_D && !imul_req_rdy_D;                                      // Need wait for req_rdy
 
+  // ostall due to load-use hazard in the bypassing
+  logic ostall_load_using_X_rs1_D;
+  logic ostall_load_using_X_rs2_D;
+
+  assign ostall_load_using_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
+    && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_D == ld );
+
+  assign ostall_load_using_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
+    && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_D == ld );
+
+  // Bypassing logic
+  logic bypass_waddr_X_rs1_D;
+  logic bypass_waddr_X_rs2_D;
+
+  bypass_waddr_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
+    && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_D != ld);
+
+  bypass_waddr_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
+    && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_D != ld);
+
+  assign op1_byp_sel_D = (bypass_waddr_X_rs1_D) ? 2'b01 : 2'b00;
+  
   // Put together ostall signal due to hazards
 
   logic  ostall_hazard_D;
   assign ostall_hazard_D =
-      ostall_waddr_X_rs1_D || ostall_waddr_M_rs1_D || ostall_waddr_W_rs1_D ||
-      ostall_waddr_X_rs2_D || ostall_waddr_M_rs2_D || ostall_waddr_W_rs2_D;
+      ostall_load_using_X_rs1_D || ostall_load_using_X_rs2_D;
 
   // Final ostall signal
 

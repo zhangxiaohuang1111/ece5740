@@ -16,6 +16,8 @@
 `include "lab2_proc/ProcDpathAlu.v"
 `include "lab1_imul/IntMulAlt.v" // Include Lab1 multiplier with 
 
+
+
 module lab2_proc_ProcAltDpath
 #(
   parameter p_num_cores = 1
@@ -52,6 +54,8 @@ module lab2_proc_ProcAltDpath
   input  logic [1:0]   op2_sel_D,
   input  logic [1:0]   csrr_sel_D,
   input  logic [2:0]   imm_type_D,
+  input  logic         op1_byp_sel_D,
+  input  logic         op2_byp_sel_D,
 
   input  logic         reg_en_X,
   input  logic [3:0]   alu_fn_X,
@@ -211,7 +215,7 @@ module lab2_proc_ProcAltDpath
 
   vc_Mux2#(32) op1_sel_mux_D(
     .in0  (pc_D),
-    .in1  (rf_rdata0_D),
+    .in1  (op1_byp_mux_out),    // We change wire here for bypassing
     .sel  (op1_sel_D),
     .out  (op1_D)
   );
@@ -221,8 +225,8 @@ module lab2_proc_ProcAltDpath
   // csrr sel mux. Basically we are using two muxes here for pedagogy.
   vc_Mux3#(32) op2_sel_mux_D
   (
-    .in0  (rf_rdata1_D),
-    .in1  (imm_D),
+    .in0  (op2_byp_mux_out),  // 0 is the rs1 come out of RF
+    .in1  (imm_D),        // 
     .in2  (csrr_data_D),
     .sel  (op2_sel_D),
     .out  (op2_D)
@@ -239,7 +243,7 @@ module lab2_proc_ProcAltDpath
 
   
 
-  // #Lab01 Alternative Multiplier#######################################################################
+  //#####################################Lab01 Alternative Multiplier##################################
 
   logic [31:0] imul_resp_msg;  // Output data wire
   logic [63:0] combined_data_in;
@@ -255,6 +259,35 @@ module lab2_proc_ProcAltDpath
     .ostream_rdy(imul_resp_rdy_X),
     .ostream_msg(imul_resp_msg)
   );
+
+  //#####################################Lab02 Bypassing Mux##################################
+  
+  // Bypassing logic wires
+  logic [31:0] byp_X;
+  logic [31:0] byp_M;
+  logic [31:0] byp_W;
+
+  logic [31:0] op1_byp_mux_out;
+  logic [31:0] op2_byp_mux_out;
+
+  vc_Mux4#(32) op1_byp_mux(
+    .in0(rf_rdata0_D),
+    .in1(byp_X),
+    .in2(byp_M),
+    .in3(byp_W),
+    .sel(op1_byp_sel_D),
+    .out(op1_byp_mux_out)
+  ) 
+
+  vc_Mux4#(32) op2_byp_mux(
+    .in0(rf_rdata1_D),
+    .in1(byp_X),
+    .in2(byp_M),
+    .in3(byp_W),
+    .sel(op2_byp_sel_D),
+    .out(op2_byp_mux_out)
+  ) 
+
 
   //--------------------------------------------------------------------
   // X stage
@@ -343,6 +376,7 @@ module lab2_proc_ProcAltDpath
   );
 
   assign dmem_reqstream_msg_addr = alu_result_X;
+  assign byp_X = exresult_X;  // Bypassing wire
 
   //--------------------------------------------------------------------
   // M stage
@@ -372,6 +406,8 @@ module lab2_proc_ProcAltDpath
     .out    (wb_result_M)
   );
 
+  assign byp_M = wb_result_M; // Bypassing wire
+
   //--------------------------------------------------------------------
   // W stage
   //--------------------------------------------------------------------
@@ -388,8 +424,8 @@ module lab2_proc_ProcAltDpath
   );
 
   assign proc2mngr_data = wb_result_W;
-
   assign rf_wdata_W = wb_result_W;
+  assign byp_W = wb_result_W;   // Bypassing wire
 
   // stats output
   // note the stats en is full 32-bit here but the outside port is one
