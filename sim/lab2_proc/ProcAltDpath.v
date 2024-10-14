@@ -17,7 +17,6 @@
 `include "lab1_imul/IntMulAlt.v" // Include Lab1 multiplier with 
 
 
-
 module lab2_proc_ProcAltDpath
 #(
   parameter p_num_cores = 1
@@ -242,7 +241,6 @@ module lab2_proc_ProcAltDpath
   );
 
   
-
   //#####################################Lab01 Alternative Multiplier##################################
 
   logic [31:0] imul_resp_msg;  // Output data wire
