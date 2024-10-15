@@ -47,9 +47,6 @@ def gen_basic_test():
 
   """
 
-# ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Define additional directed and random test cases.
-# '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 def gen_multijump_test():
   return """
 
