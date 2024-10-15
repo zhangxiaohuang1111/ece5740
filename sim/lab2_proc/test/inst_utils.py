@@ -573,8 +573,6 @@ def gen_ld_value_test( inst, offset, base, result ):
   return gen_ld_template( 0, 0, "x1", inst, offset, base, result )
 
 
-
-
 #-------------------------------------------------------------------------
 # gen_st_template
 #-------------------------------------------------------------------------
@@ -645,3 +643,87 @@ def gen_st_base_eq_dep_test( base ):
 
 def gen_st_value_test( offset, base, reg_value, result ):
   return gen_st_template( 0, 0, "x1", base, reg_value, offset, result )
+
+# #-------------------------------------------------------------------------
+# # gen_jump_template
+# #-------------------------------------------------------------------------
+def gen_jump_template(num_nops_dest, inst,result_b,result_c):
+    if inst == "jal":
+        return """
+
+    # Use x3 to track the control flow pattern
+    addi  x3, x0, 0                # 0x00000200
+    
+    {inst}   x1, label_a           # 0x00000204
+    addi  x3, x3, 0b000001         # 0x00000208
+
+  label_b:
+    {nops_dest}
+    addi  x3, x3, 0b000010         # 0x0000020c
+    addi  x5, x1, 0                # 0x00000210
+    {inst}   x1, label_c           # 0x00000214
+    addi  x1, x3, 0b000100         # 0x00000218
+
+  label_a:
+    {nops_dest}
+    addi  x3, x3, 0b001000         # 0x0000021c
+    addi  x4, x1, 0                # 0x00000220
+    {inst}   x1, label_b           # 0x00000224
+    addi  x3, x3, 0b010000         # 0x00000228
+
+  label_c:
+    {nops_dest}
+    addi  x3, x3, 0b100000         # 0x0000022c
+    addi  x6, x1, 0                # 0x00000230
+
+    # Carefully determine which bits are expected
+    # to be set if jump operates correctly.
+    csrw  proc2mngr, x3 > 0b101010
+
+    # Check the link addresses
+    csrw  proc2mngr, x4 > 0x00000208
+    csrw  proc2mngr, x5 > {result_b}
+    csrw  proc2mngr, x6 > {result_c}
+  """.format(
+    nops_dest = gen_nops(num_nops_dest),
+    **locals()
+  )
+
+    elif inst == "jalr":
+        return """
+        # Use x3 to track the control flow pattern
+        addi  x3, x0, 0                # 0x00000200
+
+        {inst}   x1, 0(x4)             # 0x00000204
+        addi  x3, x3, 0b000001         # 0x00000208
+
+      label_b:
+        addi  x3, x3, 0b000010         # 0x0000020c
+        addi  x5, x1, 0                # 0x00000210
+        {inst}   x1, 0(x5)             # 0x00000214
+        addi  x1, x3, 0b000100         # 0x00000218
+
+      label_a:
+        addi  x3, x3, 0b001000         # 0x0000021c
+        addi  x4, x1, 0                # 0x00000220
+        {inst}   x1, 0(x4)             # 0x00000224
+        addi  x3, x3, 0b010000         # 0x00000228
+
+      label_c:
+        addi  x3, x3, 0b100000         # 0x0000022c
+        addi  x6, x1, 0                # 0x00000230
+
+        # Carefully determine which bits are expected
+        # to be set if jump operates correctly.
+        csrw  proc2mngr, x3 > 0b101010
+
+        # Check the link addresses
+        csrw  proc2mngr, x4 > 0x00000208
+        csrw  proc2mngr, x5 > {result_b}
+        csrw  proc2mngr, x6 > {result_c}
+        """
+    else:
+        return "# Unsupported instruction type"
+    
+def gen_jump_dest_dep_test( num_nops, inst, result_b, result_c):
+    return gen_jump_template(num_nops, inst, result_b, result_c)

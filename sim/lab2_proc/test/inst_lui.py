@@ -39,10 +39,6 @@ def gen_basic_test():
 #-------------------------------------------------------------------------
 # gen_dest_dep_test
 #-------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------
-# gen_dest_dep_test
-#-------------------------------------------------------------------------
 # Test the destination register dependencies by varying how many nops are
 # inserted after the instruction under test before reading the destination.
 

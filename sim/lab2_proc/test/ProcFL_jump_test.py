@@ -31,21 +31,20 @@ class Tests:
   #-----------------------------------------------------------------------
 
   @pytest.mark.parametrize( "name,test", [
-    asm_test( inst_jal.gen_basic_test        ) ,
-    asm_test( inst_jal.gen_multijump_test    ) ,
-
-    # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    # Add more rows to the test case table to test more complicated
-    # scenarios.
-    # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    asm_test( inst_jal.gen_basic_test      ) ,
+    asm_test( inst_jal.gen_multijump_test  ) ,
+    asm_test( inst_jal.gen_dest_dep_5_test ) ,
+    asm_test( inst_jal.gen_dest_dep_4_test ) ,
+    asm_test( inst_jal.gen_dest_dep_3_test ) ,
+    asm_test( inst_jal.gen_dest_dep_2_test ) ,
+    asm_test( inst_jal.gen_dest_dep_1_test ) ,
+    asm_test( inst_jal.gen_dest_dep_0_test ) ,
+    asm_test( inst_jal.gen_back_to_back_test ) ,
   ])
 
   def test_jal( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # random stall and delay
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   def test_jal_delays( s ):
     run_test( s.ProcType, inst_jal.gen_multijump_test, delays=True,
               cmdline_opts=s.__class__.cmdline_opts )
