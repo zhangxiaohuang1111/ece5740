@@ -178,3 +178,49 @@ class Tests:
   def test_bltu_delays( s ):
     run_test( s.ProcType, inst_bltu.gen_random_test, delays=True,
               cmdline_opts=s.__class__.cmdline_opts )
+
+  def gen_branch_jal_test():
+    return """
+      csrr x1, mngr2proc < 5
+      csrr x2, mngr2proc < 4
+      addi x4, x0, 0
+      nop
+      nop
+      nop
+      nop
+      nop
+      nop
+      nop
+      nop
+      bne  x1, x2, label_a
+      jal  x3, label_b
+      nop
+      nop
+      nop
+      nop
+    label_b:
+      addi x4, x4, 0b10
+      nop
+      nop
+      nop
+    label_a:
+      addi x4, x4, 0b01
+      nop
+      nop
+      nop
+      nop
+      csrw proc2mngr, x4 > 0b01
+      nop
+      nop
+      nop
+      nop
+      nop
+      nop
+      nop
+      nop
+    """
+  @pytest.mark.parametrize("name, test", [
+      asm_test( gen_branch_jal_test )
+  ])
+  def test_branch_jal(s, name, test):
+      run_test(s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts  )
