@@ -47,10 +47,7 @@ class Tests:
     asm_test( inst_beq.gen_random_test ) ,
     asm_test( inst_beq.gen_back_to_back_test ) ,
   ])
-    # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    # Add more rows to the test case table to test more complicated
-    # scenarios.
-    # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+   
   def test_beq( s, name, test ):
     run_test( s.ProcType, test, cmdline_opts=s.__class__.cmdline_opts )
 
