@@ -174,7 +174,7 @@ module lab2_proc_ProcAltCtrl
   // PC select logic
 
   always_comb begin
-    if ( pc_redirect_D )  // If a jump is taken in D stage
+    if ( pc_redirect_D && pc_redirect_X==0)  // If a jump is taken in D stage
       pc_sel_F = pc_sel_D;     // Use jal
     else if ( pc_redirect_X )   // If a branch is taken in X stage
       pc_sel_F = pc_sel_X; // Use pc from X
