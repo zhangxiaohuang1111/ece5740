@@ -573,8 +573,6 @@ def gen_ld_value_test( inst, offset, base, result ):
   return gen_ld_template( 0, 0, "x1", inst, offset, base, result )
 
 
-
-
 #-------------------------------------------------------------------------
 # gen_st_template
 #-------------------------------------------------------------------------
@@ -645,3 +643,90 @@ def gen_st_base_eq_dep_test( base ):
 
 def gen_st_value_test( offset, base, reg_value, result ):
   return gen_st_template( 0, 0, "x1", base, reg_value, offset, result )
+
+#-------------------------------------------------------------------------
+# gen_jal_template
+#-------------------------------------------------------------------------
+def gen_jal_template(num_nops_dest,result_b,result_c):
+        return """
+
+    # Use x3 to track the control flow pattern
+    addi  x3, x0, 0                # 0x00000200
+    
+    jal   x1, label_a           # 0x00000204
+    addi  x3, x3, 0b000001         # 0x00000208
+
+  label_b:
+    {nops_dest}
+    addi  x3, x3, 0b000010         # 0x0000020c
+    addi  x5, x1, 0                # 0x00000210
+    jal   x1, label_c           # 0x00000214
+    addi  x1, x3, 0b000100         # 0x00000218
+
+  label_a:
+    {nops_dest}
+    addi  x3, x3, 0b001000         # 0x0000021c
+    addi  x4, x1, 0                # 0x00000220
+    jal   x1, label_b           # 0x00000224
+    addi  x3, x3, 0b010000         # 0x00000228
+
+  label_c:
+    {nops_dest}
+    addi  x3, x3, 0b100000         # 0x0000022c
+    addi  x6, x1, 0                # 0x00000230
+
+    # Carefully determine which bits are expected
+    # to be set if jump operates correctly.
+    csrw  proc2mngr, x3 > 0b101010
+
+    # Check the link addresses
+    csrw  proc2mngr, x4 > 0x00000208
+    csrw  proc2mngr, x5 > {result_b}
+    csrw  proc2mngr, x6 > {result_c}
+  """.format(
+    nops_dest = gen_nops(num_nops_dest),
+    **locals()
+  )
+    
+def gen_jal_dest_dep_test( num_nops, result_b, result_c):
+    return gen_jal_template(num_nops, result_b, result_c)
+
+#-------------------------------------------------------------------------
+# gen_jalr_template
+#-------------------------------------------------------------------------
+def gen_jalr_template(num_nops_src,num_nops_dest,reg_src,result):  
+  return """
+
+    # Use r3 to track the control flow pattern
+    addi  x3, x0, 0           # 0x0200
+    lui x1,      %hi[label_a] # 0x0204
+    addi x1, x1, %lo[label_a] # 0x0208
+    {nops_src}
+                              
+    jalr  {reg_src}, x1, 0    # 0x020c
+    addi  x3, x3, 0b01        # 0x0210
+
+  label_a:
+    {nops_dest}
+    addi  x3, x3, 0b10
+
+    # Check the link address
+    csrw  proc2mngr, {reg_src} > {result}
+
+    # Only the second bit should be set if jump was taken
+    csrw  proc2mngr, x3  > 0b10
+
+  """.format(
+    nops_src = gen_nops(num_nops_src),
+    nops_dest = gen_nops(num_nops_dest),
+    **locals()
+  )
+
+def gen_jalr_src_dep_test( num_nops_src,num_nops_dest,reg_src,result ):
+  return gen_jalr_template(num_nops_src,num_nops_dest,reg_src,result)
+
+def gen_jalr_dest_dep_test( num_nops_src,num_nops_dest,reg_src,result):
+  return gen_jalr_template(num_nops_src,num_nops_dest,reg_src,result)
+
+def gen_jalr_src_eq_dest_test( num_nops_src,num_nops_dest,reg_src,result ):
+  return gen_jalr_template(num_nops_src,num_nops_dest,reg_src,result)
