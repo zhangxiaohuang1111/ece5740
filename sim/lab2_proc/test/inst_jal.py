@@ -87,32 +87,32 @@ def gen_multijump_test():
 
 def gen_dest_dep_5_test():
   return [
-    gen_jump_dest_dep_test( 5, "jal", 0x228+2*4*5, 0x218+4*5 ),  
+    gen_jal_dest_dep_test( 5,  0x228+2*4*5, 0x218+4*5 ),  
   ]
 
 def gen_dest_dep_4_test():
   return [
-    gen_jump_dest_dep_test( 4, "jal", 0x228+2*4*4, 0x218+4*4 ),  
+    gen_jal_dest_dep_test( 4,  0x228+2*4*4, 0x218+4*4 ),  
   ]
 
 def gen_dest_dep_3_test():
   return [
-    gen_jump_dest_dep_test( 3, "jal", 0x228+2*4*3, 0x218+4*3 ),  
+    gen_jal_dest_dep_test( 3,  0x228+2*4*3, 0x218+4*3 ),  
   ]
 
 def gen_dest_dep_2_test():
   return [
-    gen_jump_dest_dep_test( 2, "jal", 0x228+2*4*2, 0x218+4*2 ),
+    gen_jal_dest_dep_test( 2,  0x228+2*4*2, 0x218+4*2 ),
   ]
 
 def gen_dest_dep_1_test():
   return [
-    gen_jump_dest_dep_test( 1, "jal", 0x228+2*4*1, 0x218+4*1 ),
+    gen_jal_dest_dep_test( 1, 0x228+2*4*1, 0x218+4*1 ),
   ]
 
 def gen_dest_dep_0_test():
   return [
-    gen_jump_dest_dep_test( 0, "jal", 0x228, 0x218 ),
+    gen_jal_dest_dep_test( 0,  0x228, 0x218 ),
   ]
 
 def gen_back_to_back_test():
