@@ -65,12 +65,12 @@ module lab2_proc_ProcBaseCtrl
 
   // status signals (dpath->ctrl)
 
-  input  logic [31:0]  inst_D,
-  input  logic         br_cond_eq_X,
-  input  logic         br_cond_lt_X,
-  input  logic         br_cond_ltu_X,
-  input  logic         imul_req_rdy_D,    // Input ready signal to Controll Unit
-  input  logic         imul_resp_val_X,   // Output valid signal to Controll Unit
+  input  logic [31:0] inst_D,
+  input  logic        br_cond_eq_X,      // Branch condition signals
+  input  logic        br_cond_lt_X,
+  input  logic        br_cond_ltu_X,
+  input  logic        imul_req_rdy_D,    // Input ready signal to Controll Unit
+  input  logic        imul_resp_val_X,   // Output valid signal to Controll Unit
   // extra ports
 
   output logic        commit_inst
@@ -173,11 +173,11 @@ module lab2_proc_ProcBaseCtrl
 
   always_comb begin
     if ( pc_redirect_D && pc_redirect_X==0)  // If a jump is taken in D stage
-      pc_sel_F = pc_sel_D;     // Use jal
-    else if ( pc_redirect_X )   // If a branch is taken in X stage
-      pc_sel_F = pc_sel_X; // Use pc from X
+      pc_sel_F = pc_sel_D;        // Use jal
+    else if ( pc_redirect_X )     // If a branch is taken in X stage
+      pc_sel_F = pc_sel_X;        // Use pc from X
     else
-      pc_sel_F = 2'b0;     // Use pc+4
+      pc_sel_F = 2'b0;            // Use pc+4
   end
 
   // ostall due to the imem response not valid.
@@ -314,6 +314,7 @@ module lab2_proc_ProcBaseCtrl
 
 
   // Immediate Type
+
   localparam imm_x    = 3'bx;
   localparam imm_i    = 3'd0;
   localparam imm_s    = 3'd1;
@@ -328,6 +329,7 @@ module lab2_proc_ProcBaseCtrl
   localparam st       = 2'd2; // Store
 
   // Ex result Mux Select
+
   localparam pc       = 2'd0; // PC realative jump
   localparam alu      = 2'd1; // ALU
   localparam imul     = 2'd2; // Multiplier
@@ -355,7 +357,7 @@ module lab2_proc_ProcBaseCtrl
   logic       mngr2proc_rdy_D;
   logic       stats_en_wen_D;
   // We add
-  logic [1:0] ex_result_sel_D;
+  logic [1:0] ex_result_sel_D;  // Select the result to be passed to the next stage
 
   task cs
   (
@@ -525,11 +527,11 @@ module lab2_proc_ProcBaseCtrl
     = rs2_en_D && val_W && rf_wen_W
       && ( inst_rs2_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 );
 
-  // ostall_imul_D
+  // ostall_imul_D 
   
   logic ostall_imul_D;
-  assign imul_req_val_D = val_D && !stall_D && !squash_D && (ex_result_sel_D == imul); // We send req_val only no stall/squash
-  assign ostall_imul_D = val_D && !imul_req_rdy_D;                   // Need wait for req_rdy
+  assign imul_req_val_D = val_D && !stall_D && !squash_D && (ex_result_sel_D == imul);  // We send req_val only no stall/squash
+  assign ostall_imul_D = val_D && !imul_req_rdy_D;                                      // Need wait for req_rdy
 
   // Put together ostall signal due to hazards
 

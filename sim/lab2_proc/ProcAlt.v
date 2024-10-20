@@ -138,6 +138,7 @@ module lab2_proc_ProcAlt
   logic [31:0] dmem_reqstream_enq_msg_addr;
   logic [31:0] dmem_reqstream_enq_msg_data;
 
+  // We need to recognize the lw and sw instructions passing to the data queue
   assign dmem_reqstream_enq_msg.type_ = (dmem_reqstream_enq_type == 2'd2)? `VC_MEM_REQ_MSG_TYPE_WRITE : `VC_MEM_REQ_MSG_TYPE_READ;
   assign dmem_reqstream_enq_msg.opaque = 8'b0;
   assign dmem_reqstream_enq_msg.addr   = dmem_reqstream_enq_msg_addr;
@@ -197,8 +198,8 @@ module lab2_proc_ProcAlt
   logic [1:0]  op2_sel_D;
   logic [1:0]  csrr_sel_D;
   logic [2:0]  imm_type_D;
-  logic [1:0]  op1_byp_sel_D;
-  logic [1:0]  op2_byp_sel_D;
+  logic [1:0]  op1_byp_sel_D;     // bypass select for op1
+  logic [1:0]  op2_byp_sel_D;     // bypass select for op2
 
   logic        reg_en_X;
   logic [3:0]  alu_fn_X;
@@ -218,7 +219,7 @@ module lab2_proc_ProcAlt
   // status signals (dpath->ctrl)
 
   logic [31:0] inst_D;
-  logic        br_cond_eq_X;
+  logic        br_cond_eq_X;      // Branch condition signals
   logic        br_cond_lt_X;
   logic        br_cond_ltu_X;
   logic        imul_req_rdy_D;    // Input ready signal to Controll Unit
@@ -288,9 +289,6 @@ module lab2_proc_ProcAlt
     .*
   );
 
-  
-  
-  
   
   
   //----------------------------------------------------------------------

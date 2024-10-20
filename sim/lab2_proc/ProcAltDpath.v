@@ -445,4 +445,3 @@ module lab2_proc_ProcAltDpath
 endmodule
 
 `endif /* LAB2_PROC_PROC_ALT_DPATH_V */
-

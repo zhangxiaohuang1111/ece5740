@@ -264,9 +264,9 @@ module lab2_proc_ProcAltCtrl
 
   // Register specifiers
 
-  localparam rx = 5'bx;   // don't care
-  localparam r0 = 5'd0;   // zero
-  localparam rL = 5'd31;  // for jal
+  localparam rx = 5'bx;       // don't care
+  localparam r0 = 5'd0;       // zero
+  localparam rL = 5'd31;      // for jal
 
   // Branch type
 
@@ -287,8 +287,8 @@ module lab2_proc_ProcAltCtrl
 
   // Operand 1 Mux Select
 
-  localparam op1_pc     = 0; // PC
-  localparam op1_rf     = 1; // Register file
+  localparam op1_pc     = 0;  // PC
+  localparam op1_rf     = 1;  // Register file
 
   // Operand 2 Mux Select
 
@@ -343,8 +343,8 @@ module lab2_proc_ProcAltCtrl
   // Instruction Decode
 
   logic       inst_val_D;
-  logic [2:0] br_type_D;
-  logic [1:0] jump_type_D; // jump
+  logic [2:0] br_type_D;      // branch
+  logic [1:0] jump_type_D;    // jump
   logic       rs1_en_D;
   logic       rs2_en_D;
   logic [3:0] alu_fn_D;
@@ -484,6 +484,8 @@ module lab2_proc_ProcAltCtrl
 
   logic  ostall_mngr2proc_D;
   assign ostall_mngr2proc_D = val_D && mngr2proc_rdy_D && !mngr2proc_val;
+  
+  // We don't need the ostall_D signals here except for the load-use hazard
 
   // ostall_imul_D
   
@@ -495,14 +497,16 @@ module lab2_proc_ProcAltCtrl
   logic ostall_load_using_X_rs1_D;
   logic ostall_load_using_X_rs2_D;
 
+  // Load-use hazard in the bypassing for rs1
   assign ostall_load_using_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
     && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_X == ld );
 
+  // Load-use hazard in the bypassing for rs2
   assign ostall_load_using_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
     && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && ( dmem_type_X == ld );
 
 
-  // Bypassing logic
+  // Bypassing logic wires
   logic bypass_waddr_X_rs1_D;
   logic bypass_waddr_X_rs2_D;
   logic bypass_waddr_M_rs1_D;
@@ -510,31 +514,32 @@ module lab2_proc_ProcAltCtrl
   logic bypass_waddr_W_rs1_D;
   logic bypass_waddr_W_rs2_D;
 
+  // X stage bypassing
   assign bypass_waddr_X_rs1_D = val_D && rs1_en_D && val_X && rf_wen_X
     && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_X != ld);
 
   assign bypass_waddr_X_rs2_D = val_D && rs2_en_D && val_X && rf_wen_X
     && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 ) && (dmem_type_X != ld);
 
-
+  // M stage bypassing
   assign bypass_waddr_M_rs1_D = val_D && rs1_en_D && val_M && rf_wen_M
     && ( inst_rs1_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 );
 
   assign bypass_waddr_M_rs2_D = val_D && rs2_en_D && val_M && rf_wen_M
     && ( inst_rs2_D == rf_waddr_M ) && ( rf_waddr_M != 5'd0 );
 
-
+  // W stage bypassing
   assign bypass_waddr_W_rs1_D = val_D && rs1_en_D && val_W && rf_wen_W
     && ( inst_rs1_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 );
   
   assign bypass_waddr_W_rs2_D = val_D && rs2_en_D && val_W && rf_wen_W
     && ( inst_rs2_D == rf_waddr_W ) && ( rf_waddr_W != 5'd0 );
   
+  // Bypass select signals for two bypassing muxs
   assign op1_byp_sel_D = (bypass_waddr_X_rs1_D) ? 2'b01 : (bypass_waddr_M_rs1_D) ? 2'b10 : (bypass_waddr_W_rs1_D) ? 2'b11 : 2'b00;
   assign op2_byp_sel_D = (bypass_waddr_X_rs2_D) ? 2'b01 : (bypass_waddr_M_rs2_D) ? 2'b10 : (bypass_waddr_W_rs2_D) ? 2'b11 : 2'b00;
   
   // Put together ostall signal due to hazards
-
   logic  ostall_hazard_D;
   assign ostall_hazard_D =
       ostall_load_using_X_rs1_D || ostall_load_using_X_rs2_D;

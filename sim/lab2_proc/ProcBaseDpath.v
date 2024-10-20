@@ -237,9 +237,8 @@ module lab2_proc_ProcBaseDpath
     .cout ()
   );
 
-  
 
-  // #Lab01 Alternative Multiplier#######################################################################
+  //###############################Lab01 Alternative Multiplier#######################################
 
   logic [31:0] imul_resp_msg;  // Output data wire
   logic [63:0] combined_data_in;

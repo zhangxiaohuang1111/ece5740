@@ -12,7 +12,6 @@ impls  = [ "fl", "base" , "alt" ]
 inputs = [ "vvadd-unopt", "vvadd-opt", "cmult", "mfilt", "bsearch" ]
 
 
-
 test_cases = []
 for input_ in inputs:
   for impl in impls:

@@ -133,11 +133,12 @@ module lab2_proc_ProcBase
   mem_req_4B_t dmem_reqstream_enq_msg;
   logic        dmem_reqstream_enq_val;
   logic        dmem_reqstream_enq_rdy;
-  logic  [1:0] dmem_reqstream_enq_type;
+  logic  [1:0] dmem_reqstream_enq_type; // Extra signal from control unit indicate lw/sw
 
   logic [31:0] dmem_reqstream_enq_msg_addr;
   logic [31:0] dmem_reqstream_enq_msg_data;
 
+  // We need to recognize the lw and sw instructions passing to the data queue
   assign dmem_reqstream_enq_msg.type_ = (dmem_reqstream_enq_type == 2'd2)? `VC_MEM_REQ_MSG_TYPE_WRITE : `VC_MEM_REQ_MSG_TYPE_READ;
   assign dmem_reqstream_enq_msg.opaque = 8'b0;
   assign dmem_reqstream_enq_msg.addr   = dmem_reqstream_enq_msg_addr;
@@ -216,7 +217,7 @@ module lab2_proc_ProcBase
   // status signals (dpath->ctrl)
 
   logic [31:0] inst_D;
-  logic        br_cond_eq_X;
+  logic        br_cond_eq_X;      // Branch condition signals
   logic        br_cond_lt_X;
   logic        br_cond_ltu_X;
   logic        imul_req_rdy_D;    // Input ready signal to Controll Unit
