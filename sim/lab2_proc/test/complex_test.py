@@ -5,14 +5,17 @@
 # to cover different instruction categories including CSR, Reg-Reg,
 # Reg-Imm, Memory, Jump, and Branch instructions.
 
+import pytest
+from pymtl3 import *
 from lab2_proc.test.harness import asm_test, run_test
-from lab2_proc.ProcFL       import ProcFL
-from lab2_proc.ProcBase     import ProcBase
-from lab2_proc.ProcAlt      import ProcAlt
+from lab2_proc.ProcFL import ProcFL
+from lab2_proc.ProcBase import ProcBase
+from lab2_proc.ProcAlt import ProcAlt
 
-def test( cmdline_opts ):
-
-  prog = """
+@pytest.mark.parametrize("ProcType", [ProcFL, ProcBase, ProcAlt])
+def test_simple(ProcType, cmdline_opts):
+  # Define a simple assembly program
+  prog  = """
     # Set up initial values using CSR instructions
     csrr  x1, mngr2proc < 10
     csrr  x2, mngr2proc < 20
@@ -143,6 +146,5 @@ def test( cmdline_opts ):
     csrw proc2mngr, x23 > 80  # x23 = 80
     csrw proc2mngr, x24 > 0x1000000  # x24 = 0x10000000
   """
-  # run_test( ProcFL, prog, cmdline_opts=cmdline_opts )
-  # run_test( ProcBase, prog, cmdline_opts=cmdline_opts )
-  # run_test( ProcAlt, prog, cmdline_opts=cmdline_opts )
+  # Run the test for the specified processor type
+  run_test(ProcType, prog, cmdline_opts=cmdline_opts)
