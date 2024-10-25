@@ -13,8 +13,8 @@ jobs:
     strategy:
       matrix:
         test_cmd:
-          - ../lab1_imul
           - ../lab2_proc
+          - ../lab3_mem
 
     steps:
       - uses: actions/checkout@v4
