@@ -59,9 +59,9 @@ module lab3_mem_CacheBaseCtrl
 
   // status signals (dpath->ctrl)
 
-  input logic  [3:0]   cachereq_type,
-  input logic [31:0]   cachereq_addr,
-  input logic          tag_match,
+  input logic  [3:0]     cachereq_type,
+  input logic [31:0]     cachereq_addr,
+  input logic            tag_match
 
 );
 
@@ -171,7 +171,6 @@ module lab3_mem_CacheBaseCtrl
         state_next = STATE_WRITE_DATA_ACCESS;
       else
       state_next = STATE_WAIT;                  // Read miss, move to wait state
-    
     STATE_WAIT:
       if(proc2cache_respstream_rdy)             // When there’s a response from the cache, move to idle state
         state_next = STATE_IDLE;
@@ -235,22 +234,47 @@ end
   (
     input logic cs_cachereq_rdy,
     input logic cs_cacheresp_val,
+    input logic cs_memreq_val,
+    input logic cs_memresp_rdy,
     input logic cs_cachereq_reg_en,
+    input logic cs_memresp_reg_en,
+    input logic cs_write_data_mux_sel,
+    input logic cs_wben_mux_sel,
     input logic cs_tag_array_wen,
     input logic cs_tag_array_ren,
     input logic cs_data_array_wen,
     input logic cs_data_array_ren,
+    input logic cs_read_data_zero_mux_sel,
+    input logic cs_read_data_reg_en,
+    input logic cs_evict_addr_reg_en,
+    input logic cs_memreq_addr_mux_sel,
+    input logic [3:0] cs_cacheresp_type,
+    input logic [1:0] cs_hit,
+    input logic [3:0] cs_memreq_type,
     input logic cs_valid_bit_in,
     input logic cs_valid_bits_write_en
+
   );
   begin
     proc2cache_reqstream_rdy  = cs_cachereq_rdy;
     proc2cache_respstream_val = cs_cacheresp_val;
+    cache2mem_reqstream_val   = cs_memreq_val;
+    cache2mem_respstream_rdy  = cs_memresp_rdy;
     cachereq_reg_en           = cs_cachereq_reg_en;
+    memresp_reg_en            = cs_memresp_reg_en;
+    write_data_mux_sel        = cs_write_data_mux_sel;
+    wben_mux_sel              = cs_wben_mux_sel;
     tag_array_wen             = cs_tag_array_wen;
     tag_array_ren             = cs_tag_array_ren;
     data_array_wen            = cs_data_array_wen;
     data_array_ren            = cs_data_array_ren;
+    read_data_zero_mux_sel    = cs_read_data_zero_mux_sel;
+    read_data_reg_en          = cs_read_data_reg_en;
+    evict_addr_reg_en         = cs_evict_addr_reg_en;
+    memreq_addr_mux_sel       = cs_memreq_addr_mux_sel;
+    cacheresp_type            = cs_cacheresp_type;
+    hit                       = cs_hit;
+    memreq_type               = cs_memreq_type;
     valid_bit_in              = cs_valid_bit_in;
     valid_bits_write_en       = cs_valid_bits_write_en;
   end
