@@ -53,13 +53,13 @@ module lab3_mem_CacheBaseCtrl
   output  logic          read_data_reg_en,
   output  logic          evict_addr_reg_en,
   output  logic          memreq_addr_mux_sel,
-  output  logic [2:0]    cacheresp_type,
+  output  logic [3:0]    cacheresp_type,
   output  logic [1:0]    hit,
-  output  logic [2:0]    memreq_type,
+  output  logic [3:0]    memreq_type,
 
   // status signals (dpath->ctrl)
 
-  input logic  [2:0]   cachereq_type,
+  input logic  [3:0]   cachereq_type,
   input logic [31:0]   cachereq_addr,
   input logic          tag_match,
 
@@ -115,41 +115,100 @@ module lab3_mem_CacheBaseCtrl
   logic [4:0] state_next;
 
   always @(*) begin
+  state_next = state_reg;
+  case ( state_reg )
 
-    state_next = state_reg;
-    case ( state_reg )
-
-      STATE_IDLE:
-        if ( proc2cache_reqstream_val )
-          state_next = STATE_TAG_CHECK;
-
-      // ''' SECTION TASK ''''''''''''''''''''''''''''''''''''''''''''''''
-      // Add state transitions
-      // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-      STATE_TAG_CHECK:
-      STATE_INIT_DATA_ACCESS:
-      STATE_WAIT:
-
-      default:
+    // Initial idle state
+    STATE_IDLE:
+      if ( proc2cache_reqstream_val ) // When there’s a request from the processor, move to TAG_CHECK
+        state_next = STATE_TAG_CHECK;
+      else
+        state_next = STATE_IDLE;        // Stay in idle state
+    // TAG check state to determine hit or miss
+    STATE_TAG_CHECK:
+      if ( is_init )
+          state_next = STATE_INIT_DATA_ACCESS;  // Initialization transaction, move to init data access
+      else if ( tag_match&&is_read ) 
+          state_next = STATE_READ_DATA_ACCESS;  // Read hit, move to read data state
+      else if ( tag_match&&is_write ) 
+          state_next = STATE_WRITE_DATA_ACCESS; // Write hit, move to write data state
+      else if ( !tag_match&&is_valid ) 
+          state_next = STATE_REFILL_REQUEST;    // Read miss, move to refill request stat
+      else if ( !tag_match&&!is_valid )
+          state_next = STATE_EVICT_PREPARE;     // Write miss, move to evict prepare state
+    STATE_INIT_DATA_ACCESS:
+      state_next = STATE_WAIT;                  // Initialization transaction, move to wait state
+    STATE_READ_DATA_ACCESS:
+      state_next = STATE_WAIT;                  // Read hit, move to wait state
+    STATE_WRITE_DATA_ACCESS:
+      state_next = STATE_WAIT;                  // Write hit, move to wait state
+    STATE_EVICT_PREPARE:
+      state_next = STATE_EVICT_REQUEST;         // Write miss, move to evict request state
+    STATE_EVICT_REQUEST:
+      if (cache2mem_reqstream_rdy)                // When there’s a request from the cache, move to evict wait state
+        state_next = STATE_EVICT_WAIT;            // Write miss, move to evict wait state
+      else if ( !cache2mem_reqstream_rdy )        // When there’s no request from the cache, stay in evict request state
+        state_next = STATE_EVICT_REQUEST;
+    STATE_EVICT_WAIT:
+      if(cache2mem_respstream_val)             // When there’s a response from the cache, move to refill request state
+        state_next = STATE_REFILL_REQUEST;        // Write miss, move to refill request state
+      else if ( !cache2mem_respstream_val )    // When there’s no response from the cache, stay in evict wait state
+        state_next = STATE_EVICT_WAIT;
+    STATE_REFILL_REQUEST:
+      if (cache2mem_reqstream_rdy)                // When there’s a request from the cache, move to refill wait state
+        state_next = STATE_REFILL_WAIT;           // Read miss, move to refill wait state
+      else if ( !cache2mem_reqstream_rdy )        // When there’s no request from the cache, stay in refill request state
+        state_next = STATE_REFILL_REQUEST;
+    STATE_REFILL_WAIT:
+      if(cache2mem_respstream_val)             // When there’s a response from the cache, move to refill update state
+        state_next = STATE_REFILL_UPDATE;         // Read miss, move to refill update state
+      else if ( !cache2mem_respstream_val )    // When there’s no response from the cache, stay in refill wait state
+        state_next = STATE_REFILL_WAIT;
+    STATE_REFILL_UPDATE:
+      if(is_read)                               // When there’s a read request, move to read data access state
+        state_next = STATE_READ_DATA_ACCESS;
+      else if (is_write)                        // When there’s a write request, move to write data access state
+        state_next = STATE_WRITE_DATA_ACCESS;
+      else
+      state_next = STATE_WAIT;                  // Read miss, move to wait state
+    
+    STATE_WAIT:
+      if(proc2cache_respstream_rdy)             // When there’s a response from the cache, move to idle state
         state_next = STATE_IDLE;
+      else if ( !proc2cache_respstream_rdy )    // When there’s no response from the cache, stay in wait state
+        state_next = STATE_WAIT;
+    default:
+      state_next = STATE_IDLE;
 
-    endcase
-
-  end
+  endcase
+end
 
   //----------------------------------------------------------------------
   // Valid/Dirty bits record
   //----------------------------------------------------------------------
 
-  logic [3:0] cachereq_addr_index;
+  // Address Mapping
+
+  logic  [1:0] cachereq_addr_byte_offset;
+  logic  [1:0] cachereq_addr_word_offset;
+  logic  [3:0] cachereq_addr_index;
+  logic [23:0] cachereq_addr_tag;
+  logic  [1:0] cachereq_addr_bank;
 
   generate
     if ( p_num_banks == 1 ) begin
-      assign cachereq_addr_index = cachereq_addr[7:4];
+      assign cachereq_addr_byte_offset = cachereq_addr[1:0];
+      assign cachereq_addr_word_offset = cachereq_addr[3:2];
+      assign cachereq_addr_index       = cachereq_addr[7:4];
+      assign cachereq_addr_tag         = cachereq_addr[31:8];
     end
     else if ( p_num_banks == 4 ) begin
       // handle address mapping for four banks
+      assign cachereq_addr_byte_offset = cachereq_addr[1:0];
+      assign cachereq_addr_word_offset = cachereq_addr[3:2];
+      assign cachereq_addr_bank        = cachereq_addr[5:4];
+      assign cachereq_addr_index       = cachereq_addr[9:6];
+      assign cachereq_addr_tag         = cachereq_addr[31:10];
     end
   endgenerate
 

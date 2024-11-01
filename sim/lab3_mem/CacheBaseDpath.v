@@ -49,13 +49,13 @@ module lab3_mem_CacheBaseDpath
   input  logic          read_data_reg_en,
   input  logic          evict_addr_reg_en,
   input  logic          memreq_addr_mux_sel,
-  input  logic [2:0]    cacheresp_type,
+  input  logic [3:0]    cacheresp_type,
   input  logic [1:0]    hit,
-  input  logic [2:0]    memreq_type,
+  input  logic [3:0]    memreq_type,
 
   // status signals (dpath->ctrl)
 
-  output logic  [2:0]   cachereq_type,
+  output logic  [3:0]   cachereq_type,
   output logic [31:0]   cachereq_addr,
   output logic          tag_match,
 
@@ -75,7 +75,7 @@ module lab3_mem_CacheBaseDpath
   logic  [2:0] cachereq_type_reg_out;
   logic  [7:0] cachereq_opaque_reg_out;
 
-  vc_EnResetReg #(3,0) cachereq_type_reg
+  vc_EnResetReg #(4,0) cachereq_type_reg
   (
     .clk    (clk),
     .reset  (reset),
