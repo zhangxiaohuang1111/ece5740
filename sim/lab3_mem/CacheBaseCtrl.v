@@ -65,6 +65,15 @@ module lab3_mem_CacheBaseCtrl
 
 );
 
+  logic [1:0] test;
+  always @(*) begin
+    case (tag_match)
+      1'b1: 
+          test = 2'b1;
+      1'b0:
+          test = 2'b0;
+    endcase
+  end
   //----------------------------------------------------------------------
   // State Definitions
   //----------------------------------------------------------------------
@@ -290,31 +299,31 @@ end
       //                          cache cache mem  mem   cache mem   write  wb   tag   tag   data   data   read   read   evict     mem   cache           mem     valid valid
       //                          req   resp  req  resp  req   resp  data   en   array array array  array  zero   data   addr      req   resp     hit    req      bit   write
       //                          rdy   val   val  rdy   en    en    mux    mux  wen   ren   wen    ren    mux     en     en       mux   type            type     in    en
-      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0000, 2'b00, 4'b0000, 0,    0 );
+      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'dx, 2'b00, 4'b0000, 0,    0 );
       
-      STATE_TAG_CHECK:         cs( 0,    0,    0,    0,    0,    1,   0,    1,    0,    1,    0,     0,     0,     0,     0,       0,    4'b0000, 2'b00, 4'b0000, 0,    0 );
+      STATE_TAG_CHECK:         cs( 0,    0,    0,    0,    0,    0,   1,    1,    0,    1,    0,     0,     0,     0,     0,       0,    4'dx, test , 4'b0000, 0,    0 );
       
-      STATE_INIT_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    1,   1,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'b0001, 2'b00, 4'b0001, 1,    1 );
+      STATE_INIT_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    0,   1,    1,    1,    0,    1,     0,     0,     0,     0,       0,    4'd2, 2'b00, 4'b0001, 1,    1 );
       
-      STATE_READ_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    1,   0,    0,    0,    1,    0,     1,     1,     0,     0,       0,    4'b0001, 2'b01, 4'b0000, 0,    0 );
-      
-      STATE_WRITE_DATA_ACCESS: cs( 0,    0,    0,    0,    0,    1,   0,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'b0010, 2'b01, 4'b0001, 1,    1 );
-      
-      STATE_EVICT_PREPARE:     cs( 0,    0,    0,    0,    0,    0,   1,    0,    1,    0,    1,     0,     1,     1,     0,       0,    4'b0011, 2'b10, 4'b0011, 1,    0 );
-      
-      STATE_EVICT_REQUEST:     cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     1,     0,       1,    4'b0011, 2'b10, 4'b0011, 1,    0 );
-      
-      STATE_EVICT_WAIT:        cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0011, 2'b10, 4'b0011, 1,    0 );
-      
-      STATE_REFILL_REQUEST:    cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0100, 2'b11, 4'b0100, 0,    0 );
-      
-      STATE_REFILL_WAIT:       cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0101, 2'b11, 4'b0101, 0,    0 );
-      
-      STATE_REFILL_UPDATE:     cs( 0,    0,    0,    0,    0,    1,   1,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'b0101, 2'b11, 4'b0101, 1,    1 );
-      
-      STATE_WAIT:              cs( 0,    1,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0110, 2'b11, 4'b0110, 0,    0 );
+      STATE_READ_DATA_ACCESS:  cs( 0,    1,    0,    0,    0,    0,   0,    1,    0,    1,    0,     1,     1,     1,     0,       0,    4'd0, test , 4'b0000, 0,    0 ); 
 
-      default:                 cs( 0,    0,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0000, 2'b00, 4'b0000, 0,    0 );
+      STATE_WRITE_DATA_ACCESS: cs( 0,    0,    0,    0,    0,    1,   0,    1,    1,    0,    1,     0,     0,     0,     0,       0,    4'd1, 2'b01, 4'b0001, 1,    1 );
+      
+      STATE_EVICT_PREPARE:     cs( 0,    0,    0,    0,    0,    0,   1,    0,    1,    0,    1,     0,     1,     1,     0,       0,    4'dx, 2'b10, 4'b0011, 1,    0 );
+      
+      STATE_EVICT_REQUEST:     cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     1,     0,       1,    4'dx, 2'b10, 4'b0011, 1,    0 );
+      
+      STATE_EVICT_WAIT:        cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'dx, 2'b10, 4'b0011, 1,    0 );
+      
+      STATE_REFILL_REQUEST:    cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'b11, 4'b0100, 0,    0 );
+      
+      STATE_REFILL_WAIT:       cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'b11, 4'b0101, 0,    0 );
+      
+      STATE_REFILL_UPDATE:     cs( 0,    0,    0,    0,    0,    1,   1,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'd2, 2'b11, 4'b0101, 1,    1 );
+      
+      STATE_WAIT:              cs( 0,    1,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'bx,  4'bx   , 0,    0 );
+
+      default:                 cs( 0,    0,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'b00, 4'b0000, 0,    0 );
 
     endcase
   end
