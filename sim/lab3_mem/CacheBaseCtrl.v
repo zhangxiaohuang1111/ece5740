@@ -120,7 +120,7 @@ module lab3_mem_CacheBaseCtrl
 
     // Initial idle state
     STATE_IDLE:
-      if ( proc2cache_reqstream_val ) // When there’s a request from the processor, move to TAG_CHECK
+      if ( proc2cache_reqstream_val ) // When there is a request from the processor, move to TAG_CHECK
         state_next = STATE_TAG_CHECK;
       else
         state_next = STATE_IDLE;        // Stay in idle state
@@ -145,36 +145,36 @@ module lab3_mem_CacheBaseCtrl
     STATE_EVICT_PREPARE:
       state_next = STATE_EVICT_REQUEST;         // Write miss, move to evict request state
     STATE_EVICT_REQUEST:
-      if (cache2mem_reqstream_rdy)                // When there’s a request from the cache, move to evict wait state
+      if (cache2mem_reqstream_rdy)                // When there is a request from the cache, move to evict wait state
         state_next = STATE_EVICT_WAIT;            // Write miss, move to evict wait state
-      else if ( !cache2mem_reqstream_rdy )        // When there’s no request from the cache, stay in evict request state
+      else if ( !cache2mem_reqstream_rdy )        // When there is no request from the cache, stay in evict request state
         state_next = STATE_EVICT_REQUEST;
     STATE_EVICT_WAIT:
-      if(cache2mem_respstream_val)             // When there’s a response from the cache, move to refill request state
+      if(cache2mem_respstream_val)             // When there is a response from the cache, move to refill request state
         state_next = STATE_REFILL_REQUEST;        // Write miss, move to refill request state
-      else if ( !cache2mem_respstream_val )    // When there’s no response from the cache, stay in evict wait state
+      else if ( !cache2mem_respstream_val )    // When there is no response from the cache, stay in evict wait state
         state_next = STATE_EVICT_WAIT;
     STATE_REFILL_REQUEST:
-      if (cache2mem_reqstream_rdy)                // When there’s a request from the cache, move to refill wait state
+      if (cache2mem_reqstream_rdy)                // When there's a request from the cache, move to refill wait state
         state_next = STATE_REFILL_WAIT;           // Read miss, move to refill wait state
-      else if ( !cache2mem_reqstream_rdy )        // When there’s no request from the cache, stay in refill request state
+      else if ( !cache2mem_reqstream_rdy )        // When there's no request from the cache, stay in refill request state
         state_next = STATE_REFILL_REQUEST;
     STATE_REFILL_WAIT:
-      if(cache2mem_respstream_val)             // When there’s a response from the cache, move to refill update state
+      if(cache2mem_respstream_val)             // When there's a response from the cache, move to refill update state
         state_next = STATE_REFILL_UPDATE;         // Read miss, move to refill update state
-      else if ( !cache2mem_respstream_val )    // When there’s no response from the cache, stay in refill wait state
+      else if ( !cache2mem_respstream_val )    // When there's no response from the cache, stay in refill wait state
         state_next = STATE_REFILL_WAIT;
     STATE_REFILL_UPDATE:
-      if(is_read)                               // When there’s a read request, move to read data access state
+      if(is_read)                               // When there's a read request, move to read data access state
         state_next = STATE_READ_DATA_ACCESS;
-      else if (is_write)                        // When there’s a write request, move to write data access state
+      else if (is_write)                        // When there's a write request, move to write data access state
         state_next = STATE_WRITE_DATA_ACCESS;
       else
       state_next = STATE_WAIT;                  // Read miss, move to wait state
     STATE_WAIT:
-      if(proc2cache_respstream_rdy)             // When there’s a response from the cache, move to idle state
+      if(proc2cache_respstream_rdy)             // When there's a response from the cache, move to idle state
         state_next = STATE_IDLE;
-      else if ( !proc2cache_respstream_rdy )    // When there’s no response from the cache, stay in wait state
+      else if ( !proc2cache_respstream_rdy )    // When there's no response from the cache, stay in wait state
         state_next = STATE_WAIT;
     default:
       state_next = STATE_IDLE;
@@ -256,57 +256,71 @@ end
 
   );
   begin
-    proc2cache_reqstream_rdy  = cs_cachereq_rdy;
-    proc2cache_respstream_val = cs_cacheresp_val;
-    cache2mem_reqstream_val   = cs_memreq_val;
-    cache2mem_respstream_rdy  = cs_memresp_rdy;
-    cachereq_reg_en           = cs_cachereq_reg_en;
-    memresp_reg_en            = cs_memresp_reg_en;
-    write_data_mux_sel        = cs_write_data_mux_sel;
-    wben_mux_sel              = cs_wben_mux_sel;
-    tag_array_wen             = cs_tag_array_wen;
-    tag_array_ren             = cs_tag_array_ren;
-    data_array_wen            = cs_data_array_wen;
-    data_array_ren            = cs_data_array_ren;
-    read_data_zero_mux_sel    = cs_read_data_zero_mux_sel;
-    read_data_reg_en          = cs_read_data_reg_en;
-    evict_addr_reg_en         = cs_evict_addr_reg_en;
-    memreq_addr_mux_sel       = cs_memreq_addr_mux_sel;
-    cacheresp_type            = cs_cacheresp_type;
-    hit                       = cs_hit;
-    memreq_type               = cs_memreq_type;
-    valid_bit_in              = cs_valid_bit_in;
-    valid_bits_write_en       = cs_valid_bits_write_en;
+    proc2cache_reqstream_rdy  = cs_cachereq_rdy;          // 1
+    proc2cache_respstream_val = cs_cacheresp_val;         // 2     
+    cache2mem_reqstream_val   = cs_memreq_val;            // 3
+    cache2mem_respstream_rdy  = cs_memresp_rdy;           // 4
+    cachereq_reg_en           = cs_cachereq_reg_en;       // 5
+    memresp_reg_en            = cs_memresp_reg_en;        // 6
+    write_data_mux_sel        = cs_write_data_mux_sel;    // 7
+    wben_mux_sel              = cs_wben_mux_sel;          // 8
+    tag_array_wen             = cs_tag_array_wen;         // 9
+    tag_array_ren             = cs_tag_array_ren;         // 10
+    data_array_wen            = cs_data_array_wen;        // 11
+    data_array_ren            = cs_data_array_ren;        // 12
+    read_data_zero_mux_sel    = cs_read_data_zero_mux_sel;// 13  
+    read_data_reg_en          = cs_read_data_reg_en;      // 14
+    evict_addr_reg_en         = cs_evict_addr_reg_en;     // 15
+    memreq_addr_mux_sel       = cs_memreq_addr_mux_sel;   // 16  
+    cacheresp_type            = cs_cacheresp_type;        // 17
+    hit                       = cs_hit;                   // 18
+    memreq_type               = cs_memreq_type;           // 19
+    valid_bit_in              = cs_valid_bit_in;          // 20
+    valid_bits_write_en       = cs_valid_bits_write_en;   // 21
   end
   endtask
 
   // Set outputs using a control signal "table"
   always @(*) begin
-                              cs( 0,   0,    0,    0,    0,    0,    0,    0,    0     );
+    // Initialize control signals to default values (all zero/off)
+    cs( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4'b0000, 2'b00, 4'b0000, 0, 0 );
     case ( state_reg )
-      //                             cache cache cache tag   tag   data  data  valid valid
-      //                             req   resp  req   array array array array bit   write
-      //                             rdy   val   en    wen   ren   wen   ren   in    en
+      // Control signals for each state
+      //                           1     2    3     4    5     6     7     8     9    10    11      12     13     14      15       16     17      18     19       20     21
+      //                          cache cache mem  mem   cache mem   write  wb   tag   tag   data   data   read   read   evict     mem   cache           mem     valid valid
+      //                          req   resp  req  resp  req   resp  data   en   array array array  array  zero   data   addr      req   resp     hit    req      bit   write
+      //                          rdy   val   val  rdy   en    en    mux    mux  wen   ren   wen    ren    mux     en     en       mux   type            type     in    en
+      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0000, 2'b00, 4'b0000, 0,    0 );
+      
+      STATE_TAG_CHECK:         cs( 0,    0,    0,    0,    0,    1,   0,    1,    0,    1,    0,     0,     0,     0,     0,       0,    4'b0000, 2'b00, 4'b0000, 0,    0 );
+      
+      STATE_INIT_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    1,   1,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'b0001, 2'b00, 4'b0001, 1,    1 );
+      
+      STATE_READ_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    1,   0,    0,    0,    1,    0,     1,     1,     0,     0,       0,    4'b0001, 2'b01, 4'b0000, 0,    0 );
+      
+      STATE_WRITE_DATA_ACCESS: cs( 0,    0,    0,    0,    0,    1,   0,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'b0010, 2'b01, 4'b0001, 1,    1 );
+      
+      STATE_EVICT_PREPARE:     cs( 0,    0,    0,    0,    0,    0,   1,    0,    1,    0,    1,     0,     1,     1,     0,       0,    4'b0011, 2'b10, 4'b0011, 1,    0 );
+      
+      STATE_EVICT_REQUEST:     cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     1,     0,       1,    4'b0011, 2'b10, 4'b0011, 1,    0 );
+      
+      STATE_EVICT_WAIT:        cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0011, 2'b10, 4'b0011, 1,    0 );
+      
+      STATE_REFILL_REQUEST:    cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0100, 2'b11, 4'b0100, 0,    0 );
+      
+      STATE_REFILL_WAIT:       cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0101, 2'b11, 4'b0101, 0,    0 );
+      
+      STATE_REFILL_UPDATE:     cs( 0,    0,    0,    0,    0,    1,   1,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'b0101, 2'b11, 4'b0101, 1,    1 );
+      
+      STATE_WAIT:              cs( 0,    1,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0110, 2'b11, 4'b0110, 0,    0 );
 
-      STATE_IDLE:                  cs( 1,   0,    1,    0,    0,    0,    0,    0,    0     );
-      STATE_TAG_CHECK:             cs( 0,   0,    0,    0,    1,    0,    0,    0,    0     );
-      STATE_INIT_DATA_ACCESS:      cs( 0,   0,    0,    1,    0,    1,    0,    1,    1     );
-      STATE_WAIT:                  cs( 0,   1,    0,    0,    0,    0,    0,    0,    0     );
-
-      // ''' SECTION  ''''''''''''''''''''''''''''''''''''''''''''''''''''
-      // Add outputs for TAG_CHECK, DATA_ACCESS, WAIT states
-      // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-      default:                cs( 0,   0,    0,    0,    0,    0,    0,    0,    0     );
+      default:                 cs( 0,    0,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'b0000, 2'b00, 4'b0000, 0,    0 );
 
     endcase
   end
 
-  // Hard code cache <-> memory interface val/rdy signals since we are
-  // not using this interface yet
 
-  assign cache2mem_reqstream_val  = 1'b0;
-  assign cache2mem_respstream_rdy = 1'b1;
+
 endmodule
 
 `endif

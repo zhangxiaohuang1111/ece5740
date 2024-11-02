@@ -13,6 +13,7 @@
 `include "vc/srams.v"
 `include "vc/regs.v"
 `include "vc/muxes.v"
+`include "vc/arithmetic.v"
 
 `include "lab3_mem/WbenDecoder.v"
 `include "lab3_mem/ReplUnit.v"
@@ -57,7 +58,7 @@ module lab3_mem_CacheBaseDpath
 
   output logic  [3:0]   cachereq_type,
   output logic [31:0]   cachereq_addr,
-  output logic          tag_match,
+  output logic          tag_match
 
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // LAB TASK: Define additional ports
@@ -201,7 +202,7 @@ module lab3_mem_CacheBaseDpath
   .in2  (read_data_reg_out[95:64]),
   .in1  (read_data_reg_out[63:32]),
   .in0  (read_data_reg_out[31:0]),
-  .sel  (read_data_mux_sel),
+  .sel  (cachereq_addr_byte_offset),
   .out  (read_data_mux_out)
   );
 
