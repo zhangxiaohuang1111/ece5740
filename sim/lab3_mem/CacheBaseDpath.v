@@ -149,12 +149,6 @@ module lab3_mem_CacheBaseDpath
   .out (tag_match)
   );
 
-  // make_addr
-  logic [31:0] make_addr_1;
-  logic [31:0] make_addr_0;
-  assign make_addr_1 = {tag_array_read_out, cachereq_addr_index, 4'b0};
-  assign make_addr_0 = {cachereq_addr_tag, cachereq_addr_index, 4'b0};
-
   // evict_addr_reg
   logic [31:0] evict_addr_reg_out;
   vc_EnResetReg #(32,0) evict_addr_reg(
@@ -205,6 +199,10 @@ module lab3_mem_CacheBaseDpath
   .out  (read_data_mux_out)
   );
 
+  // make_addr
+  logic [31:0] make_addr_1;
+  logic [31:0] make_addr_0;
+
 
   // Address Mapping
 
@@ -220,6 +218,8 @@ module lab3_mem_CacheBaseDpath
       assign cachereq_addr_word_offset = cachereq_addr[3:2];
       assign cachereq_addr_index       = cachereq_addr[7:4];
       assign cachereq_addr_tag         = cachereq_addr[31:8];
+      assign make_addr_1 = {tag_array_read_out, cachereq_addr_index, 4'b0};
+      assign make_addr_0 = {cachereq_addr_tag, cachereq_addr_index, 4'b0};
     end
     else if ( p_num_banks == 4 ) begin
       // handle address mapping for four banks
@@ -228,6 +228,8 @@ module lab3_mem_CacheBaseDpath
       assign cachereq_addr_bank        = cachereq_addr[5:4];
       assign cachereq_addr_index       = cachereq_addr[9:6];
       assign cachereq_addr_tag         = cachereq_addr[31:10];
+      assign make_addr_1 = {tag_array_read_out, cachereq_addr_index, cachereq_addr_bank, 4'b0};
+      assign make_addr_0 = {cachereq_addr_tag, cachereq_addr_index, cachereq_addr_bank, 4'b0};
     end
   endgenerate
 

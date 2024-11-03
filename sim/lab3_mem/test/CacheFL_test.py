@@ -801,7 +801,7 @@ def test_sassoc( test_params, cmdline_opts ):
 
 def bank_test():
   return [
-    #    type  opq  addr       len data                type  opq  test len data
+    #    type  opq  addr      len data        type  opq  test len data
     req( 'rd', 0x0, 0x00000000, 0, 0 ), resp( 'rd', 0x0, 0,   0,  0xdeadbeef ),
     req( 'rd', 0x1, 0x00000100, 0, 0 ), resp( 'rd', 0x1, 0,   0,  0x00c0ffee ),
     req( 'rd', 0x2, 0x00000200, 0, 0 ), resp( 'rd', 0x2, 0,   0,  0xffffffff ),
