@@ -141,9 +141,9 @@ module lab3_mem_CacheBaseCtrl
           state_next = STATE_READ_DATA_ACCESS;  // Read hit, move to read data state
       else if ( tag_match&&is_write ) 
           state_next = STATE_WRITE_DATA_ACCESS; // Write hit, move to write data state
-      else if ( !tag_match&&is_valid ) 
+      else if ( !tag_match&&!is_dirty ) 
           state_next = STATE_REFILL_REQUEST;    // Read miss, move to refill request stat
-      else if ( !tag_match&&!is_valid )
+      else if ( !tag_match&&is_dirty )
           state_next = STATE_EVICT_PREPARE;     // Write miss, move to evict prepare state
     STATE_INIT_DATA_ACCESS:
       state_next = STATE_WAIT;                  // Initialization transaction, move to wait state
@@ -235,6 +235,21 @@ end
     .write_data (valid_bit_in)
   );
 
+  logic dirty_bit_in;
+  logic dirty_bits_write_en;
+  logic is_dirty;
+
+  vc_ResetRegfile_1r1w#(1,16) dirty_bits
+(
+  .clk        (clk),
+  .reset      (reset),
+  .read_addr  (cachereq_addr_index),
+  .read_data  (is_dirty),
+  .write_en   (dirty_bits_write_en),
+  .write_addr (cachereq_addr_index),
+  .write_data (dirty_bit_in)
+);
+
   //----------------------------------------------------------------------
   // State Outputs
   //----------------------------------------------------------------------
@@ -299,29 +314,29 @@ end
       //                          cache cache mem  mem   cache mem   write  wb   tag   tag   data   data   read   read   evict     mem   cache           mem     valid valid
       //                          req   resp  req  resp  req   resp  data   en   array array array  array  zero   data   addr      req   resp     hit    req      bit   write
       //                          rdy   val   val  rdy   en    en    mux    mux  wen   ren   wen    ren    mux     en     en       mux   type            type     in    en
-      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'dx, 2'b00, 4'b0000, 0,    0 );
+      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd0, 2'bx,  4'bx   , 0,    0 );
       
-      STATE_TAG_CHECK:         cs( 0,    0,    0,    0,    0,    0,   1,    1,    0,    1,    0,     0,     0,     0,     0,       0,    4'dx, test , 4'b0000, 0,    0 );
+      STATE_TAG_CHECK:         cs( 0,    0,    0,    0,    0,    0,   1,    1,    0,    1,    0,     0,     0,     0,     0,       0,    4'bx, 2'bx , 4'b0000, 0,    0 );
       
       STATE_INIT_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    0,   1,    1,    1,    0,    1,     0,     0,     0,     0,       0,    4'd2, 2'b00, 4'b0001, 1,    1 );
       
-      STATE_READ_DATA_ACCESS:  cs( 0,    1,    0,    0,    0,    0,   0,    1,    0,    1,    0,     1,     1,     1,     0,       0,    4'd0, test , 4'b0000, 0,    0 ); 
+      STATE_READ_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    0,   0,    0,    0,    0,    0,     1,     1,     1,     0,       0,    4'd0, 2'b10, 4'b0000, 0,    0 ); 
 
-      STATE_WRITE_DATA_ACCESS: cs( 0,    0,    0,    0,    0,    1,   0,    1,    1,    0,    1,     0,     0,     0,     0,       0,    4'd1, 2'b01, 4'b0001, 1,    1 );
+      STATE_WRITE_DATA_ACCESS: cs( 0,    0,    0,    0,    0,    0,   1,    1,    1,    0,    1,     0,     0,     1,     0,       0,    4'd1, 2'b10, 4'b0001, 1,    1 );
       
-      STATE_EVICT_PREPARE:     cs( 0,    0,    0,    0,    0,    0,   1,    0,    1,    0,    1,     0,     1,     1,     0,       0,    4'dx, 2'b10, 4'b0011, 1,    0 );
+      STATE_REFILL_REQUEST:    cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'b00, 4'b0100, 0,    0 );
       
-      STATE_EVICT_REQUEST:     cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     1,     0,       1,    4'dx, 2'b10, 4'b0011, 1,    0 );
+      STATE_REFILL_WAIT:       cs( 0,    0,    0,    1,    0,    1,   1,    0,    0,    0,    1,     0,     0,     0,     0,       0,    4'd2, 2'b00, 4'b0101, 0,    0 );
       
-      STATE_EVICT_WAIT:        cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'dx, 2'b10, 4'b0011, 1,    0 );
+      STATE_REFILL_UPDATE:     cs( 0,    0,    0,    0,    0,    0,   0,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'd2, 2'b10, 4'b0101, 1,    1 );
+
+      STATE_EVICT_PREPARE:     cs( 0,    0,    0,    0,    0,    0,   1,    0,    1,    0,    1,     0,     1,     1,     0,       0,    4'bx, 2'b00, 4'b0011, 1,    0 );
       
-      STATE_REFILL_REQUEST:    cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'b11, 4'b0100, 0,    0 );
+      STATE_EVICT_REQUEST:     cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     1,     0,       1,    4'bx, 2'b00, 4'b0011, 1,    0 );
       
-      STATE_REFILL_WAIT:       cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'b11, 4'b0101, 0,    0 );
+      STATE_EVICT_WAIT:        cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'bx, 2'b00, 4'b0011, 1,    0 );
       
-      STATE_REFILL_UPDATE:     cs( 0,    0,    0,    0,    0,    1,   1,    0,    1,    0,    1,     0,     0,     0,     0,       0,    4'd2, 2'b11, 4'b0101, 1,    1 );
-      
-      STATE_WAIT:              cs( 0,    1,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'bx,  4'bx   , 0,    0 );
+      STATE_WAIT:              cs( 0,    1,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'bx, 2'b01,  4'bx   , 0,    0 );
 
       default:                 cs( 0,    0,    0,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    4'd2, 2'b00, 4'b0000, 0,    0 );
 

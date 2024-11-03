@@ -202,7 +202,7 @@ module lab3_mem_CacheBaseDpath
   .in2  (read_data_reg_out[95:64]),
   .in1  (read_data_reg_out[63:32]),
   .in0  (read_data_reg_out[31:0]),
-  .sel  (cachereq_addr_byte_offset),
+  .sel  (cachereq_addr_word_offset),
   .out  (read_data_mux_out)
   );
 
@@ -291,9 +291,16 @@ module lab3_mem_CacheBaseDpath
 
   // proc2cache_reqstream_msg
 
-  assign proc2cache_respstream_msg.type_  = cacheresp_type;
+  assign proc2cache_respstream_msg.type_  = cachereq_type;
   assign proc2cache_respstream_msg.opaque = cachereq_opaque_reg_out;
-  assign proc2cache_respstream_msg.test   = hit;
+  always_comb begin
+    case (hit)
+      2'b00: proc2cache_respstream_msg.test = 2'b00;
+      2'b01: ;
+      2'b10: proc2cache_respstream_msg.test = proc2cache_respstream_msg.test ^ 2'b01; 
+      default: proc2cache_respstream_msg.test = 2'b00;
+    endcase
+  end
   assign proc2cache_respstream_msg.len    = 2'b0;
   assign proc2cache_respstream_msg.data = read_data_mux_out;
 
