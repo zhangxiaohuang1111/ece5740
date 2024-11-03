@@ -67,7 +67,6 @@ module lab3_mem_CacheBase
   logic          read_data_reg_en;
   logic          evict_addr_reg_en;
   logic          memreq_addr_mux_sel;
-  logic [3:0]    cacheresp_type;
   logic [1:0]    hit;
   logic [3:0]    memreq_type;
 

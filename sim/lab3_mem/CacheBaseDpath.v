@@ -50,7 +50,6 @@ module lab3_mem_CacheBaseDpath
   input  logic          read_data_reg_en,
   input  logic          evict_addr_reg_en,
   input  logic          memreq_addr_mux_sel,
-  input  logic [3:0]    cacheresp_type,
   input  logic [1:0]    hit,
   input  logic [3:0]    memreq_type,
 
