@@ -169,14 +169,14 @@ module lab3_mem_CacheBase
 
     // Use a "hit" signal in the control unit to display h/m
 
-    // if ( ctrl.state_reg == ctrl.STATE_TAG_CHECK ) begin
+    if ( ctrl.state_reg == ctrl.STATE_TAG_CHECK ) begin
       if ( ctrl.tag_match )
         vc_trace.append_str( trace_str, "h" );
       else
         vc_trace.append_str( trace_str, "m" );
-    // end
-    // else
-    //   vc_trace.append_str( trace_str, " " );
+    end
+    else
+      vc_trace.append_str( trace_str, " " );
 
     // Display all valid tags, show dirty bits with ; symbol
 
