@@ -624,6 +624,108 @@ def evict_multi_cacheline():
     req( 'rd', 0xf, 0x10f0, 0, 0          ), resp( 'rd', 0xf, 0,   0,  0x1f1f1f1f ),
   ]
 
+
+# Read hit path for clean lines
+def read_hit_clean_line():
+    return [
+        # type  opq   addr          len   data                 type  opq   test    len    data
+        req('in', 0x0, 0x1000, len=0, data=0x12345678), resp('in', 0x0, test=0, len=0, data=0),  # Initialize line
+        req('rd', 0x1, 0x1000, len=0, data=0),          resp('rd', 0x1, test=1, len=0, data=0x12345678)  # Read clean line
+    ]
+
+# Write hit path for clean lines
+def write_hit_clean_line():
+    return [
+        # type  opq   addr          len   data                 type  opq   test    len    data
+        req('in', 0x0, 0x1000, len=0, data=0x12345678), resp('in', 0x0, test=0, len=0, data=0),  # Initialize line
+        req('wr', 0x1, 0x1000, len=0, data=0xabcdef00), resp('wr', 0x1, test=1, len=0, data=0)   # Write clean line
+    ]
+
+# Read hit path for dirty lines
+def read_hit_dirty_line():
+    return [
+        # type  opq   addr          len   data                 type  opq   test    len    data
+        req('wr', 0x0, 0x1000, len=0, data=0xdeadbeef), resp('wr', 0x0, test=0, len=0, data=0),  # Write to make line dirty
+        req('rd', 0x1, 0x1000, len=0, data=0),          resp('rd', 0x1, test=1, len=0, data=0xdeadbeef)  # Read dirty line
+    ]
+
+# Write hit path for dirty lines
+def write_hit_dirty_line():
+    return [
+        # type  opq   addr          len   data                 type  opq   test    len    data
+        req('wr', 0x0, 0x1000, len=0, data=0xdeadbeef), resp('wr', 0x0, test=0, len=0, data=0),  # Initial write to make dirty
+        req('wr', 0x1, 0x1000, len=0, data=0xcafebabe), resp('wr', 0x1, test=1, len=0, data=0)   # Write hit to update dirty line
+    ]
+
+# Read miss with refill and no eviction
+def read_miss_refill_no_evict():
+    return [
+        # type  opq   addr          len   data                 type  opq   test    len    data
+        req('rd', 0x0, 0x1000, len=0, data=0),          resp('rd', 0x0, test=0, len=0, data=0x000c0ffe),  # Miss and refill
+        req('rd', 0x1, 0x1004, len=0, data=0),          resp('rd', 0x1, test=1, len=0, data=0x10101010)   # Read hit after refill
+    ]
+
+# Write miss with refill and no eviction
+def write_miss_refill_no_evict():
+    return [
+        # type  opq   addr          len   data                 type  opq   test    len    data
+        req('wr', 0x0, 0x1000, len=0, data=0x87654321), resp('wr', 0x0, test=0, len=0, data=0),  # Miss and refill
+        req('rd', 0x1, 0x1000, len=0, data=0),          resp('rd', 0x1, test=1, len=0, data=0x87654321),   # Read hit after refill
+        req('rd', 0x1, 0x1004, len=0, data=0),          resp('rd', 0x1, test=1, len=0, data=0x10101010)   # Read hit after refill
+    ]
+
+# Read miss with refill and eviction
+def read_miss_refill_evict():
+      return [
+    #    type  opq  addr   len data                type  opq  test len data
+    req( 'wr', 0x0, 0x1000, 0, 0xcafecafe ), resp( 'wr', 0x0, 0,   0,  0          ),
+    req( 'rd', 0x0, 0x1000, 0, 0          ), resp( 'rd', 0x0, 1,   0,  0xcafecafe ),
+    req( 'wr', 0x0, 0x1080, 0, 0x000c0ffe ), resp( 'wr', 0x0, 0,   0,  0          ),
+    req( 'rd', 0x0, 0x1080, 0, 0          ), resp( 'rd', 0x0, 1,   0,  0x000c0ffe ),
+    req( 'rd', 0x0, 0x1100, 0, 0          ), resp( 'rd', 0x0, 0,   0,  0xabcd1100 ), # conflicts
+    req( 'rd', 0x0, 0x1000, 0, 0          ), resp( 'rd', 0x0, 0,   0,  0xcafecafe ),
+  ]
+
+# Write miss with refill and eviction
+def write_miss_refill_evict():
+    return [
+        #    type  opq  addr   len data                type  opq  test len data
+        req('wr', 0x0, 0x1000, 0, 0xdeadbeef), resp('wr', 0x0, 0,   0,  0          ),  # Write to address 0x1000
+        req('rd', 0x0, 0x1000, 0, 0          ),resp('rd', 0x0, 1,   0,  0xdeadbeef ),  # Read to verify write
+        req('wr', 0x0, 0x1080, 0, 0x12345678), resp('wr', 0x0, 0,   0,  0          ),  # Write to a different address (fills cache)
+        req('rd', 0x0, 0x1080, 0, 0          ),resp('rd', 0x0, 1,   0,  0x12345678 ),  # Read to verify write
+        req('wr', 0x0, 0x1100, 0, 0xcafecafe), resp('wr', 0x0, 0,   0,  0          ),  # Write causing conflict, triggers eviction
+        req('rd', 0x0, 0x1000, 0, 0          ),resp('rd', 0x0, 0,   0,  0xdeadbeef ),  # Refill from main memory after eviction
+    ]
+
+def capacity_miss_test():
+    return [
+        #    type  opq  addr      len data             type  opq  test len data
+        req('wr', 0x0, 0x00001000, 0, 777),       resp('wr', 0x0,   0,  0,  0), 
+        req('wr', 0x1, 0x00001010, 0, 1),         resp('wr', 0x1,   0,  0,  0), 
+        req('wr', 0x2, 0x00001020, 0, 2),         resp('wr', 0x2,   0,  0,  0), 
+        req('wr', 0x3, 0x00001030, 0, 3),         resp('wr', 0x3,   0,  0,  0), 
+        req('wr', 0x4, 0x00001040, 0, 4),         resp('wr', 0x4,   0,  0,  0), 
+        req('wr', 0x5, 0x00001050, 0, 5),         resp('wr', 0x5,   0,  0,  0), 
+        req('wr', 0x6, 0x00001060, 0, 6),         resp('wr', 0x6,   0,  0,  0), 
+        req('wr', 0x7, 0x00001070, 0, 7),         resp('wr', 0x7,   0,  0,  0), 
+        req('wr', 0x8, 0x00001080, 0, 8),         resp('wr', 0x8,   0,  0,  0),
+        req('wr', 0x9, 0x00001090, 0, 9),         resp('wr', 0x9,   0,  0,  0),
+        req('wr', 0xa, 0x000010a0, 0, 10),        resp('wr', 0xa,   0,  0,  0),
+        req('wr', 0xb, 0x000010b0, 0, 11),        resp('wr', 0xb,   0,  0,  0),
+        req('wr', 0xc, 0x000010c0, 0, 12),        resp('wr', 0xc,   0,  0,  0),
+        req('wr', 0xd, 0x000010d0, 0, 13),        resp('wr', 0xd,   0,  0,  0),
+        req('wr', 0xe, 0x000010e0, 0, 14),        resp('wr', 0xe,   0,  0,  0),
+        req('wr', 0xf, 0x000010f0, 0, 15),        resp('wr', 0xf,   0,  0,  0),
+        req('wr', 0x10,0x00001100, 0, 16),        resp('wr', 0x10,  0,  0,  0), # capacity miss
+        req('rd', 0x11,0x00001100, 0, 0),         resp('rd', 0x11,  1,  0, 16), # read
+        req('rd', 0x11,0x00001000, 0, 0),         resp('rd', 0x11,  0,  0,777), # capacity miss, but get from main memory
+    
+
+    ]
+
+
+
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # LAB TASK: Add more directed test cases
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -677,6 +779,18 @@ test_case_table_generic = mk_test_case_table([
   [ "evict_multi_word_sink_delay",      evict_multi_word,           data_512B,    0.9,  3,  0,  10   ],
   [ "evict_multi_word_src_delay",       evict_multi_word,           data_512B,    0.9,  3,  10, 0    ],
 
+  # more tests for lab3
+  [ "read_hit_clean_line",              read_hit_clean_line,        None,         0.0,  0,  0,  0    ],
+  [ "write_hit_clean_line",             write_hit_clean_line,       None,         0.0,  0,  0,  0    ],
+  [ "read_hit_dirty_line",              read_hit_dirty_line,        None,         0.0,  0,  0,  0    ],
+  [ "write_hit_dirty_line",             write_hit_dirty_line,       None,         0.0,  0,  0,  0    ],
+  [ "read_miss_refill_no_evict",        read_miss_refill_no_evict,  data_64B,     0.0,  0,  0,  0    ],
+  [ "write_miss_refill_no_evict",       write_miss_refill_no_evict, data_64B,     0.0,  0,  0,  0    ],
+  [ "read_miss_refill_evict",           read_miss_refill_evict,     data_512B,    0.0,  0,  0,  0    ],
+  [ "write_miss_refill_evict",          write_miss_refill_evict,    data_512B,    0.0,  0,  0,  0    ],
+  [ "capacity_miss_test",               capacity_miss_test,         data_64B,     0.0,  0,  0,  0    ],
+
+
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add more entries to test case table
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -694,8 +808,32 @@ def test_generic( test_params, cmdline_opts ):
 # LAB TASK: Add random test cases
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+#-------------------------------------------------------------------------
+# Random test messages
+#-------------------------------------------------------------------------
+
+def random_msgs():
+  # 
+  msgs = []
+  for i in range(100):
+    # 
+    idx = randint(0, 255)  #
+    addr = 0x00001000 + idx * 4
+    data = data_random()[2 * idx + 1]  # 
+
+    # 
+    msgs.extend([
+      req('rd', i, addr, 0, 0), resp('rd', i, 0, 0, data),
+    ])
+
+  return msgs
+
+
 test_case_table_random = mk_test_case_table([
   (                        "msg_func       mem_data_func stall lat src sink"),
+  [ "random",              random_msgs,     data_random,     0.0,  0,  0,  0    ],
+  [ "random_delays",       random_msgs,     data_random,     0.9,  3,  10, 10   ],
+
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add more entries to test case table
@@ -714,8 +852,156 @@ def test_random( test_params, cmdline_opts ):
 # LAB TASK: Add directed test cases explicitly for direct mapped cache
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def stress_test_dmap():
+    msgs = []
+    num_lines = 16  # Number of cache lines
+    line_size = 16  # Size of each cache line in bytes
+    base_addr = 0x00001000  # Starting address for initial fill
+    new_base_addr = 0x00002000  # Address range for eviction phase
+    max_opq = num_lines * 4  # Maximum opaque value to differentiate stages
+
+    # --- Step 1: Initial cache fill ---
+    for i in range(num_lines):
+        addr_base = base_addr + i * line_size
+        data_list = [i * 4 + j for j in range(4)]  # Deterministic data for each word
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = i * 4 + j
+            # Initial write to fill cache line; first write is treated as a miss
+            msgs.extend([
+                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
+            ])
+        for j in range(4):
+            addr = addr_base + j * 4
+            msgs.extend([
+                req('rd', i * 4 + j, addr, 0, 0), resp('rd', i * 4 + j, 1, 0, data_list[j])
+            ])
+
+    # --- Step 2: Evict cache by writing to new addresses ---
+    for i in range(num_lines):
+        addr_base = new_base_addr + i * line_size
+        data_list = [100 + i * 4 + j for j in range(4)]  # Deterministic data for eviction phase
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = max_opq + i * 4 + j
+            # New addresses cause evictions; first write in each line is treated as a miss
+            msgs.extend([
+                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
+            ])
+        for j in range(4):
+            addr = addr_base + j * 4
+            msgs.extend([
+                req('rd', max_opq + i * 4 + j, addr, 0, 0), resp('rd', max_opq + i * 4 + j, 1, 0, data_list[j])
+            ])
+
+    # --- Step 3: Re-access initial addresses to validate eviction ---
+    for i in range(num_lines):
+        addr_base = base_addr + i * line_size
+        data_list = [i * 4 + j for j in range(4)]  # Reuse initial data for validation
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = max_opq * 2 + i * 4 + j
+            # The first re-accessed address should miss, with subsequent hits
+            msgs.extend([
+                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
+            ])
+        for j in range(4):
+            addr = addr_base + j * 4
+            msgs.extend([
+                req('rd', max_opq * 2 + i * 4 + j, addr, 0, 0), resp('rd', max_opq * 2 + i * 4 + j, 1, 0, data_list[j])
+            ])
+    return msgs
+
+def random_stress_test_dmap():
+    msgs = []
+    num_lines = 16  # Number of cache lines
+    line_size = 16  # Size of each cache line in bytes
+    base_addr = 0x00001000  # Starting address for initial fill
+    new_base_addr = 0x00002000  # Address range for eviction phase
+    max_opq = num_lines * 4  # Maximum opaque value to differentiate stages
+
+    # --- Step 1: Initial cache fill ---
+    for i in range(num_lines):
+        addr_base = base_addr + i * line_size
+        data_list = [randint(0, 0xffffffff) for _ in range(4)]
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = i * 4 + j
+            msgs.extend([
+                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
+            ])
+        for j in range(4):
+            addr = addr_base + j * 4
+            msgs.extend([
+                req('rd', i * 4 + j, addr, 0, 0), resp('rd', i * 4 + j, 1, 0, data_list[j])
+            ])
+
+    # --- Step 2: Evict cache by writing to new addresses ---
+    for i in range(num_lines):
+        addr_base = new_base_addr + i * line_size
+        data_list = [randint(0, 0xffffffff) for _ in range(4)]
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = max_opq + i * 4 + j
+            msgs.extend([
+                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
+            ])
+        for j in range(4):
+            addr = addr_base + j * 4
+            msgs.extend([
+                req('rd', max_opq + i * 4 + j, addr, 0, 0), resp('rd', max_opq + i * 4 + j, 1, 0, data_list[j])
+            ])
+
+    # --- Step 3: Re-access initial addresses to validate eviction ---
+    for i in range(num_lines):
+        addr_base = base_addr + i * line_size
+        data_list = [randint(0, 0xffffffff) for _ in range(4)]
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = max_opq * 2 + i * 4 + j
+            msgs.extend([
+                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
+            ])
+        for j in range(4):
+            addr = addr_base + j * 4
+            msgs.extend([
+                req('rd', max_opq * 2 + i * 4 + j, addr, 0, 0), resp('rd', max_opq * 2 + i * 4 + j, 1, 0, data_list[j])
+            ])
+
+    return msgs
+
+def conflict_miss_test():
+    return [
+        #    type  opq  addr      len data               type  opq  test len data
+        req('wr', 0x0, 0x00001000, 0, 0x11111111), resp('wr', 0x0, 0, 0, 0),  # write 0x00001000
+        req('wr', 0x1, 0x00001004, 0, 0x22222222), resp('wr', 0x1, 1, 0, 0),  # write 0x00001004
+        req('wr', 0x2, 0x00001008, 0, 0x33333333), resp('wr', 0x2, 1, 0, 0),  # write 0x00001008
+        req('rd', 0x3, 0x00001000, 0, 0),          resp('rd', 0x3, 1, 0, 0x11111111),  # read 0x00001000
+        req('rd', 0x4, 0x00001004, 0, 0),          resp('rd', 0x4, 1, 0, 0x22222222),  # read 0x00001004
+        req('rd', 0x5, 0x00001008, 0, 0),          resp('rd', 0x5, 1, 0, 0x33333333),  # read 0x00001008
+
+        # conflict miss
+        req('wr', 0x6, 0x00001100, 0, 0x44444444), resp('wr', 0x6, 0, 0, 0),  # (conflict miss)
+        req('wr', 0x7, 0x00001000, 0, 0x55555555), resp('wr', 0x7, 0, 0, 0),  # (conflict miss)
+        req('wr', 0x8, 0x00000100, 0, 0x66666666), resp('wr', 0x8, 0, 0, 0),  # (conflict miss)
+        
+    ]
+
 test_case_table_dmap = mk_test_case_table([
-  (                                   "msg_func                         mem_data_func stall lat src sink"),
+  (                                        "msg_func                         mem_data_func stall lat src sink"),
+  [ "stress_test_dmap",                        stress_test_dmap,                None,         0.0,  0,  0,  0    ],
+  [ "stress_test_dmap_sink_delay",             stress_test_dmap,                None,         0.9,  3,  0,  10   ],
+  [ "stress_test_dmap_src_delay",              stress_test_dmap,                None,         0.9,  3,  10, 0    ],
+  [ "random_stress_test_dmap",            random_stress_test_dmap,              None,         0.0,  0,  0,  0    ],
+  [ "random_stress_test_dmap_sink_delay", random_stress_test_dmap,              None,         0.9,  3,  0,  10   ],
+  [ "random_stress_test_dmap_src_delay",  random_stress_test_dmap,              None,         0.9,  3,  10, 0    ],
+  [ "conflict_miss_test",                      conflict_miss_test,              None,         0.0,  0,  0,  0    ],
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add more entries to test case table
@@ -801,7 +1087,7 @@ def test_sassoc( test_params, cmdline_opts ):
 
 def bank_test():
   return [
-    #    type  opq  addr       len data                type  opq  test len data
+    #    type  opq  addr      len data        type  opq  test len data
     req( 'rd', 0x0, 0x00000000, 0, 0 ), resp( 'rd', 0x0, 0,   0,  0xdeadbeef ),
     req( 'rd', 0x1, 0x00000100, 0, 0 ), resp( 'rd', 0x1, 0,   0,  0x00c0ffee ),
     req( 'rd', 0x2, 0x00000200, 0, 0 ), resp( 'rd', 0x2, 0,   0,  0xffffffff ),
