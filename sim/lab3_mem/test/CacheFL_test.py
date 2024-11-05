@@ -823,16 +823,35 @@ def random_msgs():
 
     # 
     msgs.extend([
-      req('rd', i, addr, 0, 0), resp('rd', i, 0, 0, data),
+      req('rd', i, addr, 0, 0), resp('rd', i, 1, 0, data),
     ])
 
   return msgs
+
+
+def random_write_read_msgs():
+    msgs = []
+    for i in range(256):
+        # 
+        idx = randint(0, 255)
+        addr = 0x00001000 + idx * 4
+        data = 0x1000 + idx  #  data_random
+        
+        # 
+        msgs.extend([
+            req('wr', i, addr, 0, data), resp('wr', i, 0, 0, 0),   # 
+            req('rd', i, addr, 0, 0),    resp('rd', i, 1, 0, data),   # 
+        ])
+
+    return msgs
 
 
 test_case_table_random = mk_test_case_table([
   (                        "msg_func       mem_data_func stall lat src sink"),
   [ "random",              random_msgs,     data_random,     0.0,  0,  0,  0    ],
   [ "random_delays",       random_msgs,     data_random,     0.9,  3,  10, 10   ],
+  [ "random_write_read",   random_write_read_msgs, data_random, 0.0,  0,  0,  0    ],
+  [ "random_write_read_delays", random_write_read_msgs, data_random, 0.9,  3,  10, 10   ],
 
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -976,7 +995,7 @@ def random_stress_test_dmap():
 
     return msgs
 
-def conflict_miss_test():
+def conflict_miss_test_dmap():
     return [
         #    type  opq  addr      len data               type  opq  test len data
         req('wr', 0x0, 0x00001000, 0, 0x11111111), resp('wr', 0x0, 0, 0, 0),  # write 0x00001000
@@ -993,6 +1012,26 @@ def conflict_miss_test():
         
     ]
 
+
+def random_write_read_test_dmap():
+    msgs = []
+    
+    for i in range(16):  # 
+        # 
+        addr = 0x00001000 + i * 16
+        data = 0x1000 + i  # 
+
+        #  miss
+        msgs.extend([
+            req('wr', i * 4,     addr, 0, data),  resp('wr',     i * 4, 0, 0, 0),   #  miss
+            req('rd', i * 4 + 1, addr, 0, 0), resp('rd', i * 4 + 1, 1, 0, data),   #  hit
+            req('rd', i * 4 + 2, addr, 0, 0), resp('rd', i * 4 + 2, 1, 0, data),   #  hit
+            req('rd', i * 4 + 3, addr, 0, 0), resp('rd', i * 4 + 3, 1, 0, data),   #  hit
+        ])
+
+    return msgs
+
+
 test_case_table_dmap = mk_test_case_table([
   (                                        "msg_func                         mem_data_func stall lat src sink"),
   [ "stress_test_dmap",                        stress_test_dmap,                None,         0.0,  0,  0,  0    ],
@@ -1001,7 +1040,15 @@ test_case_table_dmap = mk_test_case_table([
   [ "random_stress_test_dmap",            random_stress_test_dmap,              None,         0.0,  0,  0,  0    ],
   [ "random_stress_test_dmap_sink_delay", random_stress_test_dmap,              None,         0.9,  3,  0,  10   ],
   [ "random_stress_test_dmap_src_delay",  random_stress_test_dmap,              None,         0.9,  3,  10, 0    ],
-  [ "conflict_miss_test",                      conflict_miss_test,              None,         0.0,  0,  0,  0    ],
+  [ "conflict_miss_test",                 conflict_miss_test_dmap,              None,         0.0,  0,  0,  0    ],
+  [ "conflict_miss_test_sink_delay",      conflict_miss_test_dmap,              None,         0.9,  3,  0,  10   ],
+  [ "conflict_miss_test_src_delay",       conflict_miss_test_dmap,              None,         0.9,  3,  10, 0    ],
+  [ "random_write_read_msgs",             random_write_read_test_dmap,          None,         0.0,  0,  0,  0    ],
+  [ "random_write_read_msgs_sink_delay",  random_write_read_test_dmap,          None,         0.9,  3,  0,  10   ],
+  [ "random_write_read_msgs_src_delay",   random_write_read_test_dmap,          None,         0.9,  3,  10, 0    ],
+
+
+
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add more entries to test case table
