@@ -8,8 +8,8 @@ import os
 
 from subprocess import check_call, CalledProcessError
 
-impls  = [ "fl" ]
-inputs = [ "loop1", "loop2", "loop3" ]
+impls  = [ "fl" , "base" , "alt" ]
+inputs = [ "loop1", "loop2", "loop3" , "loop4" , "loop5"]
 
 # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Once you get your baseline and alternative design passing all of your
