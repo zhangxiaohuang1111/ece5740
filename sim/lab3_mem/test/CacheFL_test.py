@@ -1031,6 +1031,18 @@ def random_write_read_test_dmap():
 
     return msgs
 
+def head():
+  return [
+    #    type  opq  addr      len data            type  opq  test len data
+    # req( 'rd', 0x0, 0x1000, 0, 0         ), resp( 'rd', 0x0, 0,  0, 0xabcd1000 ),
+    # req( 'rd', 0x1, 0x1100, 0, 0         ), resp( 'rd', 0x1, 0,  0, 0xabcd1100 ),
+    req( 'wr', 0x2, 0x1000, 0, 0x00000000 ), resp( 'wr', 0x2, 0,   0, 0         ),
+    # req( 'wr', 0x3, 0x1100, 0, 0x11111111 ), resp( 'wr', 0x3, 0,   0, 0         ),
+    req( 'rd', 0x4, 0x1004, 0, 0         ), resp( 'rd', 0x4, 1,  0, 0xabcd1004 ),
+    req( 'rd', 0x5, 0x1104, 0, 0         ), resp( 'rd', 0x5, 0,  0, 0xabcd1104 ),
+    req( 'wr', 0x6, 0x1004, 0, 0x22222222 ), resp( 'wr', 0x6, 0,   0, 0         ),
+    req( 'wr', 0x7, 0x1104, 0, 0x33333333 ), resp( 'wr', 0x7, 0,  0,  0 ),
+  ]
 
 test_case_table_dmap = mk_test_case_table([
   (                                        "msg_func                         mem_data_func stall lat src sink"),
@@ -1046,8 +1058,7 @@ test_case_table_dmap = mk_test_case_table([
   [ "random_write_read_msgs",             random_write_read_test_dmap,          None,         0.0,  0,  0,  0    ],
   [ "random_write_read_msgs_sink_delay",  random_write_read_test_dmap,          None,         0.9,  3,  0,  10   ],
   [ "random_write_read_msgs_src_delay",   random_write_read_test_dmap,          None,         0.9,  3,  10, 0    ],
-
-
+  [ "head",                               head,                               data_512B,         0.0,  0,  0,  0    ],
 
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
