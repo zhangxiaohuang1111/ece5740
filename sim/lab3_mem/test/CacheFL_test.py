@@ -1031,7 +1031,6 @@ def random_write_read_test_dmap():
 
     return msgs
 
-
 test_case_table_dmap = mk_test_case_table([
   (                                        "msg_func                         mem_data_func stall lat src sink"),
   [ "stress_test_dmap",                        stress_test_dmap,                None,         0.0,  0,  0,  0    ],
@@ -1046,8 +1045,6 @@ test_case_table_dmap = mk_test_case_table([
   [ "random_write_read_msgs",             random_write_read_test_dmap,          None,         0.0,  0,  0,  0    ],
   [ "random_write_read_msgs_sink_delay",  random_write_read_test_dmap,          None,         0.9,  3,  0,  10   ],
   [ "random_write_read_msgs_src_delay",   random_write_read_test_dmap,          None,         0.9,  3,  10, 0    ],
-
-
 
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

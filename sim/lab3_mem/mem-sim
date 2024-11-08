@@ -41,6 +41,8 @@
 
 import os
 import sys
+from random import randint
+
 
 sim_dir = os.path.dirname( os.path.abspath( __file__ ) )
 while sim_dir:
@@ -90,7 +92,7 @@ def parse_cmdline():
   # LAB TASK: Add choices to --input option to use your new patterns
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  p.add_argument(       "--input",    choices=["loop1", "loop2", "loop3"], default="loop1" )
+  p.add_argument(       "--input",    choices=["loop1", "loop2", "loop3","loop4","loop5"], default="loop1" )
   p.add_argument(       "--trace",    action="store_true"                                          )
   p.add_argument(       "--stats",    action="store_true"                                          )
   p.add_argument(       "--dump-vcd", action="store_true"                                          )
@@ -198,6 +200,53 @@ def loop3():
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 #-------------------------------------------------------------------------
+# Pattern: loop4 (Strided access)
+#-------------------------------------------------------------------------
+
+def loop4():
+  mem = []
+
+  # Stride access: accessing every 8th word in memory
+  for i in range(0, 100, 8):
+    mem.append(0x00001000 + i * 4)
+    mem.append(0xabcd1000 + i * 4)
+
+  imsgs = []
+  omsgs = []
+
+  for i in range(0, 100, 8):
+    addr = 0x00001000 + i * 4
+    data = 0xabcd1000 + i * 4
+    imsgs.append(req('rd', i, addr, 0, 0))
+    omsgs.append(resp('rd', i, 0, 0, data))
+
+  return [imsgs, omsgs, mem]
+
+#-------------------------------------------------------------------------
+# Pattern: loop5 (Random access)
+#-------------------------------------------------------------------------
+
+def loop5():
+  mem = []
+
+  # Generate random memory addresses
+  for i in range(100):
+    addr = 0x00001000 + randint(0, 255) * 4
+    mem.append(addr)
+    mem.append(0xabcd0000 + addr)
+
+  imsgs = []
+  omsgs = []
+
+  for i in range(100):
+    addr = mem[2 * i]
+    data = mem[2 * i + 1]
+    imsgs.append(req('rd', i, addr, 0, 0))
+    omsgs.append(resp('rd', i, 0, 0, data))
+
+  return [imsgs, omsgs, mem]
+
+#-------------------------------------------------------------------------
 # Main
 #-------------------------------------------------------------------------
 
@@ -222,6 +271,8 @@ def main():
     #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     # LAB TASK: Add your new patterns to this Python dict
     #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    'loop4' : loop4,
+    'loop5' : loop5,
 
   }
 

@@ -315,7 +315,7 @@ end
       //                          cache cache mem  mem   cache mem   write  wb   tag   tag   data   data   read   read   evict     mem           mem     valid valid   dirty dirty
       //                          req   resp  req  resp  req   resp  data   en   array array array  array  zero   data   addr      req    hit    req      bit   write  bit   write
       //                          rdy   val   val  rdy   en    en    mux    mux  wen   ren   wen    ren    mux     en     en       mux           type     in    en     in    en
-      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    2'b00,    4'bx,   0,    0,     0,   0 );
+      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    2'b00,   4'bx,   0,    0,     0,   0 );
       
       STATE_TAG_CHECK:         cs( 0,    0,    0,    0,    0,    0,   1,    1,    0,    1,    0,     0,     0,     0,     0,       0,    2'bx ,   4'bx,    0,    0,     0,   0 );
       
@@ -323,7 +323,7 @@ end
       
       STATE_READ_DATA_ACCESS:  cs( 0,    0,    0,    0,    0,    0,   0,    0,    0,    0,    0,     1,     1,     1,     0,       0,    2'b10,   4'bx,    0,    0,     0,   0 ); 
 
-      STATE_WRITE_DATA_ACCESS: cs( 0,    0,    0,    0,    0,    0,   1,    1,    1,    0,    1,     0,     0,     1,     0,       0,    2'b10,   4'bx,    0,    0,     1,   1 );
+      STATE_WRITE_DATA_ACCESS: cs( 0,    0,    0,    0,    0,    0,   1,    1,    1,    0,    1,     0,     0,     1,     0,       0,    2'b10,   4'bx,    1,    1,     1,   1 );
       
       STATE_REFILL_REQUEST:    cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     1,     0,     0,       0,    2'b00,   4'd0,    0,    0,     0,   0 );
       
