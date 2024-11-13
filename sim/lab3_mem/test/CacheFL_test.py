@@ -847,11 +847,11 @@ def random_write_read_msgs():
 
 
 test_case_table_random = mk_test_case_table([
-  (                        "msg_func       mem_data_func stall lat src sink"),
-  [ "random",              random_msgs,     data_random,     0.0,  0,  0,  0    ],
-  [ "random_delays",       random_msgs,     data_random,     0.9,  3,  10, 10   ],
-  [ "random_write_read",   random_write_read_msgs, data_random, 0.0,  0,  0,  0    ],
-  [ "random_write_read_delays", random_write_read_msgs, data_random, 0.9,  3,  10, 10   ],
+  (                        "msg_func                    mem_data_func stall lat src sink"),
+  [ "random",              random_msgs,                 data_random,     0.0,  0,  0,  0    ],
+  [ "random_delays",       random_msgs,                 data_random,     0.9,  3,  10, 10   ],
+  [ "random_write_read",   random_write_read_msgs,      None, 0.0,  0,  0,  0    ],
+  [ "random_write_read_delays", random_write_read_msgs, None, 0.9,  3,  10, 10   ],
 
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
