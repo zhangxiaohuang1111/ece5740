@@ -138,6 +138,7 @@ module lab3_mem_CacheAltCtrl
   assign data_array_0_wen = (current_way == 0) ? data_array_wen : 1'b0;
   assign data_array_1_wen = (current_way == 1) ? data_array_wen : 1'b0;
 
+  assign  current_way = (hit_indication) ? (tag_0_match) ? 0 : 1 : lru_bit;
 
   always @(*) begin
   state_next = state_reg;
@@ -152,13 +153,6 @@ module lab3_mem_CacheAltCtrl
     
     // TAG check state to determine hit or miss
     STATE_TAG_CHECK: begin
-      if (tag_0_match)
-        current_way = 1'b0;
-      else if (tag_1_match)
-        current_way = 1'b1;
-      else
-        current_way = 1'bx;
-
       if ( is_init )
           state_next = STATE_INIT_DATA_ACCESS;              // Initialization transaction
       else if ( hit_indication && is_read )
@@ -267,7 +261,6 @@ end
   logic is_valid;
   logic is_valid_way0;
   logic is_valid_way1;
-  
 
   assign is_valid = (current_way == 0) ? is_valid_way0 : is_valid_way1;
   assign valid_bits_write_en_way0 = (current_way == 0) ? valid_bits_write_en : 1'b0;
@@ -335,7 +328,7 @@ end
   logic lru_bits_write_en;
   logic lru_bits_in;
 
-  assign lru_bits_in = ~current_way;  // Inverse of current way
+  assign lru_bits_in = current_way;  // Inverse of current way
 
   vc_ResetRegfile_1r1w#(1,8) LRU_reg
   (
