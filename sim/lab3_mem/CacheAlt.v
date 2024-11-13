@@ -43,6 +43,27 @@ module lab3_mem_CacheAlt
   // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // LAB TASK: Define wires
   // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  // control signals (ctrl->dpath)
+  logic           cachereq_reg_en;
+  logic           memresp_reg_en;
+  logic           write_data_mux_sel;
+  logic           wben_mux_sel;
+  logic           tag_array_wen;
+  logic           tag_array_ren;
+  logic           data_array_wen;
+  logic           data_array_ren;
+  logic           read_data_zero_mux_sel;
+  logic           read_data_reg_en;
+  logic           evict_addr_reg_en;
+  logic           memreq_addr_mux_sel;
+  logic [1:0]     hit;
+  logic [3:0]     memreq_type;
+
+  // status signals (dpath->ctrl)
+  logic [3:0]     cachereq_type;
+  logic [31:0]    cachereq_addr;
+  logic           tag_match;
+
 
   //----------------------------------------------------------------------
   // Control
@@ -97,6 +118,8 @@ module lab3_mem_CacheAlt
 
    .*
   );
+
+
 
   //----------------------------------------------------------------------
   // Line tracing
