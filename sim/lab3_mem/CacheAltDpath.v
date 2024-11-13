@@ -17,6 +17,7 @@
 `include "lab3_mem/WbenDecoder.v"
 `include "lab3_mem/ReplUnit.v"
 
+
 module lab3_mem_CacheAltDpath
 #(
   parameter p_num_banks = 1
@@ -314,6 +315,4 @@ module lab3_mem_CacheAltDpath
 endmodule
 
 `endif
-endmodule
 
-`endif
