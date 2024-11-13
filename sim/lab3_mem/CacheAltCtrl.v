@@ -161,10 +161,8 @@ module lab3_mem_CacheAltCtrl
           state_next = STATE_WRITE_DATA_ACCESS;             // Write hit
       else if ( !hit_indication && !is_dirty ) begin
           state_next = STATE_REFILL_REQUEST;                // Miss without dirty
-          current_way = lru_bit;                            // Update current way
       end else if ( !hit_indication && is_dirty ) begin
           state_next = STATE_EVICT_PREPARE;                 // Miss with dirty, requires eviction
-          current_way = lru_bit;                            // Update current way
       end
     end
 
