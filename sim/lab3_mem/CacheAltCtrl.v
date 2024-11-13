@@ -99,6 +99,28 @@ module lab3_mem_CacheAltCtrl
   // LAB TASK: Impement control unit
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+  logic hit_indication;
+  assign hit_indication = (tag_0_match && is_valid_way0) || (tag_1_match && is_valid_way1);
+
+  logic tag_array_wen;
+  assign tag_array_0_wen = (current_way == 0) ? tag_array_wen : 1'b0;
+  assign tag_array_1_wen = (current_way == 1) ? tag_array_wen : 1'b0;
+
+  logic data_array_wen;
+  assign data_array_0_wen = (current_way == 0) ? data_array_wen : 1'b0;
+  assign data_array_1_wen = (current_way == 1) ? data_array_wen : 1'b0;
+
+  // assign current_way = (hit_indication) ? (tag_0_match) ? 0 : 1 : lru_bit;
+
+  always @(posedge clk ) begin
+    if ( reset ) begin
+      current_way <= 1'b0;
+    end else if (state_reg == 2)begin
+      current_way <= (hit_indication) ? (tag_0_match) ? 0 : 1 : lru_bit;
+    end else
+      current_way <= current_way;
+  end
+
   //----------------------------------------------------------------------
   // State
   //----------------------------------------------------------------------
@@ -127,18 +149,7 @@ module lab3_mem_CacheAltCtrl
   logic [4:0] state_reg;
   logic [4:0] state_next;
 
-  logic hit_indication;
-  assign hit_indication = (tag_0_match && is_valid_way0) || (tag_1_match && is_valid_way1);
-
-  logic tag_array_wen;
-  assign tag_array_0_wen = (current_way == 0) ? tag_array_wen : 1'b0;
-  assign tag_array_1_wen = (current_way == 1) ? tag_array_wen : 1'b0;
-
-  logic data_array_wen;
-  assign data_array_0_wen = (current_way == 0) ? data_array_wen : 1'b0;
-  assign data_array_1_wen = (current_way == 1) ? data_array_wen : 1'b0;
-
-  assign  current_way = (hit_indication) ? (tag_0_match) ? 0 : 1 : lru_bit;
+  
 
   always @(*) begin
   state_next = state_reg;
