@@ -58,9 +58,9 @@ module lab3_mem_CacheBaseCtrl
 
   // status signals (dpath->ctrl)
 
-  input logic  [3:0]     cachereq_type,
-  input logic [31:0]     cachereq_addr,
-  input logic            tag_match
+  input logic   [3:0]   cachereq_type,
+  input logic   [31:0]  cachereq_addr,
+  input logic           tag_match
 
 );
 
@@ -73,6 +73,7 @@ module lab3_mem_CacheBaseCtrl
           test = 2'b0;
     endcase
   end
+  
   //----------------------------------------------------------------------
   // State Definitions
   //----------------------------------------------------------------------
@@ -178,7 +179,7 @@ module lab3_mem_CacheBaseCtrl
       else if (is_write)                        // When there's a write request, move to write data access state
         state_next = STATE_WRITE_DATA_ACCESS;
       else
-      state_next = STATE_WAIT;                  // Read miss, move to wait state
+        state_next = STATE_WAIT;                  // Read miss, move to wait state
     STATE_WAIT:
       if(proc2cache_respstream_rdy)             // When there's a response from the cache, move to idle state
         state_next = STATE_IDLE;
@@ -196,16 +197,17 @@ end
 
   // Address Mapping
 
-  logic  [1:0] cachereq_addr_byte_offset;
-  logic  [1:0] cachereq_addr_word_offset;
-  logic  [3:0] cachereq_addr_index;
-  logic [23:0] cachereq_addr_tag;
-  logic  [1:0] cachereq_addr_bank;
+  logic [1:0]   cachereq_addr_byte_offset;
+  logic [1:0]   cachereq_addr_word_offset;
+  logic [3:0]   cachereq_addr_index;
+  logic [23:0]  cachereq_addr_tag;
+  logic [1:0]   cachereq_addr_bank;
 
   generate
     if ( p_num_banks == 1 ) begin
       assign cachereq_addr_byte_offset = cachereq_addr[1:0];
       assign cachereq_addr_word_offset = cachereq_addr[3:2];
+
       assign cachereq_addr_index       = cachereq_addr[7:4];
       assign cachereq_addr_tag         = cachereq_addr[31:8];
     end
@@ -213,6 +215,7 @@ end
       // handle address mapping for four banks
       assign cachereq_addr_byte_offset = cachereq_addr[1:0];
       assign cachereq_addr_word_offset = cachereq_addr[3:2];
+
       assign cachereq_addr_bank        = cachereq_addr[5:4];
       assign cachereq_addr_index       = cachereq_addr[9:6];
       assign cachereq_addr_tag         = cachereq_addr[31:10];
@@ -305,6 +308,7 @@ end
   end
   endtask
 
+
   // Set outputs using a control signal "table"
   always @(*) begin
     // Initialize control signals to default values (all zero/off)
@@ -315,7 +319,7 @@ end
       //                          cache cache mem  mem   cache mem   write  wb   tag   tag   data   data   read   read   evict     mem           mem     valid valid   dirty dirty
       //                          req   resp  req  resp  req   resp  data   en   array array array  array  zero   data   addr      req    hit    req      bit   write  bit   write
       //                          rdy   val   val  rdy   en    en    mux    mux  wen   ren   wen    ren    mux     en     en       mux           type     in    en     in    en
-      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    2'b00,   4'bx,   0,    0,     0,   0 );
+      STATE_IDLE:              cs( 1,    0,    0,    0,    1,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       0,    2'b00,   4'bx,    0,    0,     0,   0 );
       
       STATE_TAG_CHECK:         cs( 0,    0,    0,    0,    0,    0,   1,    1,    0,    1,    0,     0,     0,     0,     0,       0,    2'bx ,   4'bx,    0,    0,     0,   0 );
       
@@ -329,11 +333,11 @@ end
       
       STATE_REFILL_WAIT:       cs( 0,    0,    0,    1,    0,    1,   0,    0,    0,    0,    1,     0,     0,     0,     0,       0,    2'b00,   4'd0,    0,    0,     0,   0 );
       
-      STATE_REFILL_UPDATE:     cs( 0,    0,    0,    0,    0,    0,   0,    0,    1,    0,    1,     0,     0,     0,     0,       0,    2'b10,   4'd0,    1,    1,     0,   0 );
+      STATE_REFILL_UPDATE:     cs( 0,    0,    0,    0,    0,    0,   0,    0,    1,    0,    1,     0,     0,     0,     0,       0,    2'b10,   4'd0,    1,    1,     0,   1 );
 
       STATE_EVICT_PREPARE:     cs( 0,    0,    0,    0,    0,    0,   0,    0,    0,    1,    0,     1,     1,     1,     1,       0,    2'b01,   4'd1,    0,    0,     0,   0 );
       
-      STATE_EVICT_REQUEST:     cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       1,    2'b01,   4'd1,    0,    0,     0,   1 );
+      STATE_EVICT_REQUEST:     cs( 0,    0,    1,    0,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       1,    2'b01,   4'd1,    0,    0,     0,   0 );
       
       STATE_EVICT_WAIT:        cs( 0,    0,    0,    1,    0,    0,   0,    0,    0,    0,    0,     0,     0,     0,     0,       1,    2'b01,   4'd1,    0,    0,     0,   0 );
       
