@@ -45,9 +45,11 @@ module lab3_mem_CacheAltDpath
   input  logic          memresp_reg_en,
   input  logic          write_data_mux_sel,
   input  logic          wben_mux_sel,
-  input  logic          tag_array_wen,
+  input  logic          tag_array_0_wen,      // We need one more tag array write enable signal
+  input  logic          tag_array_1_wen,
   input  logic          tag_array_ren,
-  input  logic          data_array_wen,
+  input  logic          data_array_0_wen,     // We need one more data array write enable signal
+  input  logic          data_array_1_wen,
   input  logic          data_array_ren,
   input  logic          read_data_zero_mux_sel,
   input  logic          read_data_reg_en,
@@ -55,12 +57,14 @@ module lab3_mem_CacheAltDpath
   input  logic          memreq_addr_mux_sel,
   input  logic [1:0]    hit,
   input  logic [3:0]    memreq_type,
+  input  logic          current_way,
 
   // status signals (dpath->ctrl)
 
   output logic [3:0]    cachereq_type,
   output logic [31:0]   cachereq_addr,
-  output logic          tag_match
+  output logic          tag_0_match,          // Two tag match signals send to control module
+  output logic          tag_1_match
 );
 
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -143,11 +147,18 @@ module lab3_mem_CacheAltDpath
   .out  (wben_mux_out)
   );
 
-  //tag comparator
-  vc_EqComparator #(24) tag_comparator(
+  // tag comparator 0
+  vc_EqComparator #(25) tag_comparator_0(
   .in1 (cachereq_addr_tag),
-  .in0 (tag_array_read_out),
-  .out (tag_match)
+  .in0 (tag_array_0_read_out),
+  .out (tag_0_match)
+  );
+
+  // tag comparator 1
+  vc_EqComparator #(25) tag_comparator_1(
+  .in1 (cachereq_addr_tag),
+  .in0 (tag_array_1_read_out),
+  .out (tag_1_match)
   );
 
   // evict_addr_reg
@@ -210,10 +221,9 @@ module lab3_mem_CacheAltDpath
   logic [31:0]  make_addr_0;
 
   // Address Mapping
-
   logic  [1:0]    cachereq_addr_byte_offset;
   logic  [1:0]    cachereq_addr_word_offset;
-  logic  [3:0]    cachereq_addr_index;
+  logic  [2:0]    cachereq_addr_index;        // One less bit than Baseline Cache
   logic  [23:0]   cachereq_addr_tag;
   logic  [1:0]    cachereq_addr_bank;
 
@@ -221,8 +231,8 @@ module lab3_mem_CacheAltDpath
     if ( p_num_banks == 1 ) begin
       assign cachereq_addr_byte_offset = cachereq_addr[1:0];
       assign cachereq_addr_word_offset = cachereq_addr[3:2];
-      assign cachereq_addr_index       = cachereq_addr[7:4];
-      assign cachereq_addr_tag         = cachereq_addr[31:8];
+      assign cachereq_addr_index       = cachereq_addr[6:4];  // One less bit than Baseline Cache
+      assign cachereq_addr_tag         = cachereq_addr[31:7];
       assign make_addr_1 = {tag_array_read_out, cachereq_addr_index, 4'b0};
       assign make_addr_0 = {cachereq_addr_tag, cachereq_addr_index, 4'b0};
     end else if ( p_num_banks == 4 ) begin
@@ -230,8 +240,8 @@ module lab3_mem_CacheAltDpath
       assign cachereq_addr_byte_offset = cachereq_addr[1:0];
       assign cachereq_addr_word_offset = cachereq_addr[3:2];
       assign cachereq_addr_bank        = cachereq_addr[5:4];
-      assign cachereq_addr_index       = cachereq_addr[9:6];
-      assign cachereq_addr_tag         = cachereq_addr[31:10];
+      assign cachereq_addr_index       = cachereq_addr[8:6];  // One less bit than Baseline Cache
+      assign cachereq_addr_tag         = cachereq_addr[31:9];
       assign make_addr_1 = {tag_array_read_out, cachereq_addr_index, cachereq_addr_bank, 4'b0};
       assign make_addr_0 = {cachereq_addr_tag, cachereq_addr_index, cachereq_addr_bank, 4'b0};
     end
@@ -255,40 +265,103 @@ module lab3_mem_CacheAltDpath
     .out (wben_decoder_out)
   );
 
-  // Tag array (16 tags, 24 bits/tag)
-  logic [23:0] tag_array_read_out;
+  // -----------------------------------------------------------------------
+  // Tag array instantiation
+  //------------------------------------------------------------------------
+  // Tag array 0 (8 tags, 25 bits/tag)
+  logic [24:0] tag_array_0_read_out;
 
   vc_CombinationalBitSRAM_1rw  #(
-    .p_data_nbits  (24),
-    .p_num_entries (16)
+    .p_data_nbits  (25),
+    .p_num_entries (8)
   )
-  tag_array
+  tag_array_0
   (
     .clk           (clk),
     .reset         (reset),
     .read_addr     (cachereq_addr_index),
-    .read_data     (tag_array_read_out),
-    .write_en      (tag_array_wen),
+    .read_data     (tag_array_0_read_out),
+    .write_en      (tag_array_0_wen),
     .read_en       (tag_array_ren),
     .write_addr    (cachereq_addr_index),
     .write_data    (cachereq_addr_tag)
   );
 
-  // Data array (16 cacheslines, 128 bits/cacheline)=
-  logic [127:0] data_array_read_out;
+// Tag array 1 (8 tags, 25 bits/tag)
+  logic [24:0] tag_array_1_read_out;
 
-  vc_CombinationalSRAM_1rw #(128,16) data_array
+  vc_CombinationalBitSRAM_1rw  #(
+    .p_data_nbits  (25),
+    .p_num_entries (8)
+  )
+  tag_array_1
   (
     .clk           (clk),
     .reset         (reset),
     .read_addr     (cachereq_addr_index),
-    .read_data     (data_array_read_out),
-    .write_en      (data_array_wen),
+    .read_data     (tag_array_1_read_out),  // We need to change this to tag_array_1_read_out
+    .write_en      (tag_array_1_wen),       // We need to change this to tag_array_1_wen
+    .read_en       (tag_array_ren),
+    .write_addr    (cachereq_addr_index),
+    .write_data    (cachereq_addr_tag)
+  );
+
+  logic [24:0] tag_array_read_out;
+
+  vc_Mux2 #(25) tag_array_out_mux(
+  .in1  (tag_array_1_read_out),
+  .in0  (tag_array_0_read_out),
+  .sel  (current_way),
+  .out  (tag_array_read_out)
+  );
+
+  // -----------------------------------------------------------------------
+  // Data array instantiation
+  //------------------------------------------------------------------------
+  // Data array (16 cacheslines, 128 bits/cacheline)=
+  logic [127:0] data_array_0_read_out;
+
+  vc_CombinationalSRAM_1rw #(128,8) data_array_0
+  (
+    .clk           (clk),
+    .reset         (reset),
+    .read_addr     (cachereq_addr_index),
+    .read_data     (data_array_0_read_out),
+    .write_en      (data_array_0_wen),
     .read_en       (data_array_ren),
     .write_byte_en (wben_mux_out),
     .write_addr    (cachereq_addr_index),
     .write_data    (write_data_mux_out)
   );
+
+  logic [127:0] data_array_1_read_out;
+
+  vc_CombinationalSRAM_1rw #(128,8) data_array_1
+  (
+    .clk           (clk),
+    .reset         (reset),
+    .read_addr     (cachereq_addr_index),
+    .read_data     (data_array_1_read_out),
+    .write_en      (data_array_1_wen),
+    .read_en       (data_array_ren),
+    .write_byte_en (wben_mux_out),
+    .write_addr    (cachereq_addr_index),
+    .write_data    (write_data_mux_out)
+  );
+
+  //----------------------------------------------------------------------
+  // Extra muxes
+  //----------------------------------------------------------------------
+  logic [127:0] data_array_read_out;
+
+  vc_Mux2 #(128) data_array_out_mux(
+  .in1  (data_array_1_read_out),
+  .in0  (data_array_0_read_out),
+  .sel  (current_way),
+  .out  (data_array_read_out)
+  );
+
+  
 
   // proc2cache_reqstream_msg
   assign proc2cache_respstream_msg.type_  = cachereq_type;
@@ -296,7 +369,7 @@ module lab3_mem_CacheAltDpath
   always_comb begin
     case (hit)
       2'b00: proc2cache_respstream_msg.test = 2'b00;
-      2'b01: ;
+      2'b01: ;    // May cause latch
       2'b10: proc2cache_respstream_msg.test = proc2cache_respstream_msg.test ^ 2'b01; 
       default: proc2cache_respstream_msg.test = 2'b00;
     endcase
@@ -315,4 +388,3 @@ module lab3_mem_CacheAltDpath
 endmodule
 
 `endif
-

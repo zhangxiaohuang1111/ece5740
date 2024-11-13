@@ -48,9 +48,11 @@ module lab3_mem_CacheAlt
   logic           memresp_reg_en;
   logic           write_data_mux_sel;
   logic           wben_mux_sel;
-  logic           tag_array_wen;
+  logic           tag_array_0_wen;
+  logic           tag_array_1_wen;
   logic           tag_array_ren;
-  logic           data_array_wen;
+  logic           data_array_0_wen;
+  logic           data_array_1_wen;
   logic           data_array_ren;
   logic           read_data_zero_mux_sel;
   logic           read_data_reg_en;
@@ -58,11 +60,13 @@ module lab3_mem_CacheAlt
   logic           memreq_addr_mux_sel;
   logic [1:0]     hit;
   logic [3:0]     memreq_type;
+  logic           current_way;
 
   // status signals (dpath->ctrl)
   logic [3:0]     cachereq_type;
   logic [31:0]    cachereq_addr;
-  logic           tag_match;
+  logic           tag_0_match;
+  logic           tag_1_match;
 
 
   //----------------------------------------------------------------------
