@@ -326,7 +326,7 @@ end
   logic lru_bits_write_en;
   logic lru_bits_in;
 
-  assign lru_bits_in = current_way;  // Inverse of current way
+  assign lru_bits_in = ~current_way;  // Inverse of current way
 
   vc_ResetRegfile_1r1w#(1,8) LRU_reg
   (
