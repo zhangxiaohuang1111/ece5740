@@ -18,11 +18,13 @@
 `include "lab3_mem/WbenDecoder.v"
 `include "lab3_mem/ReplUnit.v"
 
+
 module lab3_mem_CacheBaseDpath
 #(
   parameter p_num_banks = 1
 )
 (
+
   input  logic          clk,
   input  logic          reset,
 
@@ -55,7 +57,7 @@ module lab3_mem_CacheBaseDpath
 
   // status signals (dpath->ctrl)
 
-  output logic  [3:0]   cachereq_type,
+  output logic [3:0]    cachereq_type,
   output logic [31:0]   cachereq_addr,
   output logic          tag_match
 
@@ -70,10 +72,10 @@ module lab3_mem_CacheBaseDpath
 
   // Register the unpacked proc2cache_reqstream_msg
 
-  logic [31:0] cachereq_addr_reg_out;
-  logic [31:0] cachereq_data_reg_out;
-  logic  [2:0] cachereq_type_reg_out;
-  logic  [7:0] cachereq_opaque_reg_out;
+  logic [31:0]    cachereq_addr_reg_out;
+  logic [31:0]    cachereq_data_reg_out;
+  logic [2:0]     cachereq_type_reg_out;
+  logic [7:0]     cachereq_opaque_reg_out;
 
   vc_EnResetReg #(4,0) cachereq_type_reg
   (
@@ -115,6 +117,7 @@ module lab3_mem_CacheBaseDpath
   assign cachereq_addr = cachereq_addr_reg_out;
   
   logic [127:0] memresp_data_reg_out;
+
   vc_EnResetReg #(128,0) memresp_data_reg
   (
     .clk    (clk),
@@ -126,6 +129,7 @@ module lab3_mem_CacheBaseDpath
 
   // Write data mux
   logic [127:0] write_data_mux_out;
+
   vc_Mux2 #(128) write_data_mux(
   .in1  (cachereq_data_replicated),
   .in0  (memresp_data_reg_out),
@@ -135,6 +139,7 @@ module lab3_mem_CacheBaseDpath
 
   // wben_mux
   logic [15:0]  wben_mux_out;
+
   vc_Mux2 #(16) wben_mux(
   .in1  (wben_decoder_out),
   .in0  (16'hffff),
@@ -151,6 +156,7 @@ module lab3_mem_CacheBaseDpath
 
   // evict_addr_reg
   logic [31:0] evict_addr_reg_out;
+
   vc_EnResetReg #(32,0) evict_addr_reg(
   .clk    (clk),
   .reset  (reset),
@@ -161,6 +167,7 @@ module lab3_mem_CacheBaseDpath
 
   // memreq_addr_mux
   logic [31:0] memreq_addr_mux_out;
+
   vc_Mux2 #(32) memreq_addr_mux(
   .in1  (evict_addr_reg_out),
   .in0  (make_addr_0),
@@ -171,6 +178,7 @@ module lab3_mem_CacheBaseDpath
   
   // read_data_zero_mux
   logic [127:0] read_data_zero_mux_out;
+
   vc_Mux2 #(128) read_data_zero_mux(
   .in1  (data_array_read_out),
   .in0  (128'h0),
@@ -180,6 +188,7 @@ module lab3_mem_CacheBaseDpath
 
   // read_data_reg
   logic [127:0] read_data_reg_out;
+
   vc_EnResetReg #(128,0) read_data_reg(
   .clk    (clk),
   .reset  (reset),
@@ -190,6 +199,7 @@ module lab3_mem_CacheBaseDpath
 
   // 4-1 mux for read data
   logic [31:0] read_data_mux_out;
+
   vc_Mux4 #(32) read_data_mux(
   .in3  (read_data_reg_out[127:96]),
   .in2  (read_data_reg_out[95:64]),
@@ -200,17 +210,16 @@ module lab3_mem_CacheBaseDpath
   );
 
   // make_addr
-  logic [31:0] make_addr_1;
-  logic [31:0] make_addr_0;
-
+  logic [31:0]  make_addr_1;
+  logic [31:0]  make_addr_0;
 
   // Address Mapping
 
-  logic  [1:0] cachereq_addr_byte_offset;
-  logic  [1:0] cachereq_addr_word_offset;
-  logic  [3:0] cachereq_addr_index;
-  logic [23:0] cachereq_addr_tag;
-  logic  [1:0] cachereq_addr_bank;
+  logic  [1:0]    cachereq_addr_byte_offset;
+  logic  [1:0]    cachereq_addr_word_offset;
+  logic  [3:0]    cachereq_addr_index;
+  logic  [23:0]   cachereq_addr_tag;
+  logic  [1:0]    cachereq_addr_bank;
 
   generate
     if ( p_num_banks == 1 ) begin
@@ -220,8 +229,7 @@ module lab3_mem_CacheBaseDpath
       assign cachereq_addr_tag         = cachereq_addr[31:8];
       assign make_addr_1 = {tag_array_read_out, cachereq_addr_index, 4'b0};
       assign make_addr_0 = {cachereq_addr_tag, cachereq_addr_index, 4'b0};
-    end
-    else if ( p_num_banks == 4 ) begin
+    end else if ( p_num_banks == 4 ) begin
       // handle address mapping for four banks
       assign cachereq_addr_byte_offset = cachereq_addr[1:0];
       assign cachereq_addr_word_offset = cachereq_addr[3:2];
@@ -234,7 +242,6 @@ module lab3_mem_CacheBaseDpath
   endgenerate
 
   // Replicate cachereq_data
-
   logic [127:0] cachereq_data_replicated;
 
   lab3_mem_ReplUnit repl_unit
@@ -244,7 +251,6 @@ module lab3_mem_CacheBaseDpath
   );
 
   // Write byte enable decoder
-
   logic [15:0] wben_decoder_out;
 
   lab3_mem_WbenDecoder wben_decoder
@@ -254,7 +260,6 @@ module lab3_mem_CacheBaseDpath
   );
 
   // Tag array (16 tags, 24 bits/tag)
-
   logic [23:0] tag_array_read_out;
 
   vc_CombinationalBitSRAM_1rw  #(
@@ -273,8 +278,7 @@ module lab3_mem_CacheBaseDpath
     .write_data    (cachereq_addr_tag)
   );
 
-  // Data array (16 cacheslines, 128 bits/cacheline)
-
+  // Data array (16 cacheslines, 128 bits/cacheline)=
   logic [127:0] data_array_read_out;
 
   vc_CombinationalSRAM_1rw #(128,16) data_array
@@ -291,7 +295,6 @@ module lab3_mem_CacheBaseDpath
   );
 
   // proc2cache_reqstream_msg
-
   assign proc2cache_respstream_msg.type_  = cachereq_type;
   assign proc2cache_respstream_msg.opaque = cachereq_opaque_reg_out;
   always_comb begin
@@ -304,6 +307,7 @@ module lab3_mem_CacheBaseDpath
   end
   assign proc2cache_respstream_msg.len    = 2'b0;
   assign proc2cache_respstream_msg.data = read_data_mux_out;
+
 
   // cache2mem_reqstream_msg
   assign cache2mem_reqstream_msg.data = read_data_reg_out;
