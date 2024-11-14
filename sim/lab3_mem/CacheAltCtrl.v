@@ -112,15 +112,24 @@ module lab3_mem_CacheAltCtrl
 
   // assign current_way = (hit_indication) ? (tag_0_match) ? 0 : 1 : lru_bit;
 
-  always @(posedge clk or posedge reset) begin
+  always @(*) begin
   if (reset) begin
-    current_way <= 1'b0; //
-  end else if (state_reg == STATE_TAG_CHECK) begin
-    // 
-    current_way <= (hit_indication) ? (tag_0_match ? 1'b0 : 1'b1) : lru_bit;
+    current_way = 1'b0;
+  end 
+  else 
+  begin
+    // Default value for current_way to avoid latch
+    current_way = current_way;
+    // Update current_way based on specific conditions
+    if (state_reg == STATE_TAG_CHECK) begin
+      current_way = (hit_indication) ? (tag_0_match ? 0 : 1) : lru_bit;
+    end
+    else begin
+      current_way = current_way;
+    end
   end
-  // 
 end
+  // 
 
   //----------------------------------------------------------------------
   // State
