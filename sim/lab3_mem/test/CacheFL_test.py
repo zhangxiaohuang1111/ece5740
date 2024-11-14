@@ -997,23 +997,23 @@ def random_stress_test_dmap():
 
 def conflict_miss_test_dmap():
     return [
-        #    type  opq  addr      len data               type  opq  test len data
-        req('wr', 0x0, 0x00001000, 0, 0x11111111), resp('wr', 0x0, 0, 0, 0),  # write 0x00001000
-        req('wr', 0x1, 0x00001004, 0, 0x22222222), resp('wr', 0x1, 1, 0, 0),  # write 0x00001004
-        req('wr', 0x2, 0x00001008, 0, 0x33333333), resp('wr', 0x2, 1, 0, 0),  # write 0x00001008
-        req('rd', 0x3, 0x00001000, 0, 0),          resp('rd', 0x3, 1, 0, 0x11111111),  # read 0x00001000
-        req('rd', 0x4, 0x00001004, 0, 0),          resp('rd', 0x4, 1, 0, 0x22222222),  # read 0x00001004
-        req('rd', 0x5, 0x00001008, 0, 0),          resp('rd', 0x5, 1, 0, 0x33333333),  # read 0x00001008
+        #    type  opq  addr      len data             type  opq  test len data
+        req('wr', 0x0, 0x00001000, 0, 0x11111111), resp('wr', 0x0, 0, 0, 0),  # write 0x00001000 (way 0)
+        req('wr', 0x1, 0x00001004, 0, 0x22222222), resp('wr', 0x1, 1, 0, 0),  # write 0x00001004 (way 0)
+        req('wr', 0x2, 0x00001008, 0, 0x33333333), resp('wr', 0x2, 1, 0, 0),  # write 0x00001008 (way 0)
+        req('wr', 0x3, 0x00001100, 0, 0x44444444), resp('wr', 0x3, 0, 0, 0),  # write 0x00001000 (way 1)
+        req('wr', 0x4, 0x00001104, 0, 0x55555555), resp('wr', 0x4, 1, 0, 0),  # write 0x00001004 (way 1)
+        req('wr', 0x5, 0x00001108, 0, 0x66666666), resp('wr', 0x5, 1, 0, 0),  # write 0x00001008 (way 1)
 
         # conflict miss
-        req('wr', 0x6, 0x00001100, 0, 0x44444444), resp('wr', 0x6, 0, 0, 0),  # (conflict miss)
+        req('wr', 0x6, 0x00001100, 0, 0x44444444), resp('wr', 0x6, 1, 0, 0),  # (used to be conflict miss)
         req('wr', 0x7, 0x00001000, 0, 0x55555555), resp('wr', 0x7, 0, 0, 0),  # (conflict miss)
         req('wr', 0x8, 0x00000100, 0, 0x66666666), resp('wr', 0x8, 0, 0, 0),  # (conflict miss)
         
     ]
 
 
-def random_write_read_test_dmap():
+def write_read_test_dmap():
     msgs = []
     
     for i in range(16):  # 
@@ -1032,19 +1032,19 @@ def random_write_read_test_dmap():
     return msgs
 
 test_case_table_dmap = mk_test_case_table([
-  (                                        "msg_func                         mem_data_func stall lat src sink"),
-  [ "stress_test_dmap",                        stress_test_dmap,                None,         0.0,  0,  0,  0    ],
-  [ "stress_test_dmap_sink_delay",             stress_test_dmap,                None,         0.9,  3,  0,  10   ],
-  [ "stress_test_dmap_src_delay",              stress_test_dmap,                None,         0.9,  3,  10, 0    ],
-  [ "random_stress_test_dmap",            random_stress_test_dmap,              None,         0.0,  0,  0,  0    ],
-  [ "random_stress_test_dmap_sink_delay", random_stress_test_dmap,              None,         0.9,  3,  0,  10   ],
-  [ "random_stress_test_dmap_src_delay",  random_stress_test_dmap,              None,         0.9,  3,  10, 0    ],
-  [ "conflict_miss_test",                 conflict_miss_test_dmap,              None,         0.0,  0,  0,  0    ],
-  [ "conflict_miss_test_sink_delay",      conflict_miss_test_dmap,              None,         0.9,  3,  0,  10   ],
-  [ "conflict_miss_test_src_delay",       conflict_miss_test_dmap,              None,         0.9,  3,  10, 0    ],
-  [ "random_write_read_msgs",             random_write_read_test_dmap,          None,         0.0,  0,  0,  0    ],
-  [ "random_write_read_msgs_sink_delay",  random_write_read_test_dmap,          None,         0.9,  3,  0,  10   ],
-  [ "random_write_read_msgs_src_delay",   random_write_read_test_dmap,          None,         0.9,  3,  10, 0    ],
+  (                                             "msg_func                         mem_data_func stall lat src sink"),
+  [ "stress_test_dmap",                          stress_test_dmap,                None,         0.0,  0,  0,  0    ],
+  [ "stress_test_dmap_sink_delay",               stress_test_dmap,                None,         0.9,  3,  0,  10   ],
+  [ "stress_test_dmap_src_delay",                stress_test_dmap,                None,         0.9,  3,  10, 0    ],
+  [ "random_stress_test_dmap",            random_stress_test_dmap,                None,         0.0,  0,  0,  0    ],
+  [ "random_stress_test_dmap_sink_delay", random_stress_test_dmap,                None,         0.9,  3,  0,  10   ],
+  [ "random_stress_test_dmap_src_delay",  random_stress_test_dmap,                None,         0.9,  3,  10, 0    ],
+  [ "conflict_miss_dmap_test",            conflict_miss_test_dmap,                None,         0.0,  0,  0,  0    ],
+  [ "conflict_miss_dmap_test_sink_delay", conflict_miss_test_dmap,                None,         0.9,  3,  0,  10   ],
+  [ "conflict_miss_dmap_test_src_delay",  conflict_miss_test_dmap,                None,         0.9,  3,  10, 0    ],
+  [ "write_read_msgs",                       write_read_test_dmap,                None,         0.0,  0,  0,  0    ],
+  [ "write_read_msgs_sink_delay",            write_read_test_dmap,                None,         0.9,  3,  0,  10   ],
+  [ "write_read_msgs_src_delay",             write_read_test_dmap,                None,         0.9,  3,  10, 0    ],
 
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1064,8 +1064,26 @@ def test_dmap( test_params, cmdline_opts ):
 # LAB TASK: Add directed test cases explicitly for set associative cache
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+def conflict_miss_test_sassoc():
+    return [
+        #    type  opq  addr      len data             type  opq  test len data
+        req('wr', 0x0, 0x00001000, 0, 0x11111111), resp('wr', 0x0, 0, 0, 0),  # write 0x00001000 (way 0)
+        req('wr', 0x1, 0x00001004, 0, 0x22222222), resp('wr', 0x1, 1, 0, 0),  # write 0x00001004 (way 0)
+        req('wr', 0x2, 0x00001008, 0, 0x33333333), resp('wr', 0x2, 1, 0, 0),  # write 0x00001008 (way 0)
+        req('wr', 0x3, 0x00001100, 0, 0x44444444), resp('wr', 0x3, 0, 0, 0),  # write 0x00001000 (way 1)
+        req('wr', 0x4, 0x00001104, 0, 0x55555555), resp('wr', 0x4, 1, 0, 0),  # write 0x00001004 (way 1)
+        req('wr', 0x5, 0x00001108, 0, 0x66666666), resp('wr', 0x5, 1, 0, 0),  # write 0x00001008 (way 1)
+
+        # conflict miss
+        req('wr', 0x6, 0x00001100, 0, 0x44444444), resp('wr', 0x6, 1, 0, 0),  # (used to be conflict miss)
+        req('wr', 0x7, 0x00001000, 0, 0x55555555), resp('wr', 0x7, 1, 0, 0),  # (used to be conflict miss)
+        req('wr', 0x8, 0x00000100, 0, 0x66666666), resp('wr', 0x8, 0, 0, 0),  # (conflict miss need more associativity)
+        
+    ]
+
 test_case_table_sassoc = mk_test_case_table([
   (                       "msg_func            mem_data_func    stall lat src sink"),
+  [ "conflict_miss_test",  conflict_miss_test_sassoc, None, 0.0,  0,  0,  0    ],
 
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add more entries to test case table

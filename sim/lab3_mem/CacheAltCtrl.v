@@ -59,6 +59,7 @@ module lab3_mem_CacheAltCtrl
   output  logic [1:0]    hit,
   output  logic [3:0]    memreq_type,
   output  logic          current_way,     // 1 bit current way indicator
+  output  logic          hit_indication,  // 1 bit hit indication
 
   // status signals (dpath->ctrl)
 
@@ -99,7 +100,6 @@ module lab3_mem_CacheAltCtrl
   // LAB TASK: Impement control unit
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  logic hit_indication;
   assign hit_indication = (tag_0_match && is_valid_way0) || (tag_1_match && is_valid_way1);
 
   logic tag_array_wen;

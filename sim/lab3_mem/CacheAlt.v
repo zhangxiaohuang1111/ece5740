@@ -61,6 +61,7 @@ module lab3_mem_CacheAlt
   logic [1:0]     hit;
   logic [3:0]     memreq_type;
   logic           current_way;
+  logic           hit_indication;
 
   // status signals (dpath->ctrl)
   logic [3:0]     cachereq_type;
