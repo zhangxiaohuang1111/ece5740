@@ -182,9 +182,13 @@ module lab3_mem_CacheAlt
         vc_trace.append_str( trace_str, "   " );
       else begin
         $sformat( str, "%x", dpath.tag_array_0.mem[i][7:0] );
+        vc_trace.append_str( trace_str, "[" );
         vc_trace.append_str( trace_str, str );
+        vc_trace.append_str( trace_str, "]" );
         $sformat( str, "%x", dpath.tag_array_1.mem[i][7:0] );
+        vc_trace.append_str( trace_str, "[" );
         vc_trace.append_str( trace_str, str );
+        vc_trace.append_str( trace_str, "]" );        
         if ( !ctrl.dirty_bits_way0.rfile[i] )
           vc_trace.append_str( trace_str, " " );
         else

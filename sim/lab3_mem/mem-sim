@@ -196,24 +196,30 @@ def loop3():
 
 def loop4():
 
-  # Initialize memory with the first four elements of array 'a'
+  # return memory message
 
   mem = []
-  for i in range(4):
-    mem.append(0x00001000 + i * 4)
-    mem.append(0xABCD1000 + i * 4)
 
-  # Generate input and expected output messages
+  for i in range( 100 ):
+    mem.append( 0x00001000+i*4 )
+    mem.append( 0xabcd1000+i*4 )
+
+  for i in range( 100 ):
+    mem.append( 0x00002000+i*4 )
+    mem.append( 0xabcd2000+i*4 )
+
+  # return src/sink message
 
   imsgs = []
   omsgs = []
-  for i in range(1000):
-    addr = 0x00001000 + (i % 4) * 4
-    # Limit the opaque field to 8 bits by using (i % 256)
-    imsgs.append(req('rd', i % 256, addr, 0, 0))
-    omsgs.append(resp('rd', i % 256, 0, 0, 0xABCD1000 + (i % 4) * 4))
 
-  return [imsgs, omsgs, mem]
+  for i in range( 100 ):
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
+
+  return [ imsgs, omsgs, mem ]
 
 #-------------------------------------------------------------------------
 # Pattern: loop5

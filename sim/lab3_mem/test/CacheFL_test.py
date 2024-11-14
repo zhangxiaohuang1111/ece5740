@@ -813,7 +813,6 @@ def simple_pattern_single_req_random_msgs():
 
   return msgs
 
-
 def random_write_read_msgs():
     msgs = []
     for i in range(256):

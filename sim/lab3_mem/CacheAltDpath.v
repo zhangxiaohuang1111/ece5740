@@ -357,11 +357,21 @@ module lab3_mem_CacheAltDpath
   // proc2cache_reqstream_msg
   assign proc2cache_respstream_msg.type_  = cachereq_type;
   assign proc2cache_respstream_msg.opaque = cachereq_opaque_reg_out;
+
+  logic prev_test;
+  always_ff @(posedge clk) begin
+    if (reset) begin
+      prev_test <= 1'b0;
+    end 
+    else
+      prev_test <= proc2cache_respstream_msg.test;
+  end
+
   always_comb begin
     case (hit)
       2'b00: proc2cache_respstream_msg.test = 2'b00;
-      2'b01: ;    // May cause latch
-      2'b10: proc2cache_respstream_msg.test = proc2cache_respstream_msg.test ^ 2'b01; 
+      2'b01: proc2cache_respstream_msg.test = prev_test;    
+      2'b10: proc2cache_respstream_msg.test = prev_test ^ 2'b01; 
       default: proc2cache_respstream_msg.test = 2'b00;
     endcase
   end
