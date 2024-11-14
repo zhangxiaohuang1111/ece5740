@@ -6,9 +6,6 @@
 `define LAB3_MEM_CACHE_ALT_CTRL_V
 
 
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// LAB TASK: Include necessary files
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 `include "vc/regfiles.v"
 `include "vc/mem-msgs.v"
 
@@ -36,10 +33,6 @@ module lab3_mem_CacheAltCtrl
   input  logic        cache2mem_respstream_val,
   output logic        cache2mem_respstream_rdy,
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Define additional ports
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
   // control signals (ctrl->dpath)
 
   output  logic          cachereq_reg_en,
@@ -59,6 +52,7 @@ module lab3_mem_CacheAltCtrl
   output  logic [1:0]    hit,
   output  logic [3:0]    memreq_type,
   output  logic          current_way,     // 1 bit current way indicator
+  output  logic          hit_indication,  // 1 bit hit indication
 
   // status signals (dpath->ctrl)
 
@@ -95,11 +89,6 @@ module lab3_mem_CacheAltCtrl
   localparam STATE_EVICT_WAIT        = 5'd10;
   localparam STATE_WAIT              = 5'd11;
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Impement control unit
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-  logic hit_indication;
   assign hit_indication = (tag_0_match && is_valid_way0) || (tag_1_match && is_valid_way1);
 
   logic tag_array_wen;
@@ -112,14 +101,12 @@ module lab3_mem_CacheAltCtrl
 
   // assign current_way = (hit_indication) ? (tag_0_match) ? 0 : 1 : lru_bit;
 
-  always @(*) begin
+  always_ff begin
   if (reset) begin
     current_way = 1'b0;
   end 
   else 
   begin
-    // Default value for current_way to avoid latch
-    current_way = current_way;
     // Update current_way based on specific conditions
     if (state_reg == STATE_TAG_CHECK) begin
       current_way = (hit_indication) ? (tag_0_match ? 0 : 1) : lru_bit;
