@@ -5,9 +5,6 @@
 `ifndef LAB3_MEM_CACHE_BASE_CTRL_V
 `define LAB3_MEM_CACHE_BASE_CTRL_V
 
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// LAB TASK: Include necessary files
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 `include "vc/regfiles.v"
 `include "vc/mem-msgs.v"
 
@@ -35,9 +32,6 @@ module lab3_mem_CacheBaseCtrl
   input  logic        cache2mem_respstream_val,
   output logic        cache2mem_respstream_rdy,
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Define additional ports
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   // control signals (ctrl->dpath)
 
@@ -91,9 +85,6 @@ module lab3_mem_CacheBaseCtrl
   localparam STATE_EVICT_WAIT        = 5'd10;
   localparam STATE_WAIT              = 5'd11;
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Impement control unit
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   //----------------------------------------------------------------------
   // State

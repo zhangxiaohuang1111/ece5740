@@ -4,7 +4,7 @@
 
 import pytest
 
-from random import seed, randint
+from random import seed, randint, choice
 
 from pymtl3 import *
 from pymtl3.stdlib.mem        import MemMsgType
@@ -724,12 +724,6 @@ def capacity_miss_test():
 
     ]
 
-
-
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# LAB TASK: Add more directed test cases
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 #-------------------------------------------------------------------------
 # Generic tests
 #-------------------------------------------------------------------------
@@ -789,11 +783,6 @@ test_case_table_generic = mk_test_case_table([
   [ "read_miss_refill_evict",           read_miss_refill_evict,     data_512B,    0.0,  0,  0,  0    ],
   [ "write_miss_refill_evict",          write_miss_refill_evict,    data_512B,    0.0,  0,  0,  0    ],
   [ "capacity_miss_test",               capacity_miss_test,         data_64B,     0.0,  0,  0,  0    ],
-
-
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # LAB TASK: Add more entries to test case table
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ])
 
 @pytest.mark.parametrize( **test_case_table_generic )
@@ -803,10 +792,6 @@ def test_generic( test_params, cmdline_opts ):
 #-------------------------------------------------------------------------
 # Test Case with Random Addresses and Data
 #-------------------------------------------------------------------------
-
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# LAB TASK: Add random test cases
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 #-------------------------------------------------------------------------
 # Random test messages
@@ -969,54 +954,278 @@ def random_stress_test():
 
     return msgs
 
-def simple_address_random_req_data_msg():
+def simple_pattern_random_req_data_msg():
+    # Initialize address-data map with data_random contents
+    seed(0xdeadbeef)  # Ensure the same seed as data_random()
+    addr_data_map = {}
+    base_addr = 0x00001000
+    data_random_list = data_random()
+    for i in range(0, len(data_random_list), 2):
+        addr = data_random_list[i]
+        data = data_random_list[i+1]
+        addr_data_map[addr] = data
+
+    # Now create the test messages
     msgs = []
-    base_addr = 0x00001000  # Starting address for pattern
-
-    # Iterate over addresses with a unit stride pattern
+    # Let's perform 16 operations, randomly choosing between write and read
     for i in range(16):
-        addr = base_addr + i * 4  # Sequential addresses with unit stride
-        req_type = 'wr' if i % 2 == 0 else 'rd'  # Alternate between write and read
-        data = randint(0, 0xffffffff) if req_type == 'wr' else 0  # Random data for write, 0 for read
+        addr = base_addr + randint(0, 255) * 4  # Random address in the range
+        req_type = 'wr' if randint(0,1) == 0 else 'rd'  # Randomly choose to read or write
 
-        # Append request and expected response based on request type
         if req_type == 'wr':
+            # Generate random data for write
+            data = randint(0, 0xffffffff)
+            addr_data_map[addr] = data  # Update the data map with new data
             msgs.extend([
-                req('wr', i, addr, 0, data),  # Write request with random data
-                resp('wr', i, 0, 0, 0),       # Expected response for write
+                req('wr', i, addr, 0, data),  # Write request
+                resp('wr', i, 0, 0, 0),       # Expected write response
             ])
         else:
-            # Check if a previous write happened and use its data as expected read data
-            expected_data = msgs[-2].data if i > 0 and msgs[-2].type_ == 'wr' else 0
+            # For read requests, get expected data from addr_data_map
+            expected_data = addr_data_map.get(addr, 0)
+            hit = 1 if addr in addr_data_map else 0  # Determine if it's a hit or miss
             msgs.extend([
-                req('rd', i, addr, 0, 0),  # Read request
-                resp('rd', i, 1, 0, expected_data)  # Expected response for read
+                req('rd', i, addr, 0, 0),           # Read request
+                resp('rd', i, hit, 0, expected_data),  # Expected read response
             ])
 
     return msgs
 
+def random_pattern_random_req_data_msg():
+    # Initialize the random seed for reproducibility
+    seed(0xdeadbeef)
+    
+    # Initialize the address-data map with the initial memory contents
+    addr_data_map = {}
+    base_addr = 0x00001000
+    data_random_list = data_random()  # Assume this function returns a list like [addr1, data1, addr2, data2, ...]
+    for i in range(0, len(data_random_list), 2):
+        addr = data_random_list[i]
+        data = data_random_list[i+1]
+        addr_data_map[addr] = data
+    
+    # Generate a list of test messages
+    msgs = []
+    num_operations = 100  # Total number of cache operations to perform
+    
+    for i in range(num_operations):
+        # Generate a random address within a specified range
+        addr = base_addr + randint(0, 255) * 4  # Addresses are word-aligned
+        
+        # Randomly choose to perform a read or write
+        req_type = 'wr' if randint(0, 1) == 0 else 'rd'
+        
+        if req_type == 'wr':
+            # For write requests, generate random data
+            data = randint(0, 0xffffffff)
+            # Update the address-data map with the new data
+            addr_data_map[addr] = data
+            # Append the write request and expected response
+            msgs.extend([
+                req('wr', i, addr, 0, data),  # Write request
+                resp('wr', i, 0, 0, 0),       # Expected write response (FL model always sets test field to 0)
+            ])
+        else:
+            # For read requests, get the expected data from the address-data map
+            expected_data = addr_data_map.get(addr, 0)
+            # Append the read request and expected response
+            msgs.extend([
+                req('rd', i, addr, 0, 0),           # Read request
+                resp('rd', i, 1, 0, expected_data),  # Expected read response (FL model always sets test field to 1 for hits)
+            ])
+    
+    return msgs
+
+def unit_stride_random_data_msgs():
+    # Initialize the random seed for reproducibility
+    seed(0xdeadbeef)
+    
+    # Initialize the address-data map to keep track of written data
+    addr_data_map = {}
+    base_addr = 0x00001000  # Starting address for unit stride access
+    num_accesses = 64       # Number of accesses to perform
+
+    # Build initial memory map
+    data_random_list = data_random()
+    initial_mem_map = {}
+    for i in range(0, len(data_random_list), 2):
+        addr = data_random_list[i]
+        data = data_random_list[i+1]
+        initial_mem_map[addr] = data
+
+    # Generate the test messages
+    msgs = []
+    for i in range(num_accesses):
+        addr = base_addr + i * 4  # Sequential addresses with word (4-byte) stride
+        req_type = 'wr' if i % 2 == 0 else 'rd'  # Alternate between write and read
+        
+        if req_type == 'wr':
+            # Generate random data for write operations
+            data = randint(0, 0xffffffff)
+            addr_data_map[addr] = data  # Update the data map with the new data
+            # Append the write request and expected response to the message list
+            msgs.extend([
+                req('wr', i, addr, 0, data),  # Write request
+                resp('wr', i, 0, 0, 0),       # Expected write response (test field is 0)
+            ])
+        else:
+            # For read operations
+            if addr in addr_data_map:
+                # If address has been written before, expect a hit
+                expected_data = addr_data_map[addr]
+                test_field = 1  # Hit
+            else:
+                # If address hasn't been written before, expect a miss
+                expected_data = initial_mem_map.get(addr, 0)
+                test_field = 0  # Miss
+
+            # Append the read request and expected response to the message list
+            msgs.extend([
+                req('rd', i, addr, 0, 0),           # Read request
+                resp('rd', i, test_field, 0, expected_data),  # Expected read response
+            ])
+    return msgs
+
+def stride_with_random_data_msgs():
+    # Initialize the random seed for reproducibility
+    seed(0xdeadbeef)
+    
+    # Initialize the address-data map to keep track of written data
+    addr_data_map = {}
+    base_addr = 0x00001000  # Starting address
+    num_accesses = 64       # Number of accesses to perform
+    stride = 8              # Stride value in words (32 bytes)
+    
+    # Build initial memory map
+    data_random_list = data_random()
+    initial_mem_map = {}
+    for i in range(0, len(data_random_list), 2):
+        addr = data_random_list[i]
+        data = data_random_list[i+1]
+        initial_mem_map[addr] = data
+    
+    # Generate the test messages
+    msgs = []
+    for i in range(num_accesses):
+        addr = base_addr + i * stride * 4  # Addresses with specified stride
+        req_type = 'wr' if i % 2 == 0 else 'rd'  # Alternate between write and read
+        
+        if req_type == 'wr':
+            # Generate random data for write operations
+            data = randint(0, 0xFFFFFFFF)
+            addr_data_map[addr] = data  # Update the data map with the new data
+            # Append the write request and expected response to the message list
+            msgs.extend([
+                req('wr', i, addr, 0, data),  # Write request
+                resp('wr', i, 0, 0, 0),       # Expected write response (test field is 0)
+            ])
+        else:
+            # For read operations
+            if addr in addr_data_map:
+                # If address has been written before, expect a hit
+                expected_data = addr_data_map[addr]
+                test_field = 1  # Hit
+            else:
+                # If address hasn't been written before, expect a miss
+                expected_data = initial_mem_map.get(addr, 0)
+                test_field = 0  # Miss
+    
+            # Append the read request and expected response to the message list
+            msgs.extend([
+                req('rd', i, addr, 0, 0),                    # Read request
+                resp('rd', i, test_field, 0, expected_data),  # Expected read response
+            ])
+    return msgs
+
+def unit_stride_shared_data_msgs():
+    # Initialize the random seed for reproducibility
+    seed(0xdeadbeef)
+    
+    # Initialize the address-data map to keep track of written data
+    addr_data_map = {}
+    base_addr = 0x00001000  # Starting address for unit stride access
+    num_accesses = 100      # Total number of accesses
+    
+    # Build initial memory map
+    data_random_list = data_random()
+    initial_mem_map = {}
+    for i in range(0, len(data_random_list), 2):
+        addr = data_random_list[i]
+        data = data_random_list[i+1]
+        initial_mem_map[addr] = data
+    
+    # Define shared addresses (first 8 addresses)
+    shared_addrs = [base_addr + i * 4 for i in range(8)]  # Addresses with high temporal locality
+    
+    # Generate the test messages
+    msgs = []
+    for i in range(num_accesses):
+        if i % 10 == 0:
+            # Every 10 accesses, read from a shared address to introduce temporal locality
+            addr = choice(shared_addrs)
+            req_type = 'rd'  # Read shared data
+        else:
+            # Proceed with unit stride access
+            addr = base_addr + i * 4  # Sequential addresses with word (4-byte) stride
+            req_type = 'wr' if i % 2 == 0 else 'rd'  # Alternate between write and read
+            
+        if req_type == 'wr':
+            # Generate random data for write operations
+            data = randint(0, 0xFFFFFFFF)
+            addr_data_map[addr] = data  # Update the data map with the new data
+            # Append the write request and expected response to the message list
+            msgs.extend([
+                req('wr', i, addr, 0, data),  # Write request
+                resp('wr', i, 0, 0, 0),       # Expected write response
+            ])
+        else:
+            # For read operations
+            if addr in addr_data_map:
+                # If address has been written before, expect a hit
+                expected_data = addr_data_map[addr]
+                test_field = 1  # Hit
+            else:
+                # If address hasn't been written before, expect a miss
+                expected_data = initial_mem_map.get(addr, 0)
+                test_field = 0  # Miss
+                
+            # Append the read request and expected response to the message list
+            msgs.extend([
+                req('rd', i, addr, 0, 0),                    # Read request
+                resp('rd', i, test_field, 0, expected_data),  # Expected read response
+            ])
+    return msgs
+
 test_case_table_random = mk_test_case_table([
-  (                        "msg_func                    mem_data_func stall lat src sink"),
+  (                                                   "msg_func                                                mem_data_func stall lat src sink"),
   [ "simple_pattern_single_req_random",              simple_pattern_single_req_random_msgs,                 data_random,     0.0,  0,  0,  0    ],
   [ "simple_pattern_single_req_random_sink_delay",   simple_pattern_single_req_random_msgs,                 data_random,     0.9,  3,  0,  10   ],
   [ "simple_pattern_single_req_random_src_delay",    simple_pattern_single_req_random_msgs,                 data_random,     0.9,  3,  10, 0    ],
-  [ "simple_address_random_req_data",                simple_address_random_req_data_msg,                    data_random,     0.0,  0,  0,  0    ],
-  [ "simple_address_random_req_data_sink_delay",     simple_address_random_req_data_msg,                    data_random,     0.9,  3,  0,  10   ],
-  [ "simple_address_random_req_data_src_delay",      simple_address_random_req_data_msg,                    data_random,     0.9,  3,  10, 0    ],
-  [ "random_write_read",   random_write_read_msgs,      None, 0.0,  0,  0,  0    ],
-  [ "random_write_read_sink_delay",   random_write_read_msgs,      None, 0.9,  3,  0,  10    ],
-  [ "random_write_read_src_delay",   random_write_read_msgs,      None, 0.9,  3,  10, 0    ],
-  [ "stress_test",   stress_test,      None, 0.0,  0,  0,  0    ],
-  [ "stress_test_sink_delay",   stress_test,      None, 0.9,  3,  0,  10    ],
-  [ "stress_test_src_delay",   stress_test,      None, 0.9,  3,  10, 0    ],
-  [ "random_stress_test",   random_stress_test,      None, 0.0,  0,  0,  0    ],
-  [ "random_stress_test_sink_delay",   random_stress_test,      None, 0.9,  3,  0,  10    ],
-  [ "random_stress_test_src_delay",   random_stress_test,      None, 0.9,  3,  10, 0   ],
+  [ "simple_pattern_random_req_data",                simple_pattern_random_req_data_msg,                    data_random,     0.0,  0,  0,  0    ],
+  [ "simple_pattern_random_req_data_sink_delay",     simple_pattern_random_req_data_msg,                    data_random,     0.9,  3,  0,  10   ],
+  [ "simple_pattern_random_req_data_src_delay",      simple_pattern_random_req_data_msg,                    data_random,     0.9,  3,  10, 0    ],
+  [ "random_pattern_random_req_data",                random_pattern_random_req_data_msg,                    data_random,     0.0,  0,  0,  0    ],
+  [ "random_pattern_random_req_data_sink_delay",     random_pattern_random_req_data_msg,                    data_random,     0.9,  3,  0,  10   ],
+  [ "random_pattern_random_req_data_src_delay",      random_pattern_random_req_data_msg,                    data_random,     0.9,  3,  10, 0    ],
+  [ "unit_stride_random_data",                       unit_stride_random_data_msgs,                          data_random,     0.0,  0,  0,  0    ],
+  [ "unit_stride_random_data_sink_delay",            unit_stride_random_data_msgs,                          data_random,     0.9,  3,  0,  10   ],
+  [ "unit_stride_random_data_src_delay",             unit_stride_random_data_msgs,                          data_random,     0.9,  3,  10, 0    ],
+  [ "stride_with_random_data",                       stride_with_random_data_msgs,                          data_random,     0.0,  0,  0,  0    ],
+  [ "stride_with_random_data_sink_delay",            stride_with_random_data_msgs,                          data_random,     0.9,  3,  0,  10   ],
+  [ "stride_with_random_data_src_delay",             stride_with_random_data_msgs,                          data_random,     0.9,  3,  10, 0    ],
+  [ "unit_stride_shared_data",                       unit_stride_shared_data_msgs,                          data_random,     0.0,  0,  0,  0    ],
+  [ "unit_stride_shared_data_sink_delay",            unit_stride_shared_data_msgs,                          data_random,     0.9,  3,  0,  10   ],
+  [ "unit_stride_shared_data_src_delay",             unit_stride_shared_data_msgs,                          data_random,     0.9,  3,  10, 0    ],
+  [ "random_write_read",                             random_write_read_msgs,                                None,            0.0,  0,  0,  0    ],
+  [ "random_write_read_sink_delay",                  random_write_read_msgs,                                None,            0.9,  3,  0,  10   ],
+  [ "random_write_read_src_delay",                   random_write_read_msgs,                                None,            0.9,  3,  10, 0    ],
+  [ "stress_test",                                   stress_test,                                           None,            0.0,  0,  0,  0    ],
+  [ "stress_test_sink_delay",                        stress_test,                                           None,            0.9,  3,  0,  10   ],
+  [ "stress_test_src_delay",                         stress_test,                                           None,            0.9,  3,  10, 0    ],
+  [ "random_stress_test",                            random_stress_test,                                    None,            0.0,  0,  0,  0    ],
+  [ "random_stress_test_sink_delay",                 random_stress_test,                                    None,            0.9,  3,  0,  10   ],
+  [ "random_stress_test_src_delay",                  random_stress_test,                                    None,            0.9,  3,  10, 0    ],
 
-
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # LAB TASK: Add more entries to test case table
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ])
 
 @pytest.mark.parametrize( **test_case_table_random )
@@ -1026,10 +1235,6 @@ def test_random( test_params, cmdline_opts ):
 #-------------------------------------------------------------------------
 # Test Cases for Direct Mapped
 #-------------------------------------------------------------------------
-
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# LAB TASK: Add directed test cases explicitly for direct mapped cache
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def conflict_miss_test_dmap():
     return [
@@ -1047,7 +1252,6 @@ def conflict_miss_test_dmap():
         req('wr', 0x8, 0x00000100, 0, 0), resp('wr', 0x8, 0, 0, 0),  # (conflict miss)
         
     ]
-
 
 def write_read_test_dmap():
     msgs = []
@@ -1076,10 +1280,6 @@ test_case_table_dmap = mk_test_case_table([
   [ "write_read_msgs_sink_delay",            write_read_test_dmap,                None,         0.9,  3,  0,  10   ],
   [ "write_read_msgs_src_delay",             write_read_test_dmap,                None,         0.9,  3,  10, 0    ],
 
-
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # LAB TASK: Add more entries to test case table
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ])
 
 @pytest.mark.parametrize( **test_case_table_dmap )
@@ -1089,10 +1289,6 @@ def test_dmap( test_params, cmdline_opts ):
 #-------------------------------------------------------------------------
 # Test Cases for Set Associative
 #-------------------------------------------------------------------------
-
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# LAB TASK: Add directed test cases explicitly for set associative cache
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def conflict_miss_test_sassoc():
     return [
@@ -1253,10 +1449,6 @@ test_case_table_sassoc = mk_test_case_table([
   [ "corner_case_both_tags_not_match_test_sink_delay",  corner_case_both_tags_not_match_test,None, 0.9,  3,  0,  10   ],
   [ "corner_case_both_tags_not_match_test_src_delay",  corner_case_both_tags_not_match_test, None, 0.9,  3,  10, 0    ],
 
-
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # LAB TASK: Add more entries to test case table
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ])
 
 @pytest.mark.parametrize( **test_case_table_sassoc )

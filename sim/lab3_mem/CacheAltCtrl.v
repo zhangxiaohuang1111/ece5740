@@ -6,9 +6,6 @@
 `define LAB3_MEM_CACHE_ALT_CTRL_V
 
 
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// LAB TASK: Include necessary files
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 `include "vc/regfiles.v"
 `include "vc/mem-msgs.v"
 
@@ -35,10 +32,6 @@ module lab3_mem_CacheAltCtrl
 
   input  logic        cache2mem_respstream_val,
   output logic        cache2mem_respstream_rdy,
-
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Define additional ports
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   // control signals (ctrl->dpath)
 
@@ -95,10 +88,6 @@ module lab3_mem_CacheAltCtrl
   localparam STATE_EVICT_REQUEST     = 5'd9;
   localparam STATE_EVICT_WAIT        = 5'd10;
   localparam STATE_WAIT              = 5'd11;
-
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Impement control unit
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   assign hit_indication = (tag_0_match && is_valid_way0) || (tag_1_match && is_valid_way1);
 

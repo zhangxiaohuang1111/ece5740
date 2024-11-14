@@ -5,10 +5,6 @@
 `ifndef LAB3_MEM_CACHE_BASE_DPATH_V
 `define LAB3_MEM_CACHE_BASE_DPATH_V
 
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// LAB TASK: Include necessary files
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 `include "vc/mem-msgs.v"
 `include "vc/srams.v"
 `include "vc/regs.v"
@@ -61,14 +57,9 @@ module lab3_mem_CacheBaseDpath
   output logic [31:0]   cachereq_addr,
   output logic          tag_match
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Define additional ports
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 );
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Implement data-path
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   // Register the unpacked proc2cache_reqstream_msg
 

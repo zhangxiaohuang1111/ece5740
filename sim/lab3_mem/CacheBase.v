@@ -52,9 +52,6 @@ module lab3_mem_CacheBase
   output logic          cache2mem_respstream_rdy
 );
 
-  // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Define wires
-  // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // control signals (ctrl->dpath)
   logic           cachereq_reg_en;
   logic           memresp_reg_en;

@@ -5,9 +5,6 @@
 `ifndef LAB3_MEM_CACHE_ALT_DPATH_V
 `define LAB3_MEM_CACHE_ALT_DPATH_V
 
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// LAB TASK: Include necessary files
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 `include "vc/mem-msgs.v"
 `include "vc/srams.v"
 `include "vc/regs.v"
@@ -36,9 +33,6 @@ module lab3_mem_CacheAltDpath
   output mem_req_16B_t  cache2mem_reqstream_msg,
   input  mem_resp_16B_t cache2mem_respstream_msg,
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Define additional ports
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // control signals (ctrl->dpath)
 
   input  logic          cachereq_reg_en,
@@ -67,9 +61,6 @@ module lab3_mem_CacheAltDpath
   output logic          tag_1_match
 );
 
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Implement data-path
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // Register the unpacked proc2cache_reqstream_msg
 
   logic [31:0]    cachereq_addr_reg_out;
