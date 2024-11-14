@@ -2,7 +2,7 @@
 
 # 定义实现和输入数据选项
 impls=("base" "alt")
-inputs=("loop1" "loop2" "loop3" "loop4" "loop5" "loop6")
+inputs=("loop1" "loop2" "loop3" "loop4" "loop5" )
 
 # 循环遍历所有实现和输入组合
 for impl in "${impls[@]}"; do
