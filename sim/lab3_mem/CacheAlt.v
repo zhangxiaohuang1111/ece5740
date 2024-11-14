@@ -158,6 +158,47 @@ module lab3_mem_CacheAlt
       default:                      vc_trace.append_str( trace_str, "? " );
 
     endcase
+
+    vc_trace.append_str( trace_str, " " );
+
+    // Use a "hit" signal in the control unit to display h/m
+
+    if ( ctrl.state_reg == ctrl.STATE_TAG_CHECK ) begin
+      if ( ctrl.hit_indication )
+        vc_trace.append_str( trace_str, "h" );
+      else
+        vc_trace.append_str( trace_str, "m" );
+    end
+    else
+      vc_trace.append_str( trace_str, " " );
+
+    // // Display all valid tags, show dirty bits with ; symbol
+
+    vc_trace.append_str( trace_str, "[" );
+    for ( i = 0; i < 7; i = i + 1 ) begin
+      if ( !ctrl.valid_bits_way0.rfile[i] )
+        vc_trace.append_str( trace_str, "   " );
+      if ( !ctrl.valid_bits_way1.rfile[i] )
+        vc_trace.append_str( trace_str, "   " );
+      else begin
+        $sformat( str, "%x", dpath.tag_array_0.mem[i][7:0] );
+        vc_trace.append_str( trace_str, str );
+        $sformat( str, "%x", dpath.tag_array_1.mem[i][7:0] );
+        vc_trace.append_str( trace_str, str );
+        if ( !ctrl.dirty_bits_way0.rfile[i] )
+          vc_trace.append_str( trace_str, " " );
+        else
+          vc_trace.append_str( trace_str, "," );
+        if ( !ctrl.dirty_bits_way1.rfile[i] )
+          vc_trace.append_str( trace_str, " " );
+        else
+          vc_trace.append_str( trace_str, "," );
+      end
+    end
+    vc_trace.append_str( trace_str, "]" );
+
+    vc_trace.append_str( trace_str, ")" );
+
   end
   `VC_TRACE_END
 

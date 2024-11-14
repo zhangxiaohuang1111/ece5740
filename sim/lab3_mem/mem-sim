@@ -191,49 +191,93 @@ def loop3():
   return [ imsgs, omsgs, mem ]
 
 #-------------------------------------------------------------------------
-# Pattern: loop4 (Strided access)
+# Pattern: loop4
 #-------------------------------------------------------------------------
 
 def loop4():
-  mem = []
 
-  # Stride access: accessing every 8th word in memory
-  for i in range(0, 100, 8):
+  # Initialize memory with the first four elements of array 'a'
+
+  mem = []
+  for i in range(4):
     mem.append(0x00001000 + i * 4)
-    mem.append(0xabcd1000 + i * 4)
+    mem.append(0xABCD1000 + i * 4)
+
+  # Generate input and expected output messages
 
   imsgs = []
   omsgs = []
-
-  for i in range(0, 100, 8):
-    addr = 0x00001000 + i * 4
-    data = 0xabcd1000 + i * 4
-    imsgs.append(req('rd', i, addr, 0, 0))
-    omsgs.append(resp('rd', i, 0, 0, data))
+  for i in range(1000):
+    addr = 0x00001000 + (i % 4) * 4
+    # Limit the opaque field to 8 bits by using (i % 256)
+    imsgs.append(req('rd', i % 256, addr, 0, 0))
+    omsgs.append(resp('rd', i % 256, 0, 0, 0xABCD1000 + (i % 4) * 4))
 
   return [imsgs, omsgs, mem]
 
 #-------------------------------------------------------------------------
-# Pattern: loop5 (Random access)
+# Pattern: loop5
 #-------------------------------------------------------------------------
 
 def loop5():
-  mem = []
 
-  # Generate random memory addresses
-  for i in range(100):
-    addr = 0x00001000 + randint(0, 255) * 4
-    mem.append(addr)
-    mem.append(0xabcd0000 + addr)
+  # Initialize memory with strided elements of array 'a'
+
+  mem = []
+  for i in range(0, 100 * 8, 8):
+    mem.append(0x00001000 + i * 4)
+    mem.append(0xABCD1000 + i * 4)
+
+  # Generate input and expected output messages
 
   imsgs = []
   omsgs = []
-
   for i in range(100):
-    addr = mem[2 * i]
-    data = mem[2 * i + 1]
+    addr = 0x00001000 + i * 8 * 4
     imsgs.append(req('rd', i, addr, 0, 0))
-    omsgs.append(resp('rd', i, 0, 0, data))
+    omsgs.append(resp('rd', i, 0, 0, 0xABCD1000 + i * 8 * 4))
+
+  return [imsgs, omsgs, mem]
+
+#-------------------------------------------------------------------------
+# Pattern: loop6
+#-------------------------------------------------------------------------
+
+def loop6():
+
+  # Initialize memory with elements of array 'a'
+
+  mem = []
+  for i in range(100):
+    addr = 0x00001000 + i * 4
+    mem.append(addr)
+    mem.append(0xABCD1000 + i * 4)
+
+  # Initialize a reference memory to track writes
+
+  ref_mem = {}
+  for i in range(100):
+    addr = 0x00001000 + i * 4
+    ref_mem[addr] = 0xABCD1000 + i * 4
+
+  # Generate input and expected output messages
+
+  imsgs = []
+  omsgs = []
+  for i in range(100):
+    addr = 0x00001000 + i * 4
+    if i % 2 == 0:
+      # Write operation
+      data = i
+      imsgs.append(req('wr', i, addr, 0, data))
+      omsgs.append(resp('wr', i, 0, 0, 0))
+      # Update reference memory
+      ref_mem[addr] = data
+    else:
+      # Read operation
+      imsgs.append(req('rd', i, addr, 0, 0))
+      expected_data = ref_mem[addr]
+      omsgs.append(resp('rd', i, 0, 0, expected_data))
 
   return [imsgs, omsgs, mem]
 
@@ -260,6 +304,7 @@ def main():
     'loop3' : loop3,
     'loop4' : loop4,
     'loop5' : loop5,
+    'loop6' : loop6,
 
   }
 
