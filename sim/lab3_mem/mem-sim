@@ -92,7 +92,7 @@ def parse_cmdline():
   # LAB TASK: Add choices to --input option to use your new patterns
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  p.add_argument(       "--input",    choices=["loop1", "loop2", "loop3","loop4","loop5"], default="loop1" )
+  p.add_argument(       "--input",    choices=["loop1", "loop2", "loop3","loop4","loop5","loop6"], default="loop1" )
   p.add_argument(       "--trace",    action="store_true"                                          )
   p.add_argument(       "--stats",    action="store_true"                                          )
   p.add_argument(       "--dump-vcd", action="store_true"                                          )
