@@ -41,8 +41,7 @@
 
 import os
 import sys
-from random import randint
-
+from random import seed, randint, choice
 
 sim_dir = os.path.dirname( os.path.abspath( __file__ ) )
 while sim_dir:
@@ -119,6 +118,7 @@ def loop1():
   for i in range( 100 ):
     imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
     omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    
 
   return [ imsgs, omsgs, mem ]
 
@@ -200,11 +200,11 @@ def loop4():
 
   mem = []
 
-  for i in range( 100 ):
+  for i in range( 255 ):
     mem.append( 0x00001000+i*4 )
     mem.append( 0xabcd1000+i*4 )
 
-  for i in range( 100 ):
+  for i in range( 255 ):
     mem.append( 0x00002000+i*4 )
     mem.append( 0xabcd2000+i*4 )
 
@@ -213,7 +213,35 @@ def loop4():
   imsgs = []
   omsgs = []
 
-  for i in range( 100 ):
+  for i in range( 255 ):
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
+    imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
+    omsgs.append( resp( 'rd', i, 0, 0, 0xabcd2000+i*4 ) )
     imsgs.append( req ( 'rd', i, 0x00001000+i*4, 0, 0 ) )
     omsgs.append( resp( 'rd', i, 0, 0, 0xabcd1000+i*4 ) )
     imsgs.append( req ( 'rd', i, 0x00002000+i*4, 0, 0 ) )
@@ -226,66 +254,131 @@ def loop4():
 #-------------------------------------------------------------------------
 
 def loop5():
+    # Parameters
+    num_lines = 16  # Number of cache lines
+    line_size = 16  # Size of each cache line in bytes
+    base_addr = 0x00001000  # Starting address for initial fill
+    new_base_addr = 0x00002000  # Address range for eviction phase
 
-  # Initialize memory with strided elements of array 'a'
+    # --- Memory Initialization ---
+    mem = []
+    # Fill memory with deterministic data for each cache line in the initial phase
+    for i in range(num_lines):
+        addr_base = base_addr + i * line_size
+        data_list = [i * 4 + j for j in range(4)]
+        for j in range(4):
+            addr = addr_base + j * 4
+            mem.append(addr)
+            mem.append(data_list[j])
 
-  mem = []
-  for i in range(0, 100 * 8, 8):
-    mem.append(0x00001000 + i * 4)
-    mem.append(0xABCD1000 + i * 4)
+    # Generate input and expected output messages
+    imsgs = []
+    omsgs = []
 
-  # Generate input and expected output messages
+    # --- Step 1: Initial cache fill ---
+    for i in range(num_lines):
+        addr_base = base_addr + i * line_size
+        data_list = [i * 4 + j for j in range(4)]
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = i * 4 + j
+            # Initial write to fill cache line; first write is treated as a miss
+            imsgs.append(req('wr', opq, addr, 0, data))
+            omsgs.append(resp('wr', opq, 0 if j == 0 else 1, 0, 0))
+        for j in range(4):
+            addr = addr_base + j * 4
+            imsgs.append(req('rd', i * 4 + j, addr, 0, 0))
+            omsgs.append(resp('rd', i * 4 + j, 1, 0, data_list[j]))
 
-  imsgs = []
-  omsgs = []
-  for i in range(100):
-    addr = 0x00001000 + i * 8 * 4
-    imsgs.append(req('rd', i, addr, 0, 0))
-    omsgs.append(resp('rd', i, 0, 0, 0xABCD1000 + i * 8 * 4))
+    # --- Step 2: Evict cache by writing to new addresses ---
+    for i in range(num_lines):
+        addr_base = new_base_addr + i * line_size
+        data_list = [100 + i * 4 + j for j in range(4)]
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = num_lines * 4 + i * 4 + j
+            imsgs.append(req('wr', opq, addr, 0, data))
+            omsgs.append(resp('wr', opq, 0 if j == 0 else 1, 0, 0))
+        for j in range(4):
+            addr = addr_base + j * 4
+            imsgs.append(req('rd', num_lines * 4 + i * 4 + j, addr, 0, 0))
+            omsgs.append(resp('rd', num_lines * 4 + i * 4 + j, 1, 0, data_list[j]))
 
-  return [imsgs, omsgs, mem]
+    # --- Step 3: Re-access initial addresses to validate eviction ---
+    for i in range(num_lines):
+        addr_base = base_addr + i * line_size
+        data_list = [i * 4 + j for j in range(4)]
+        for j in range(4):
+            addr = addr_base + j * 4
+            data = data_list[j]
+            opq = num_lines * 8 + i * 4 + j
+            imsgs.append(req('wr', opq, addr, 0, data))
+            omsgs.append(resp('wr', opq, 0 if j == 0 else 1, 0, 0))
+        for j in range(4):
+            addr = addr_base + j * 4
+            imsgs.append(req('rd', num_lines * 8 + i * 4 + j, addr, 0, 0))
+            omsgs.append(resp('rd', num_lines * 8 + i * 4 + j, 1, 0, data_list[j]))
+
+    return [imsgs, omsgs, mem]
 
 #-------------------------------------------------------------------------
 # Pattern: loop6
 #-------------------------------------------------------------------------
 
+def data_random():
+  seed(0xdeadbeef)
+  data = []
+  for i in range(256):
+    data.extend([0x00001000+i*4,randint(0,0xffffffff)])
+  return data
+
 def loop6():
+    # Initialize memory and address-data map
+    seed(0xdeadbeef)
+    base_addr = 0x00001000  # Starting address for unit stride access
+    num_accesses = 256       # Number of accesses to perform
 
-  # Initialize memory with elements of array 'a'
+    # Prepare initial memory map with random data
+    data_random_list = data_random()
+    mem = []
+    initial_mem_map = {}
+    for i in range(0, len(data_random_list), 2):
+        addr = data_random_list[i]
+        data = data_random_list[i+1]
+        initial_mem_map[addr] = data
+        mem.append(addr)
+        mem.append(data)
 
-  mem = []
-  for i in range(100):
-    addr = 0x00001000 + i * 4
-    mem.append(addr)
-    mem.append(0xABCD1000 + i * 4)
+    # Generate input and expected output messages
+    imsgs = []
+    omsgs = []
+    addr_data_map = {}
 
-  # Initialize a reference memory to track writes
+    for i in range(num_accesses):
+        addr = base_addr + i * 4  # Sequential addresses with word (4-byte) stride
+        req_type = 'wr' if i % 2 == 0 else 'rd'  # Alternate between write and read
 
-  ref_mem = {}
-  for i in range(100):
-    addr = 0x00001000 + i * 4
-    ref_mem[addr] = 0xABCD1000 + i * 4
+        if req_type == 'wr':
+            # Write operation with random data
+            data = randint(0, 0xffffffff)
+            addr_data_map[addr] = data
+            imsgs.append(req('wr', i, addr, 0, data))
+            omsgs.append(resp('wr', i, 0, 0, 0))
+        else:
+            # Read operation, checking if address was written before
+            if addr in addr_data_map:
+                expected_data = addr_data_map[addr]
+                test_field = 1
+            else:
+                expected_data = initial_mem_map.get(addr, 0)
+                test_field = 0
 
-  # Generate input and expected output messages
+            imsgs.append(req('rd', i, addr, 0, 0))
+            omsgs.append(resp('rd', i, test_field, 0, expected_data))
 
-  imsgs = []
-  omsgs = []
-  for i in range(100):
-    addr = 0x00001000 + i * 4
-    if i % 2 == 0:
-      # Write operation
-      data = i
-      imsgs.append(req('wr', i, addr, 0, data))
-      omsgs.append(resp('wr', i, 0, 0, 0))
-      # Update reference memory
-      ref_mem[addr] = data
-    else:
-      # Read operation
-      imsgs.append(req('rd', i, addr, 0, 0))
-      expected_data = ref_mem[addr]
-      omsgs.append(resp('rd', i, 0, 0, expected_data))
-
-  return [imsgs, omsgs, mem]
+    return [imsgs, omsgs, mem]
 
 #-------------------------------------------------------------------------
 # Main
