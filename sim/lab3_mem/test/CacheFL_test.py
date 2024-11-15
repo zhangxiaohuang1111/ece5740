@@ -1215,15 +1215,15 @@ test_case_table_random = mk_test_case_table([
   [ "unit_stride_shared_data",                       unit_stride_shared_data_msgs,                          data_random,     0.0,  0,  0,  0    ],
   [ "unit_stride_shared_data_sink_delay",            unit_stride_shared_data_msgs,                          data_random,     0.9,  3,  0,  10   ],
   [ "unit_stride_shared_data_src_delay",             unit_stride_shared_data_msgs,                          data_random,     0.9,  3,  10, 0    ],
-  [ "random_write_read",                             random_write_read_msgs,                                None,            0.0,  0,  0,  0    ],
-  [ "random_write_read_sink_delay",                  random_write_read_msgs,                                None,            0.9,  3,  0,  10   ],
-  [ "random_write_read_src_delay",                   random_write_read_msgs,                                None,            0.9,  3,  10, 0    ],
-  [ "stress_test",                                   stress_test,                                           None,            0.0,  0,  0,  0    ],
-  [ "stress_test_sink_delay",                        stress_test,                                           None,            0.9,  3,  0,  10   ],
-  [ "stress_test_src_delay",                         stress_test,                                           None,            0.9,  3,  10, 0    ],
-  [ "random_stress_test",                            random_stress_test,                                    None,            0.0,  0,  0,  0    ],
-  [ "random_stress_test_sink_delay",                 random_stress_test,                                    None,            0.9,  3,  0,  10   ],
-  [ "random_stress_test_src_delay",                  random_stress_test,                                    None,            0.9,  3,  10, 0    ],
+  [ "random_write_read",                             random_write_read_msgs,                                data_random,            0.0,  0,  0,  0    ],
+  [ "random_write_read_sink_delay",                  random_write_read_msgs,                                data_random,            0.9,  3,  0,  10   ],
+  [ "random_write_read_src_delay",                   random_write_read_msgs,                                data_random,            0.9,  3,  10, 0    ],
+  [ "stress_test",                                   stress_test,                                           data_random,            0.0,  0,  0,  0    ],
+  [ "stress_test_sink_delay",                        stress_test,                                           data_random,            0.9,  3,  0,  10   ],
+  [ "stress_test_src_delay",                         stress_test,                                           data_random,            0.9,  3,  10, 0    ],
+  [ "random_stress_test",                            random_stress_test,                                    data_random,            0.0,  0,  0,  0    ],
+  [ "random_stress_test_sink_delay",                 random_stress_test,                                    data_random,            0.9,  3,  0,  10   ],
+  [ "random_stress_test_src_delay",                  random_stress_test,                                    data_random,            0.9,  3,  10, 0    ],
 
 ])
 
@@ -1371,70 +1371,6 @@ def corner_case_both_tags_not_match_test():
         req('rd', 0x4, 0x00002000, 0, 0), resp('rd', 0x4, 0, 0, 0x22222222),  # both tags not match update way 0
         req('rd', 0x5, 0x00001100, 0, 0), resp('rd', 0x5, 0, 0, 0x33333333),  # both tags not match update way 1
     ]
-
-
-def stress_test_sassoc():
-    msgs = []
-    num_lines = 16  # Number of cache lines
-    line_size = 16  # Size of each cache line in bytes
-    base_addr = 0x00001000  # Starting address for initial fill
-    new_base_addr = 0x00002000  # Address range for eviction phase
-    max_opq = num_lines * 4  # Maximum opaque value to differentiate stages
-
-    # --- Step 1: Initial cache fill ---
-    for i in range(num_lines):
-        addr_base = base_addr + i * line_size
-        data_list = [i * 4 + j for j in range(4)]  # Deterministic data for each word
-        for j in range(4):
-            addr = addr_base + j * 4
-            data = data_list[j]
-            opq = i * 4 + j
-            # Initial write to fill cache line; first write is treated as a miss
-            msgs.extend([
-                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
-            ])
-        for j in range(4):
-            addr = addr_base + j * 4
-            msgs.extend([
-                req('rd', i * 4 + j, addr, 0, 0), resp('rd', i * 4 + j, 1, 0, data_list[j])
-            ])
-
-    # --- Step 2: Evict cache by writing to new addresses ---
-    for i in range(num_lines):
-        addr_base = new_base_addr + i * line_size
-        data_list = [100 + i * 4 + j for j in range(4)]  # Deterministic data for eviction phase
-        for j in range(4):
-            addr = addr_base + j * 4
-            data = data_list[j]
-            opq = max_opq + i * 4 + j
-            # New addresses cause evictions; first write in each line is treated as a miss
-            msgs.extend([
-                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
-            ])
-        for j in range(4):
-            addr = addr_base + j * 4
-            msgs.extend([
-                req('rd', max_opq + i * 4 + j, addr, 0, 0), resp('rd', max_opq + i * 4 + j, 1, 0, data_list[j])
-            ])
-
-    # --- Step 3: Re-access initial addresses to validate eviction ---
-    for i in range(num_lines):
-        addr_base = base_addr + i * line_size
-        data_list = [i * 4 + j for j in range(4)]  # Reuse initial data for validation
-        for j in range(4):
-            addr = addr_base + j * 4
-            data = data_list[j]
-            opq = max_opq * 2 + i * 4 + j
-            # The first re-accessed address should miss, with subsequent hits
-            msgs.extend([
-                req('wr', opq, addr, 0, data), resp('wr', opq, 0 if j == 0 else 1, 0, 0)
-            ])
-        for j in range(4):
-            addr = addr_base + j * 4
-            msgs.extend([
-                req('rd', max_opq * 2 + i * 4 + j, addr, 0, 0), resp('rd', max_opq * 2 + i * 4 + j, 1, 0, data_list[j])
-            ])
-    return msgs
 
 test_case_table_sassoc = mk_test_case_table([
   (                                   "msg_func                                       mem_data_func    stall lat src sink"),
