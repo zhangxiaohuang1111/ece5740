@@ -3,24 +3,59 @@
 //========================================================================
 
 #include "ubmark-sort.h"
-
-//''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// Implement helper functions here
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#include <stddef.h>  // For NULL
 
 //------------------------------------------------------------------------
-// ubmark_sort
+// Helper function: swap
+// Swaps two elements in an array
 //------------------------------------------------------------------------
-
-void ubmark_sort( int* x, int size )
-{
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Implement single-threaded sorting algorithm here
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // These macros allow the function to compile. Once you have
-  // implemented your algorithm you should remove these macros.
-
-  ECE4750_UNUSED_PTR(x);
-  ECE4750_UNUSED_INT(size);
+void swap(int* a, int* b) {
+  int temp = *a;
+  *a = *b;
+  *b = temp;
 }
 
+//------------------------------------------------------------------------
+// Helper function: partition
+// Partitions the array and returns the pivot index
+//------------------------------------------------------------------------
+int partition(int* array, int low, int high) {
+  int pivot = array[high];  // Choosing the last element as the pivot
+  int i = low - 1;
+
+  for (int j = low; j < high; j++) {
+    if (array[j] < pivot) {
+      i++;
+      swap(&array[i], &array[j]);
+    }
+  }
+
+  swap(&array[i + 1], &array[high]);
+  return i + 1;
+}
+
+//------------------------------------------------------------------------
+// Helper function: quicksort
+// Recursive quicksort function to sort an array
+//------------------------------------------------------------------------
+void quicksort(int* array, int low, int high) {
+  if (low < high) {
+    int pivot_index = partition(array, low, high);
+    quicksort(array, low, pivot_index - 1);
+    quicksort(array, pivot_index + 1, high);
+  }
+}
+
+//------------------------------------------------------------------------
+// Main function: ubmark_sort
+// Sorts an array of integers using quicksort
+//------------------------------------------------------------------------
+void ubmark_sort(int* x, int size) {
+  // Handle edge cases
+  if (x == NULL || size <= 1) {
+    return;
+  }
+
+  // Call quicksort on the entire array
+  quicksort(x, 0, size - 1);
+}
