@@ -77,6 +77,51 @@ def test_basic( cmdline_opts ):
   run_sim( th, cmdline_opts, duts=['sunit'] )
 
 #-------------------------------------------------------------------------
+# test_complex
+#-------------------------------------------------------------------------
+
+def test_complex( cmdline_opts ):
+
+  th = TestHarness()
+
+  msgs = [
+    #           src  dest opaq  payload
+    NetMsgType( 0,   0,   0x00, 0x04040404 ),
+    NetMsgType( 1,   0,   0x00, 0x00000000 ),
+    NetMsgType( 1,   0,   0x01, 0x01010101 ),
+    NetMsgType( 2,   0,   0x00, 0x02020202 ),
+    NetMsgType( 2,   0,   0x01, 0x03030303 ),
+    NetMsgType( 0,   0,   0x01, 0x04040404 ),
+    NetMsgType( 0,   0,   0x02, 0x05050505 ),
+    NetMsgType( 2,   0,   0x02, 0x06060606 ),
+  ]
+
+    # Generate expected output for sink based on round-robin order
+    # 120 -> 120 -> 120 priority for srcs
+  expected_msgs = []
+  src_indices = [1,2,0]  # Round-robin source order
+  src_buffers = {
+      0: [m for m in msgs if m.src == 0],
+      1: [m for m in msgs if m.src == 1],
+      2: [m for m in msgs if m.src == 2]
+  }
+
+  while any(src_buffers.values()):
+      for src in src_indices:
+          if src_buffers[src]:
+              expected_msgs.append(src_buffers[src].pop(0))
+
+  # Set parameters for sources and sink
+  th.set_param("top.srcs[0].construct", msgs=[m for m in msgs if m.src == 0])
+  th.set_param("top.srcs[1].construct", msgs=[m for m in msgs if m.src == 1])
+  th.set_param("top.srcs[2].construct", msgs=[m for m in msgs if m.src == 2])
+  th.set_param("top.sink.construct", msgs=expected_msgs)
+
+  th.elaborate()
+
+  run_sim( th, cmdline_opts, duts=['sunit'] )
+
+#-------------------------------------------------------------------------
 # Test Cases: Very Simple
 #-------------------------------------------------------------------------
 # These are examples of a simple tests using a test case table. These
@@ -186,6 +231,19 @@ def test( test_params, cmdline_opts ):
 
   th = TestHarness()
 
+  src_indices = [1, 2, 0]  
+  src_buffers = {
+      0: [m for m in test_params.msgs if m.src == 0],
+      1: [m for m in test_params.msgs if m.src == 1],
+      2: [m for m in test_params.msgs if m.src == 2]
+  }
+
+  expected_msgs = []
+  while any(src_buffers.values()):
+      for src in src_indices:
+          if src_buffers[src]:
+              expected_msgs.append(src_buffers[src].pop(0))
+
   th.set_param("top.srcs[0].construct",
     msgs                = [ m for m in test_params.msgs if m.src == 0 ],
     interval_delay_mode = test_params.delay_mode,
@@ -205,7 +263,7 @@ def test( test_params, cmdline_opts ):
     interval_delay      = test_params.src_delay )
 
   th.set_param("top.sink.construct",
-    msgs                = test_params.msgs,
+    msgs                = expected_msgs,
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay )
