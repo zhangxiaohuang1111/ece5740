@@ -305,7 +305,7 @@ test_case_table = mk_test_case_table([
   [ "stream_all_to_dest1_rand_delay", stream_all_to_dest1, 0, 20,  'random',  True ],
   [ "stream_all_to_dest2_rand_delay", stream_all_to_dest2, 0, 20,  'random',  True ],
   [ "stream_all_to_dest3_rand_delay", stream_all_to_dest3, 0, 20,  'random',  True ],
-  # [ "stream_all_to_all_rand_delay",   stream_all_to_all,   0, 20,  'random',  True ], // too hard to right the correct test case, the design should be fine
+  [ "stream_all_to_all_rand_delay",   stream_all_to_all,   0, 20,  'random',  False ], # too hard to be ordered
 ])
 
 def sort_by_round_robin(msgs, src_order):
