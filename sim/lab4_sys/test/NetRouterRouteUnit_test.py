@@ -139,6 +139,11 @@ for i in range(16):
   msg = NetMsgType( src=0, dest=2, opaque=i, payload=i )
   stream_to_dest2.append( msg )
 
+stream_to_dest3 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=3, opaque=i, payload=i )
+  stream_to_dest3.append( msg )
+
 #-------------------------------------------------------------------------
 # Test Cases: Stream to All Ports
 #-------------------------------------------------------------------------
@@ -148,6 +153,7 @@ for i in range(16):
   m0 = NetMsgType( src=0, dest=0, opaque=0x00+i, payload=0x0000+i )
   m1 = NetMsgType( src=0, dest=1, opaque=0x40+i, payload=0x1000+i )
   m2 = NetMsgType( src=0, dest=2, opaque=0x80+i, payload=0x2000+i )
+  m3 = NetMsgType( src=0, dest=3, opaque=0xc0+i, payload=0x3000+i )
   stream_to_all.extend([m0, m1, m2])
 
 #''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -166,6 +172,7 @@ test_case_table = mk_test_case_table([
   [ "stream_to_dest0",            stream_to_dest0,     0,  0,  'fixed'  ],
   [ "stream_to_dest1",            stream_to_dest1,     0,  0,  'fixed'  ],
   [ "stream_to_dest2",            stream_to_dest2,     0,  0,  'fixed'  ],
+  [ "stream_to_dest3",            stream_to_dest3,     0,  0,  'fixed'  ],
   [ "stream_to_all",              stream_to_all,       0,  0,  'fixed'  ],
 
   [ "stream_to_dest0_fixed_0x2",  stream_to_dest0,     0,  2,  'fixed'  ],
@@ -174,12 +181,15 @@ test_case_table = mk_test_case_table([
   [ "stream_to_dest1_fixed_2x0",  stream_to_dest1,     2,  0,  'fixed'  ],
   [ "stream_to_dest2_fixed_0x2",  stream_to_dest2,     0,  2,  'fixed'  ],
   [ "stream_to_dest2_fixed_2x0",  stream_to_dest2,     2,  0,  'fixed'  ],
+  [ "stream_to_dest3_fixed_0x2",  stream_to_dest3,     0,  2,  'fixed'  ],
+  [ "stream_to_dest3_fixed_2x0",  stream_to_dest3,     2,  0,  'fixed'  ],
   [ "stream_to_all_fixed_0x2",    stream_to_all,       0,  2,  'fixed'  ],
   [ "stream_to_all_fixed_2x0",    stream_to_all,       2,  0,  'fixed'  ],
 
   [ "stream_to_dest0_rand_delay", stream_to_dest0,     3, 20,  'random' ],
   [ "stream_to_dest1_rand_delay", stream_to_dest1,     3, 20,  'random' ],
   [ "stream_to_dest2_rand_delay", stream_to_dest2,     3, 20,  'random' ],
+  [ "stream_to_dest3_rand_delay", stream_to_dest3,     3, 20,  'random' ],
   [ "stream_to_all_rand_delay",   stream_to_all,       3, 20,  'random' ],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
