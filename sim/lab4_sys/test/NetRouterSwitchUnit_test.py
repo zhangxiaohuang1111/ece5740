@@ -107,6 +107,45 @@ three_diff_dest = [
 # Change above tests if necessary; add more directed tests
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream from One Port
+#-------------------------------------------------------------------------
+
+stream_from_src1 = []
+for i in range(20):
+  msg = NetMsgType( src=1, dest=0, opaque=i, payload=i )
+  stream_from_src1.append( msg )
+
+stream_from_src2 = []
+for i in range(20):
+  msg = NetMsgType( src=2, dest=0, opaque=i, payload=i )
+  stream_from_src2.append( msg )
+
+stream_from_src0 = []
+for i in range(20):
+  msg = NetMsgType( src=0, dest=0, opaque=i, payload=i )
+  stream_from_src0.append( msg )
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream from All Ports
+#-------------------------------------------------------------------------
+
+stream_from_all = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_from_all.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_from_all.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_from_all.append(msg)
+
+
 #-------------------------------------------------------------------------
 # Test Case Table
 #-------------------------------------------------------------------------
@@ -116,10 +155,27 @@ test_case_table = mk_test_case_table([
   [ "one",                         one,                  0,  0,  'fixed'  ],
   [ "three",                       three,                0,  0,  'fixed'  ],
   [ "three_diff_dest",             three_diff_dest,      0,  0,  'fixed'  ],
+  [ "stream_from_src0",            stream_from_src0,     0,  0,  'fixed'  ],
+  [ "stream_from_src1",            stream_from_src1,     0,  0,  'fixed'  ],
+  [ "stream_from_src2",            stream_from_src2,     0,  0,  'fixed'  ],
+  [ "stream_from_all",             stream_from_all,      0,  0,  'fixed'  ],
+
+  [ "stream_from_src0_fixed_0x2",  stream_from_src0,     0,  2,  'fixed'  ],
+  [ "stream_from_src0_fixed_2x0",  stream_from_src0,     2,  0,  'fixed'  ],
+  [ "stream_from_src1_fixed_0x2",  stream_from_src1,     0,  2,  'fixed'  ],
+  [ "stream_from_src1_fixed_2x0",  stream_from_src1,     2,  0,  'fixed'  ],
+  [ "stream_from_src2_fixed_0x2",  stream_from_src2,     0,  2,  'fixed'  ],
+  [ "stream_from_src2_fixed_2x0",  stream_from_src2,     2,  0,  'fixed'  ],
+  [ "stream_from_all_fixed_0x2",   stream_from_all,      0,  2,  'fixed'  ],
+
+  [ "stream_from_src0_rand_delay", stream_from_src0,     3, 20,  'random' ],
+  [ "stream_from_src1_rand_delay", stream_from_src1,     3, 20,  'random' ],
+  [ "stream_from_src2_rand_delay", stream_from_src2,     3, 20,  'random' ],
+  [ "stream_from_all_rand_delay",  stream_from_all,      0, 20,  'random' ],
+])
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-])
 
 #-------------------------------------------------------------------------
 # test
