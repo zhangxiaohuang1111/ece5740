@@ -32,6 +32,8 @@ module lab4_sys_NetRouterSwitchUnit
   //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // Implement switch unit logic
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+  // round-robin arbitration logic
   logic [1:0] last_served; // Tracks the last served input
   logic [1:0] selected_input;
 
@@ -118,6 +120,40 @@ module lab4_sys_NetRouterSwitchUnit
       end
     endcase
   end
+
+// discussion
+
+
+//   logic [1:0] selected_input;
+
+//   always_comb begin
+
+//     selected_input = 0;
+//     istream_rdy[0] = 0;
+//     istream_rdy[1] = 0;
+//     istream_rdy[2] = 0;
+//     ostream_val    = 0;
+//     ostream_msg    = 0;
+
+//     if ( istream_val[1] ) begin
+//   selected_input = 1;
+//   istream_rdy[1] = ostream_rdy;
+//   ostream_val    = 1;
+//   ostream_msg    = istream_msg[1];
+// end
+// else if ( istream_val[2] ) begin
+//   selected_input = 2;
+//   istream_rdy[2] = ostream_rdy;
+//   ostream_val    = 1;
+//   ostream_msg    = istream_msg[2];
+// end
+// else if ( istream_val[0] ) begin
+//   selected_input = 0;
+//   istream_rdy[0] = ostream_rdy;
+//   ostream_val    = 1;
+//   ostream_msg    = istream_msg[0];
+// end
+//   end
 
   //----------------------------------------------------------------------
   // Line Tracing
