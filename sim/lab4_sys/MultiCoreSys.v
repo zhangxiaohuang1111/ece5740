@@ -255,35 +255,35 @@ module lab4_sys_MultiCoreSys
   `VC_TRACE_BEGIN
   begin
 
-    vc_trace.append_str( trace_str, "(" );
-    ICACHE[0].icache.line_trace( trace_str );
-    vc_trace.append_str( trace_str, ") " );
-    PROC[0].proc.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, "(" );
+    // ICACHE[0].icache.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, ") " );
+    // PROC[0].proc.line_trace( trace_str );
 
-    vc_trace.append_str( trace_str, " " );
+    // vc_trace.append_str( trace_str, " " );
 
-    vc_trace.append_str( trace_str, "(" );
-    ICACHE[1].icache.line_trace( trace_str );
-    vc_trace.append_str( trace_str, ") " );
-    PROC[1].proc.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, "(" );
+    // ICACHE[1].icache.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, ") " );
+    // PROC[1].proc.line_trace( trace_str );
 
-    vc_trace.append_str( trace_str, " " );
+    // vc_trace.append_str( trace_str, " " );
 
-    vc_trace.append_str( trace_str, "(" );
-    ICACHE[2].icache.line_trace( trace_str );
-    vc_trace.append_str( trace_str, ") " );
-    PROC[2].proc.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, "(" );
+    // ICACHE[2].icache.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, ") " );
+    // PROC[2].proc.line_trace( trace_str );
 
-    vc_trace.append_str( trace_str, " " );
+    // vc_trace.append_str( trace_str, " " );
 
-    vc_trace.append_str( trace_str, "(" );
-    ICACHE[3].icache.line_trace( trace_str );
-    vc_trace.append_str( trace_str, ") " );
-    PROC[3].proc.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, "(" );
+    // ICACHE[3].icache.line_trace( trace_str );
+    // vc_trace.append_str( trace_str, ") " );
+    // PROC[3].proc.line_trace( trace_str );
 
-    vc_trace.append_str( trace_str, " " );
+    // vc_trace.append_str( trace_str, " " );
 
-    dcache.line_trace( trace_str );
+    // dcache.line_trace( trace_str );
   end
   `VC_TRACE_END
 
