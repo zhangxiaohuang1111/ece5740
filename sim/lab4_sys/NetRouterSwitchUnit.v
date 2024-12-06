@@ -29,10 +29,6 @@ module lab4_sys_NetRouterSwitchUnit
   input  logic                   ostream_rdy
 );
 
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Implement switch unit logic
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
   // round-robin arbitration logic
   logic [1:0] last_served; // Tracks the last served input
   logic [1:0] selected_input;

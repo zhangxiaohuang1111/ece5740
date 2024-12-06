@@ -37,10 +37,6 @@ module lab4_sys_NetRouter
   input  logic                   ostream_rdy [3]
 );
 
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Implement router with input queues, route units, and switch units
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 
   //----------------------------------------------------------------------
   // Input Queues

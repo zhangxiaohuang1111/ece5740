@@ -42,9 +42,6 @@ module lab4_sys_Net
   logic                   channels_ccw_val [4];
   logic                   channels_ccw_rdy [4];
 
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Implement ring network with four routers
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 logic [p_msg_nbits-1:0] istream_msg_r0 [3];
 logic                   istream_val_r0 [3];

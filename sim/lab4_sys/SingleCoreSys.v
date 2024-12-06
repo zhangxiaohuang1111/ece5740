@@ -62,9 +62,6 @@ module lab4_sys_SingleCoreSys
   output logic          dcache_miss
 );
 
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Instantiate and connect processor and caches
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   // Use some extra ports to report on the number of cache accesses and
   // misses to be able to calculate the miss rate in the evaluation
