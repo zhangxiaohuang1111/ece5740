@@ -161,3 +161,28 @@ def gen_multicore_random_test():
   asm_code.append(".data")
   asm_code.append(".word 0x00000000")
   return "\n".join(asm_code)
+
+def gen_basic_random_test():
+    base_addresses = [0x00002000 + i * 4 for i in range(4)]  # Generate base addresses
+    random_values = [random.randint(0, 0xFFFFFFFF) for _ in range(4)]  # Generate random data
+
+    asm_code = ""
+    for addr, val in zip(base_addresses, random_values):
+        asm_code += f"""
+        csrr x1, mngr2proc < {hex(addr)}
+        csrr x2, mngr2proc < {hex(val)}
+        sw   x2, 0(x1)
+        nop
+        nop
+        lw   x3, 0(x1)
+        csrw proc2mngr, x3 > {hex(val)}
+        """
+
+    asm_code += """
+    .data
+    """
+    # Add the random data to the .data section
+    for _ in base_addresses:
+        asm_code += ".word 0x00000000\n"
+
+    return asm_code

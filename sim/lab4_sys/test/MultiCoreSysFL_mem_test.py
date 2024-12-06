@@ -44,6 +44,7 @@ class Tests:
     asm_test( inst_mem_mcore.gen_concurrent_access_test ),
     # asm_test( inst_mem_mcore.gen_random_test     ),
     # asm_test( inst_mem_mcore.gen_multicore_random_test ),
+    asm_test( inst_mem_mcore.gen_basic_random_test ),
 
 
     #''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
