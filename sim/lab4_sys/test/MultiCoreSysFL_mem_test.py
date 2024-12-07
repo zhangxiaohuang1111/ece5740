@@ -55,7 +55,8 @@ class Tests:
   def test_mem_mcore( s, name, test ):
     run_test( s.SysType, test, cmdline_opts=s.__class__.cmdline_opts )
 
-  #''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # random stall and delay
-  #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  def test_mem_mcore_delays( s ):
+    run_test( s.SysType, inst_mem_mcore.gen_basic_random_test, delays=True,
+              cmdline_opts=s.__class__.cmdline_opts )
+    
 
