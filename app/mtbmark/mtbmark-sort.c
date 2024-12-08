@@ -1,90 +1,74 @@
-//========================================================================
-// mtbmark-sort
-//========================================================================
-#include "mtbmark-sort.h"
 #include "ece4750.h"
 #include "ubmark-sort.h"
+#include <stddef.h>
 
-//------------------------------------------------------------------------
-// arg_t
-//------------------------------------------------------------------------
-// This is used to pass arguments when we spawn work onto the cores.
+#define NUM_CORES 4
+#define THRESHOLD 1000
 
 typedef struct {
-  int* array; // Pointer to array
-  int start;  // Start index
-  int end;    // End index (exclusive)
+    int* array;
+    int start;
+    int end;
 } arg_t;
 
-//------------------------------------------------------------------------
-// Partition function
-//------------------------------------------------------------------------
-
-int partition(int* array, int start, int end) {
-  int pivot = array[end - 1];
-  int i = start - 1;
-  for (int j = start; j < end - 1; j++) {
-    if (array[j] <= pivot) {
-      i++;
-      int temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
+void merge(int* array, int start, int mid, int end, int* temp) {
+    int i = start, j = mid, k = 0;
+    while (i < mid && j < end) {
+        if (array[i] <= array[j])
+            temp[k++] = array[i++];
+        else
+            temp[k++] = array[j++];
     }
-  }
-  int temp = array[i + 1];
-  array[i + 1] = array[end - 1];
-  array[end - 1] = temp;
-  return i + 1;
+    while (i < mid)
+        temp[k++] = array[i++];
+    while (j < end)
+        temp[k++] = array[j++];
+    for (int p = 0; p < k; p++)
+        array[start + p] = temp[p];
 }
-
-//------------------------------------------------------------------------
-// Quick Sort function
-//------------------------------------------------------------------------
-
-void quick_sort(int* array, int start, int end) {
-  if (start < end) {
-    int pivot = partition(array, start, end);
-    quick_sort(array, start, pivot);
-    quick_sort(array, pivot + 1, end);
-  }
-}
-
-//------------------------------------------------------------------------
-// Worker function
-//------------------------------------------------------------------------
 
 void work(void* arg_vptr) {
-  arg_t* arg = (arg_t*)arg_vptr;
-  quick_sort(arg->array, arg->start, arg->end);
+    arg_t* arg = (arg_t*)arg_vptr;
+    ubmark_sort(arg->array + arg->start, arg->end - arg->start);
 }
 
-//------------------------------------------------------------------------
-// mtbmark_sort
-//------------------------------------------------------------------------
-
 void mtbmark_sort(int* x, int size) {
-  // Divide the array into four parts
-  int block_size = size / 4;
+    if (!x || size <= 1) return;
 
-  // Create arguments for each part
-  arg_t arg0 = {x, 0, block_size};
-  arg_t arg1 = {x, block_size, 2 * block_size};
-  arg_t arg2 = {x, 2 * block_size, 3 * block_size};
-  arg_t arg3 = {x, 3 * block_size, size};
+    int block_size = size / NUM_CORES;
 
-  // Spawn threads for sorting
-  ece4750_bthread_spawn(1, &work, &arg1);
-  ece4750_bthread_spawn(2, &work, &arg2);
-  ece4750_bthread_spawn(3, &work, &arg3);
+    // Calculate sizes and safely cast to int
+    int arg_size = (int)(NUM_CORES * sizeof(arg_t));
+    int temp_size = (int)((size_t)size * sizeof(int));
 
-  // Core 0 sorts its part
-  work(&arg0);
+    // Allocate memory using ece4750_malloc
+    arg_t* args = (arg_t*)ece4750_malloc(arg_size);
+    int* temp = (int*)ece4750_malloc(temp_size);
 
-  // Wait for all threads to finish
-  ece4750_bthread_join(1);
-  ece4750_bthread_join(2);
-  ece4750_bthread_join(3);
+    if (!args || !temp) {
+        // ece4750_wprintf(L"ERROR: Memory allocation failed.\n");
+        ece4750_exit(1);
+    }
 
-  // Merge sorted parts
-  quick_sort(x, 0, size); // Final single-threaded merge sort
+    for (int i = 0; i < NUM_CORES; i++) {
+        args[i].array = x;
+        args[i].start = i * block_size;
+        args[i].end = (i == NUM_CORES - 1) ? size : args[i].start + block_size;
+    }
+
+    for (int i = 1; i < NUM_CORES; i++) {
+        ece4750_bthread_spawn(i, work, &args[i]);
+    }
+    work(&args[0]);
+
+    for (int i = 1; i < NUM_CORES; i++) {
+        ece4750_bthread_join(i);
+    }
+
+    merge(x, args[0].start, args[0].end, args[1].end, temp);
+    merge(x, args[2].start, args[2].end, args[3].end, temp);
+    merge(x, args[0].start, args[1].end, args[3].end, temp);
+
+    ece4750_free(args);
+    ece4750_free(temp);
 }
