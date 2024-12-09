@@ -19,8 +19,9 @@ class MultiCoreSys( VerilogPlaceholder, Component ):
     s.dmem          = MemRequesterIfc( MemReqType, MemRespType )
 
     s.stats_en      = OutPort()
-    s.commit_inst   = OutPort(Bits4)
-    s.icache_access = OutPort(Bits4)
-    s.icache_miss   = OutPort(Bits4)
-    s.dcache_access = OutPort(Bits4)
-    s.dcache_miss   = OutPort(Bits4)
+    s.commit_inst   = OutPort()
+    s.icache_access = OutPort()
+    s.icache_miss   = OutPort()
+    s.dcache_access = OutPort()
+    s.dcache_miss   = OutPort()
+
