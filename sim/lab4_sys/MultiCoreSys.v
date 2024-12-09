@@ -56,11 +56,11 @@ module lab4_sys_MultiCoreSys
   // stats output
 
   output logic          stats_en,
-  output logic          commit_inst,
-  output logic          icache_access,
-  output logic          icache_miss,
-  output logic          dcache_access,
-  output logic          dcache_miss
+  output logic [3:0]    commit_inst,
+  output logic [3:0]    icache_access,
+  output logic [3:0]    icache_miss,
+  output logic [3:0]    dcache_access,
+  output logic [3:0]    dcache_miss
 );
 
   //----------------------------------------------------------------------
@@ -202,10 +202,10 @@ module lab4_sys_MultiCoreSys
       .commit_inst         (commit_insts[i])
     );
 
+    assign commit_inst[i] = commit_insts[i];  // <- Assign commit_inst[i] with commit_insts[i]
   end
   endgenerate
 
-  assign commit_inst = commit_insts[0];
   assign stats_en    = stats_ens[0];
 
   //----------------------------------------------------------------------
@@ -239,10 +239,14 @@ module lab4_sys_MultiCoreSys
   //----------------------------------------------------------------------
   // Eventually we need to figure out how to handle these.
 
-  assign icache_access = 0;
-  assign icache_miss   = 0;
-  assign dcache_access = 0;
-  assign dcache_miss   = 0;
+generate 
+  for( i = 0; i < 4; i = i + 1 ) begin: STATS
+    assign icache_access[i] = proc2icache_reqstream_val[i]  & proc2icache_reqstream_rdy[i];
+    assign icache_miss[i]   = proc2icache_respstream_val[i] & proc2icache_respstream_rdy[i] & ~proc2icache_respstream_msg[i].test[0];
+    assign dcache_access = proc2dcache_reqstream_val[i]  & proc2dcache_reqstream_rdy[i];
+    assign dcache_miss   = proc2dcache_respstream_val[i] & proc2dcache_respstream_rdy[i] & ~proc2dcache_respstream_msg[i].test[0];
+  end
+  endgenerate
 
   //----------------------------------------------------------------------
   // Line Traceing

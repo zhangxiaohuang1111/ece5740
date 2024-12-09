@@ -322,11 +322,11 @@ class MultiCoreTestHarness(Component):
     s.proc2mngr     = OStreamIfc( Bits32 )
 
     s.stats_en      = OutPort()
-    s.commit_inst   = OutPort()
-    s.icache_access = OutPort()
-    s.icache_miss   = OutPort()
-    s.dcache_access = OutPort()
-    s.dcache_miss   = OutPort()
+    s.commit_inst   = OutPort(Bits4)
+    s.icache_access = OutPort(Bits4)
+    s.icache_miss   = OutPort(Bits4)
+    s.dcache_access = OutPort(Bits4)
+    s.dcache_miss   = OutPort(Bits4)
 
     # Instantiate source, processor, and memory
 
@@ -362,10 +362,10 @@ class MultiCoreTestHarness(Component):
 
     s.stats_en      //= s.sys.stats_en
     s.commit_inst   //= s.sys.commit_inst
-    s.icache_access //= 0
-    s.icache_miss   //= 0
-    s.dcache_access //= 0
-    s.dcache_miss   //= 0
+    s.icache_access //= s.sys.icache_access
+    s.icache_miss   //= s.sys.icache_miss
+    s.dcache_access //= s.sys.dcache_access
+    s.dcache_miss   //= s.sys.dcache_miss
 
   #-----------------------------------------------------------------------
   # load
@@ -526,12 +526,20 @@ def main():
 
     if th.stats_en:
       num_cycles += 1
-
-      if th.commit_inst:   num_commit_inst   += 1
-      if th.icache_access: num_icache_access += 1
-      if th.icache_miss:   num_icache_miss   += 1
-      if th.dcache_access: num_dcache_access += 1
-      if th.dcache_miss:   num_dcache_miss   += 1
+      
+      if(isinstance(th, MultiCoreTestHarness)):
+        for i in range(4):
+          if th.commit_inst[i]:   num_commit_inst   += 1
+          if th.icache_access[i]: num_icache_access += 1
+          if th.icache_miss[i]:   num_icache_miss   += 1
+          if th.dcache_access[i]: num_dcache_access += 1
+          if th.dcache_miss[i]:   num_dcache_miss   += 1
+      else:
+        if th.commit_inst:   num_commit_inst   += 1
+        if th.icache_access: num_icache_access += 1
+        if th.icache_miss:   num_icache_miss   += 1
+        if th.dcache_access: num_dcache_access += 1
+        if th.dcache_miss:   num_dcache_miss   += 1
 
     # Check the proc2mngr interface
 

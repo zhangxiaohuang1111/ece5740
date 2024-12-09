@@ -55,11 +55,11 @@ module lab4_sys_SingleCoreSys
   // stats output
 
   output logic          stats_en,
-  output logic          commit_inst,
-  output logic          icache_access,
-  output logic          icache_miss,
-  output logic          dcache_access,
-  output logic          dcache_miss
+  output logic [3:0]    commit_inst,
+  output logic [3:0]    icache_access,
+  output logic [3:0]    icache_miss,
+  output logic [3:0]    dcache_access,
+  output logic [3:0]    dcache_miss
 );
 
 
