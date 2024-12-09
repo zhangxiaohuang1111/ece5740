@@ -68,11 +68,24 @@ def test_basic( cmdline_opts ):
     NetMsgType( 0,   2,   0x12, 0x12121212 ),
     NetMsgType( 0,   3,   0x13, 0x13131313 ),
   ]
+  router_id = 0
+  
+  # msgs_to_sink_0 = [m for m in msgs if m.dest in [3, 2]]    # Left
+  # msgs_to_sink_1 = [m for m in msgs if m.dest == 1]         # Right
+  msgs_to_sink_0 = [
+      m for m in msgs
+      if m.dest != router_id and ((m.dest - router_id) & 3) >= ((router_id - m.dest) & 3)
+  ]  # Left
+  msgs_to_sink_1 = [
+      m for m in msgs
+      if m.dest != router_id and ((m.dest - router_id) & 3) < ((router_id - m.dest) & 3)
+  ]  # Right
+  msgs_to_sink_2 = [m for m in msgs if m.dest == router_id] # Local
 
-  th.set_param("top.src.construct",   msgs=msgs  )
-  th.set_param("top.sinks[0].construct", msgs=[ m for m in msgs if m.dest == 0 ] )
-  th.set_param("top.sinks[1].construct", msgs=[ m for m in msgs if m.dest != 0 ] )
-  th.set_param("top.sinks[2].construct", msgs=[] )
+  th.set_param("top.src.construct", msgs=msgs)
+  th.set_param("top.sinks[0].construct", msgs=msgs_to_sink_0)  # sink[0]
+  th.set_param("top.sinks[1].construct", msgs=msgs_to_sink_1)  # sink[1]
+  th.set_param("top.sinks[2].construct", msgs=msgs_to_sink_2)  # sink[2]
 
   th.elaborate()
 
@@ -107,6 +120,42 @@ four_diff_src = [
   NetMsgType( 0,   3,   0x13, 0x13131313 ),
 ]
 
+#-------------------------------------------------------------------------
+# Test Cases: Stream to One Port
+#-------------------------------------------------------------------------
+
+stream_to_dest0 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=i, payload=i )
+  stream_to_dest0.append( msg )
+
+stream_to_dest1 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=1, opaque=i, payload=i )
+  stream_to_dest1.append( msg )
+
+stream_to_dest2 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=2, opaque=i, payload=i )
+  stream_to_dest2.append( msg )
+
+stream_to_dest3 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=3, opaque=i, payload=i )
+  stream_to_dest3.append( msg )
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream to All Ports
+#-------------------------------------------------------------------------
+
+stream_to_all = []
+for i in range(16):
+  m0 = NetMsgType( src=0, dest=0, opaque=0x00+i, payload=0x0000+i )
+  m1 = NetMsgType( src=0, dest=1, opaque=0x40+i, payload=0x1000+i )
+  m2 = NetMsgType( src=0, dest=2, opaque=0x80+i, payload=0x2000+i )
+  m3 = NetMsgType( src=0, dest=3, opaque=0xc0+i, payload=0x3000+i )
+  stream_to_all.extend([m0, m1, m2])
+
 #''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Change above tests if necessary; add more directed tests
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -120,6 +169,28 @@ test_case_table = mk_test_case_table([
   [ "one",                        one,                 0,  0,  'fixed'  ],
   [ "four",                       four,                0,  0,  'fixed'  ],
   [ "four_diff_src",              four_diff_src,       0,  0,  'fixed'  ],
+  [ "stream_to_dest0",            stream_to_dest0,     0,  0,  'fixed'  ],
+  [ "stream_to_dest1",            stream_to_dest1,     0,  0,  'fixed'  ],
+  [ "stream_to_dest2",            stream_to_dest2,     0,  0,  'fixed'  ],
+  [ "stream_to_dest3",            stream_to_dest3,     0,  0,  'fixed'  ],
+  [ "stream_to_all",              stream_to_all,       0,  0,  'fixed'  ],
+
+  [ "stream_to_dest0_fixed_0x2",  stream_to_dest0,     0,  2,  'fixed'  ],
+  [ "stream_to_dest0_fixed_2x0",  stream_to_dest0,     2,  0,  'fixed'  ],
+  [ "stream_to_dest1_fixed_0x2",  stream_to_dest1,     0,  2,  'fixed'  ],
+  [ "stream_to_dest1_fixed_2x0",  stream_to_dest1,     2,  0,  'fixed'  ],
+  [ "stream_to_dest2_fixed_0x2",  stream_to_dest2,     0,  2,  'fixed'  ],
+  [ "stream_to_dest2_fixed_2x0",  stream_to_dest2,     2,  0,  'fixed'  ],
+  [ "stream_to_dest3_fixed_0x2",  stream_to_dest3,     0,  2,  'fixed'  ],
+  [ "stream_to_dest3_fixed_2x0",  stream_to_dest3,     2,  0,  'fixed'  ],
+  [ "stream_to_all_fixed_0x2",    stream_to_all,       0,  2,  'fixed'  ],
+  [ "stream_to_all_fixed_2x0",    stream_to_all,       2,  0,  'fixed'  ],
+
+  [ "stream_to_dest0_rand_delay", stream_to_dest0,     3, 20,  'random' ],
+  [ "stream_to_dest1_rand_delay", stream_to_dest1,     3, 20,  'random' ],
+  [ "stream_to_dest2_rand_delay", stream_to_dest2,     3, 20,  'random' ],
+  [ "stream_to_dest3_rand_delay", stream_to_dest3,     3, 20,  'random' ],
+  [ "stream_to_all_rand_delay",   stream_to_all,       3, 20,  'random' ],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -133,7 +204,7 @@ test_case_table = mk_test_case_table([
 def test_router_id_0( test_params, cmdline_opts ):
 
   th = TestHarness( router_id=0 )
-
+  router_id = 0
   th.set_param("top.src.construct",
     msgs                = test_params.msgs,
     interval_delay_mode = test_params.delay_mode,
@@ -141,19 +212,19 @@ def test_router_id_0( test_params, cmdline_opts ):
     interval_delay      = test_params.src_delay )
 
   th.set_param("top.sinks[0].construct",
-    msgs                = [ m for m in test_params.msgs if m.dest == 0 ],
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) >= ((router_id - m.dest) & 3)) ],
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay )
 
   th.set_param("top.sinks[1].construct",
-    msgs                = [ m for m in test_params.msgs if m.dest != 0 ],
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) < ((router_id - m.dest) & 3)) ],
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay )
 
   th.set_param("top.sinks[2].construct",
-    msgs                = [],
+    msgs                = [m for m in test_params.msgs if m.dest == router_id],
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay )
@@ -163,4 +234,113 @@ def test_router_id_0( test_params, cmdline_opts ):
   run_sim( th, cmdline_opts, duts=['runit'] )
 
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#-------------------------------------------------------------------------
+# test w/ router id 1
+#-------------------------------------------------------------------------
 
+@pytest.mark.parametrize( **test_case_table )
+def test_router_id_1( test_params, cmdline_opts ):
+
+  th = TestHarness( router_id=1 )
+  router_id = 1
+  th.set_param("top.src.construct",
+    msgs                = test_params.msgs,
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.src_delay,
+    interval_delay      = test_params.src_delay )
+
+  th.set_param("top.sinks[0].construct",
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) >= ((router_id - m.dest) & 3)) ],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.set_param("top.sinks[1].construct",
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) < ((router_id - m.dest) & 3)) ],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.set_param("top.sinks[2].construct",
+    msgs                = [m for m in test_params.msgs if m.dest == router_id],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.elaborate()
+
+  run_sim( th, cmdline_opts, duts=['runit'] )
+
+#-------------------------------------------------------------------------
+# test w/ router id 2
+#-------------------------------------------------------------------------
+
+@pytest.mark.parametrize( **test_case_table )
+def test_router_id_2( test_params, cmdline_opts ):
+
+  th = TestHarness( router_id=2 )
+  router_id = 2
+  th.set_param("top.src.construct",
+    msgs                = test_params.msgs,
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.src_delay,
+    interval_delay      = test_params.src_delay )
+
+  th.set_param("top.sinks[0].construct",
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) >= ((router_id - m.dest) & 3)) ],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.set_param("top.sinks[1].construct",
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) < ((router_id - m.dest) & 3)) ],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.set_param("top.sinks[2].construct",
+    msgs                = [m for m in test_params.msgs if m.dest == router_id],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.elaborate()
+
+  run_sim( th, cmdline_opts, duts=['runit'] )
+
+#-------------------------------------------------------------------------
+# test w/ router id 3
+#-------------------------------------------------------------------------
+
+@pytest.mark.parametrize( **test_case_table )
+def test_router_id_3( test_params, cmdline_opts ):
+
+  th = TestHarness( router_id=3 )
+  router_id = 3
+  th.set_param("top.src.construct",
+    msgs                = test_params.msgs,
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.src_delay,
+    interval_delay      = test_params.src_delay )
+
+  th.set_param("top.sinks[0].construct",
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) >= ((router_id - m.dest) & 3)) ],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.set_param("top.sinks[1].construct",
+    msgs                = [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) < ((router_id - m.dest) & 3)) ],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.set_param("top.sinks[2].construct",
+    msgs                = [m for m in test_params.msgs if m.dest == router_id],
+    interval_delay_mode = test_params.delay_mode,
+    initial_delay       = test_params.sink_delay,
+    interval_delay      = test_params.sink_delay )
+
+  th.elaborate()
+
+  run_sim( th, cmdline_opts, duts=['runit'] )

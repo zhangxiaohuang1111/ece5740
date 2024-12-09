@@ -50,7 +50,7 @@ class TestHarness(Component):
   #-----------------------------------------------------------------------
 
   def construct( s, proc_cls ):
-    s.commit_inst = OutPort()
+    s.commit_inst = OutPort(Bits4)
 
     s.src  = StreamSourceFL( Bits32, [] )
     s.sink = StreamSinkFL( Bits32, [] )

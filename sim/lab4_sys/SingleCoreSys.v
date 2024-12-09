@@ -55,21 +55,124 @@ module lab4_sys_SingleCoreSys
   // stats output
 
   output logic          stats_en,
-  output logic          commit_inst,
-  output logic          icache_access,
-  output logic          icache_miss,
-  output logic          dcache_access,
-  output logic          dcache_miss
+  output logic [3:0]    commit_inst,
+  output logic [3:0]    icache_access,
+  output logic [3:0]    icache_miss,
+  output logic [3:0]    dcache_access,
+  output logic [3:0]    dcache_miss
 );
 
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Instantiate and connect processor and caches
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   // Use some extra ports to report on the number of cache accesses and
   // misses to be able to calculate the miss rate in the evaluation
   // simulator. If you use different names for your wires, you may need
   // to update this logic.
+
+  // Processor <-> Cache Interface
+  logic          icache_reqstream_val;
+  logic          icache_reqstream_rdy;
+  mem_req_4B_t   icache_reqstream_msg;
+
+  logic          icache_respstream_val;
+  logic          icache_respstream_rdy;
+  mem_resp_4B_t  icache_respstream_msg;
+
+  logic          dcache_reqstream_val;
+  logic          dcache_reqstream_rdy;
+  mem_req_4B_t   dcache_reqstream_msg;
+
+  logic          dcache_respstream_val;
+  logic          dcache_respstream_rdy;
+  mem_resp_4B_t  dcache_respstream_msg;
+
+  // Processor instance
+  lab2_proc_ProcAlt proc
+  (
+    .clk                (clk),
+    .reset              (reset),
+
+    // From mngr streaming port
+    .mngr2proc_msg      (mngr2proc_msg),
+    .mngr2proc_val      (mngr2proc_val),
+    .mngr2proc_rdy      (mngr2proc_rdy),
+
+    // To mngr streaming port
+    .proc2mngr_msg      (proc2mngr_msg),
+    .proc2mngr_val      (proc2mngr_val),
+    .proc2mngr_rdy      (proc2mngr_rdy),
+
+    // Instruction Memory Port
+    .imem_reqstream_msg (icache_reqstream_msg),
+    .imem_reqstream_val (icache_reqstream_val),
+    .imem_reqstream_rdy (icache_reqstream_rdy),
+
+    .imem_respstream_msg(icache_respstream_msg),
+    .imem_respstream_val(icache_respstream_val),
+    .imem_respstream_rdy(icache_respstream_rdy),
+
+    // Data Memory Port
+    .dmem_reqstream_msg (dcache_reqstream_msg),
+    .dmem_reqstream_val (dcache_reqstream_val),
+    .dmem_reqstream_rdy (dcache_reqstream_rdy),
+
+    .dmem_respstream_msg(dcache_respstream_msg),
+    .dmem_respstream_val(dcache_respstream_val),
+    .dmem_respstream_rdy(dcache_respstream_rdy),
+
+    .core_id            (0),
+    .commit_inst        (commit_inst),
+    .stats_en           (stats_en)
+  );
+
+  // Instruction Cache instance
+  lab3_mem_CacheAlt icache
+  (
+    .clk                (clk),
+    .reset              (reset),
+
+    // Processor <-> Cache Interface
+    .proc2cache_reqstream_msg  (icache_reqstream_msg),
+    .proc2cache_reqstream_val  (icache_reqstream_val),
+    .proc2cache_reqstream_rdy  (icache_reqstream_rdy),
+
+    .proc2cache_respstream_msg (icache_respstream_msg),
+    .proc2cache_respstream_val (icache_respstream_val),
+    .proc2cache_respstream_rdy (icache_respstream_rdy),
+
+    // Cache <-> Memory Interface
+    .cache2mem_reqstream_msg   (imem_reqstream_msg),
+    .cache2mem_reqstream_val   (imem_reqstream_val),
+    .cache2mem_reqstream_rdy   (imem_reqstream_rdy),
+
+    .cache2mem_respstream_msg  (imem_respstream_msg),
+    .cache2mem_respstream_val  (imem_respstream_val),
+    .cache2mem_respstream_rdy  (imem_respstream_rdy)
+  );
+
+  // Data Cache instance
+  lab3_mem_CacheAlt dcache
+  (
+    .clk                (clk),
+    .reset              (reset),
+
+    // Processor <-> Cache Interface
+    .proc2cache_reqstream_msg  (dcache_reqstream_msg),
+    .proc2cache_reqstream_val  (dcache_reqstream_val),
+    .proc2cache_reqstream_rdy  (dcache_reqstream_rdy),
+
+    .proc2cache_respstream_msg (dcache_respstream_msg),
+    .proc2cache_respstream_val (dcache_respstream_val),
+    .proc2cache_respstream_rdy (dcache_respstream_rdy),
+
+    // Cache <-> Memory Interface
+    .cache2mem_reqstream_msg   (dmem_reqstream_msg),
+    .cache2mem_reqstream_val   (dmem_reqstream_val),
+    .cache2mem_reqstream_rdy   (dmem_reqstream_rdy),
+
+    .cache2mem_respstream_msg  (dmem_respstream_msg),
+    .cache2mem_respstream_val  (dmem_respstream_val),
+    .cache2mem_respstream_rdy  (dmem_respstream_rdy)
+  );
 
   assign icache_access = icache_reqstream_val  & icache_reqstream_rdy;
   assign icache_miss   = icache_respstream_val & icache_respstream_rdy & ~icache_respstream_msg.test[0];

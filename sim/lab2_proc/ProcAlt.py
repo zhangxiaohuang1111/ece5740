@@ -18,6 +18,6 @@ class ProcAlt( VerilogPlaceholder, Component ):
     s.imem        = MemRequesterIfc( req_class, resp_class )
     s.dmem        = MemRequesterIfc( req_class, resp_class )
     s.core_id     = InPort(32)
-    s.commit_inst = OutPort()
+    s.commit_inst = OutPort(Bits4)
     s.stats_en    = OutPort()
 

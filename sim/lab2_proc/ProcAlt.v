@@ -64,7 +64,7 @@ module lab2_proc_ProcAlt
   // were a parameter, each core would be compiled separately.
 
   input  logic [31:0]  core_id,
-  output logic         commit_inst,
+  output logic  [3:0]  commit_inst,
   output logic         stats_en
 );
 

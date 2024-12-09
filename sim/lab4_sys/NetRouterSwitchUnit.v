@@ -29,9 +29,127 @@ module lab4_sys_NetRouterSwitchUnit
   input  logic                   ostream_rdy
 );
 
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Implement switch unit logic
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  // round-robin arbitration logic
+  logic [1:0] last_served; // Tracks the last served input
+  logic [1:0] selected_input;
+
+  always_ff @( posedge clk ) begin
+    if ( reset )
+      last_served <= 0;
+    else if ( ostream_val && ostream_rdy )
+      last_served <= selected_input;
+  end
+
+  always_comb begin
+
+    // Default outputs
+    selected_input = 0;
+    istream_rdy[0] = 0;
+    istream_rdy[1] = 0;
+    istream_rdy[2] = 0;
+    ostream_val    = 0;
+    ostream_msg    = 0;
+
+    // Round-robin arbitration logic
+    case ( last_served )
+      2'd0: begin
+        if ( istream_val[1] ) begin
+          selected_input = 1;
+          istream_rdy[1] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[1];
+        end else if ( istream_val[2] ) begin
+          selected_input = 2;
+          istream_rdy[2] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[2];
+        end else if ( istream_val[0] ) begin
+          selected_input = 0;
+          istream_rdy[0] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[0];
+        end
+      end
+      2'd1: begin
+        if ( istream_val[2] ) begin
+          selected_input = 2;
+          istream_rdy[2] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[2];
+        end else if ( istream_val[0] ) begin
+          selected_input = 0;
+          istream_rdy[0] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[0];
+        end else if ( istream_val[1] ) begin
+          selected_input = 1;
+          istream_rdy[1] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[1];
+        end
+      end
+      2'd2: begin
+        if ( istream_val[0] ) begin
+          selected_input = 0;
+          istream_rdy[0] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[0];
+        end else if ( istream_val[1] ) begin
+          selected_input = 1;
+          istream_rdy[1] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[1];
+        end else if ( istream_val[2] ) begin
+          selected_input = 2;
+          istream_rdy[2] = ostream_rdy;
+          ostream_val    = 1;
+          ostream_msg    = istream_msg[2];
+        end
+      end
+       default : begin
+        selected_input = 0;
+        istream_rdy[0] = 0;
+        istream_rdy[1] = 0;
+        istream_rdy[2] = 0;
+        ostream_val    = 0;
+        ostream_msg    = 0;
+      end
+    endcase
+  end
+
+// discussion
+
+
+//   logic [1:0] selected_input;
+
+//   always_comb begin
+
+//     selected_input = 0;
+//     istream_rdy[0] = 0;
+//     istream_rdy[1] = 0;
+//     istream_rdy[2] = 0;
+//     ostream_val    = 0;
+//     ostream_msg    = 0;
+
+//     if ( istream_val[1] ) begin
+//   selected_input = 1;
+//   istream_rdy[1] = ostream_rdy;
+//   ostream_val    = 1;
+//   ostream_msg    = istream_msg[1];
+// end
+// else if ( istream_val[2] ) begin
+//   selected_input = 2;
+//   istream_rdy[2] = ostream_rdy;
+//   ostream_val    = 1;
+//   ostream_msg    = istream_msg[2];
+// end
+// else if ( istream_val[0] ) begin
+//   selected_input = 0;
+//   istream_rdy[0] = ostream_rdy;
+//   ostream_val    = 1;
+//   ostream_msg    = istream_msg[0];
+// end
+//   end
 
   //----------------------------------------------------------------------
   // Line Tracing

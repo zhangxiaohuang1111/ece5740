@@ -73,7 +73,7 @@ module lab2_proc_ProcBaseCtrl
   input  logic        imul_resp_val_X,   // Output valid signal to Controll Unit
   // extra ports
 
-  output logic        commit_inst
+  output logic [3:0] commit_inst
 );
 
   //----------------------------------------------------------------------

@@ -154,6 +154,102 @@ all_to_dest3 = [
 # Add more directed and random tests
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream to One Destination
+#-------------------------------------------------------------------------
+
+stream_to_dest0 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=i, payload=i )
+  stream_to_dest0.append( msg )
+
+stream_to_dest1 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=1, opaque=i, payload=i )
+  stream_to_dest1.append( msg )
+
+stream_to_dest2 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=2, opaque=i, payload=i )
+  stream_to_dest2.append( msg )
+
+stream_to_dest3 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=3, opaque=i, payload=i )
+  stream_to_dest3.append( msg )
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream All to Each Destination
+#-------------------------------------------------------------------------
+
+stream_all_to_dest0 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+stream_all_to_dest1 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+stream_all_to_dest2 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+stream_all_to_dest3 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+  
+for i in range(16):
+  msg = NetMsgType( src=0, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream All to All Ports
+#-------------------------------------------------------------------------
+
+stream_all_to_all = []
+stream_all_to_all.extend( stream_all_to_dest0 )
+stream_all_to_all.extend( stream_all_to_dest1 )
+stream_all_to_all.extend( stream_all_to_dest2 )
+stream_all_to_all.extend( stream_all_to_dest3 )
+
 #-------------------------------------------------------------------------
 # Test Case Table
 #-------------------------------------------------------------------------
@@ -169,6 +265,32 @@ test_case_table = mk_test_case_table([
   [ "all_to_dest1",                   all_to_dest1,        0,  0,  'fixed'  ],
   [ "all_to_dest2",                   all_to_dest2,        0,  0,  'fixed'  ],
   [ "all_to_dest3",                   all_to_dest3,        0,  0,  'fixed'  ],
+  [ "stream_to_dest0",                stream_to_dest0,     0,  0,  'fixed', ],
+  [ "stream_to_dest1",                stream_to_dest1,     0,  0,  'fixed', ],
+  [ "stream_to_dest2",                stream_to_dest2,     0,  0,  'fixed', ],
+  [ "stream_to_dest3",                stream_to_dest3,     0,  0,  'fixed', ],
+  [ "stream_all_to_dest0",            stream_all_to_dest0, 0,  0,  'fixed', ],
+  [ "stream_all_to_dest1",            stream_all_to_dest1, 0,  0,  'fixed', ],
+  [ "stream_all_to_dest2",            stream_all_to_dest2, 0,  0,  'fixed', ],
+  [ "stream_all_to_dest3",            stream_all_to_dest3, 0,  0,  'fixed', ],
+  [ "stream_all_to_all",              stream_all_to_all,   0,  0,  'fixed', ],
+
+  [ "stream_to_dest0_fixed_2x0",      stream_to_dest0,     2,  0,  'fixed', ],
+  [ "stream_to_dest1_fixed_2x0",      stream_to_dest1,     2,  0,  'fixed', ],
+  [ "stream_to_dest2_fixed_2x0",      stream_to_dest2,     2,  0,  'fixed', ],
+  [ "stream_to_dest3_fixed_2x0",      stream_to_dest3,     2,  0,  'fixed', ],
+
+  [ "stream_all_to_dest0_fixed_0x2",  stream_all_to_dest0, 0,  2,  'fixed', ],
+  [ "stream_all_to_dest1_fixed_0x2",  stream_all_to_dest1, 0,  2,  'fixed', ],
+  [ "stream_all_to_dest2_fixed_0x2",  stream_all_to_dest2, 0,  2,  'fixed', ],
+  [ "stream_all_to_dest3_fixed_0x2",  stream_all_to_dest3, 0,  2,  'fixed', ],
+  [ "stream_all_to_all_fixed_0x2",    stream_all_to_all,   0,  2,  'fixed', ],
+
+  [ "stream_all_to_dest0_rand_delay", stream_all_to_dest0, 0, 20,  'random' ],
+  [ "stream_all_to_dest1_rand_delay", stream_all_to_dest1, 0, 20,  'random' ],
+  [ "stream_all_to_dest2_rand_delay", stream_all_to_dest2, 0, 20,  'random' ],
+  [ "stream_all_to_dest3_rand_delay", stream_all_to_dest3, 0, 20,  'random' ],
+  [ "stream_all_to_all_rand_delay",   stream_all_to_all,   0, 20,  'random' ],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 

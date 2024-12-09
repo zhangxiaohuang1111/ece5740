@@ -77,6 +77,51 @@ def test_basic( cmdline_opts ):
   run_sim( th, cmdline_opts, duts=['sunit'] )
 
 #-------------------------------------------------------------------------
+# test_complex
+#-------------------------------------------------------------------------
+
+def test_complex( cmdline_opts ):
+
+  th = TestHarness()
+
+  msgs = [
+    #           src  dest opaq  payload
+    NetMsgType( 0,   0,   0x00, 0x04040404 ),
+    NetMsgType( 1,   0,   0x00, 0x00000000 ),
+    NetMsgType( 1,   0,   0x01, 0x01010101 ),
+    NetMsgType( 2,   0,   0x00, 0x02020202 ),
+    NetMsgType( 2,   0,   0x01, 0x03030303 ),
+    NetMsgType( 0,   0,   0x01, 0x04040404 ),
+    NetMsgType( 0,   0,   0x02, 0x05050505 ),
+    NetMsgType( 2,   0,   0x02, 0x06060606 ),
+  ]
+
+    # Generate expected output for sink based on round-robin order
+    # 120 -> 120 -> 120 priority for srcs
+  expected_msgs = []
+  src_indices = [1,2,0]  # Round-robin source order
+  src_buffers = {
+      0: [m for m in msgs if m.src == 0],
+      1: [m for m in msgs if m.src == 1],
+      2: [m for m in msgs if m.src == 2]
+  }
+
+  while any(src_buffers.values()):
+      for src in src_indices:
+          if src_buffers[src]:
+              expected_msgs.append(src_buffers[src].pop(0))
+
+  # Set parameters for sources and sink
+  th.set_param("top.srcs[0].construct", msgs=[m for m in msgs if m.src == 0])
+  th.set_param("top.srcs[1].construct", msgs=[m for m in msgs if m.src == 1])
+  th.set_param("top.srcs[2].construct", msgs=[m for m in msgs if m.src == 2])
+  th.set_param("top.sink.construct", msgs=expected_msgs)
+
+  th.elaborate()
+
+  run_sim( th, cmdline_opts, duts=['sunit'] )
+
+#-------------------------------------------------------------------------
 # Test Cases: Very Simple
 #-------------------------------------------------------------------------
 # These are examples of a simple tests using a test case table. These
@@ -107,6 +152,114 @@ three_diff_dest = [
 # Change above tests if necessary; add more directed tests
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream from One Port
+#-------------------------------------------------------------------------
+
+stream_from_src1 = []
+for i in range(20):
+  msg = NetMsgType( src=1, dest=0, opaque=i, payload=i )
+  stream_from_src1.append( msg )
+
+stream_from_src2 = []
+for i in range(20):
+  msg = NetMsgType( src=2, dest=0, opaque=i, payload=i )
+  stream_from_src2.append( msg )
+
+stream_from_src0 = []
+for i in range(20):
+  msg = NetMsgType( src=0, dest=0, opaque=i, payload=i )
+  stream_from_src0.append( msg )
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream from All Ports
+#-------------------------------------------------------------------------
+
+stream_from_all = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_from_all.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_from_all.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_from_all.append(msg)
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream All to Each Destination
+#-------------------------------------------------------------------------
+
+stream_all_to_dest0 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+stream_all_to_dest1 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+stream_all_to_dest2 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+stream_all_to_dest3 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+  
+for i in range(16):
+  msg = NetMsgType( src=0, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream All to All Ports
+#-------------------------------------------------------------------------
+
+stream_all_to_all = []
+stream_all_to_all.extend( stream_all_to_dest0 )
+stream_all_to_all.extend( stream_all_to_dest1 )
+stream_all_to_all.extend( stream_all_to_dest2 )
+stream_all_to_all.extend( stream_all_to_dest3 )
+
 #-------------------------------------------------------------------------
 # Test Case Table
 #-------------------------------------------------------------------------
@@ -116,10 +269,48 @@ test_case_table = mk_test_case_table([
   [ "one",                         one,                  0,  0,  'fixed'  ],
   [ "three",                       three,                0,  0,  'fixed'  ],
   [ "three_diff_dest",             three_diff_dest,      0,  0,  'fixed'  ],
+  [ "stream_from_src0",            stream_from_src0,     0,  0,  'fixed'  ],
+  [ "stream_from_src1",            stream_from_src1,     0,  0,  'fixed'  ],
+  [ "stream_from_src2",            stream_from_src2,     0,  0,  'fixed'  ],
+  [ "stream_from_all",             stream_from_all,      0,  0,  'fixed'  ],
+  [ "stream_all_to_dest0",         stream_all_to_dest0,  0,  0,  'fixed'  ],
+  [ "stream_all_to_dest1",         stream_all_to_dest1,  0,  0,  'fixed'  ],
+  [ "stream_all_to_dest2",         stream_all_to_dest2,  0,  0,  'fixed'  ],
+  [ "stream_all_to_dest3",         stream_all_to_dest3,  0,  0,  'fixed'  ],
+  [ "stream_all_to_all",           stream_all_to_all,    0,  0,  'fixed'  ],
+
+  [ "stream_from_src0_fixed_0x2",  stream_from_src0,     0,  2,  'fixed'  ],
+  [ "stream_from_src0_fixed_2x0",  stream_from_src0,     2,  0,  'fixed'  ],
+  [ "stream_from_src1_fixed_0x2",  stream_from_src1,     0,  2,  'fixed'  ],
+  [ "stream_from_src1_fixed_2x0",  stream_from_src1,     2,  0,  'fixed'  ],
+  [ "stream_from_src2_fixed_0x2",  stream_from_src2,     0,  2,  'fixed'  ],
+  [ "stream_from_src2_fixed_2x0",  stream_from_src2,     2,  0,  'fixed'  ],
+  [ "stream_from_all_fixed_0x2",   stream_from_all,      0,  2,  'fixed'  ],
+  [ "stream_from_all_fixed_2x0",   stream_from_all,      2,  0,  'fixed'  ],
+  [ "stream_all_to_dest0_fixed_0x2", stream_all_to_dest0, 0,  2,  'fixed'  ],
+  [ "stream_all_to_dest0_fixed_2x0", stream_all_to_dest0, 2,  0,  'fixed'  ],
+  [ "stream_all_to_dest1_fixed_0x2", stream_all_to_dest1, 0,  2,  'fixed'  ],
+  [ "stream_all_to_dest1_fixed_2x0", stream_all_to_dest1, 2,  0,  'fixed'  ],
+  [ "stream_all_to_dest2_fixed_0x2", stream_all_to_dest2, 0,  2,  'fixed'  ],
+  [ "stream_all_to_dest2_fixed_2x0", stream_all_to_dest2, 2,  0,  'fixed'  ],
+  [ "stream_all_to_dest3_fixed_0x2", stream_all_to_dest3, 0,  2,  'fixed'  ],
+  [ "stream_all_to_dest3_fixed_2x0", stream_all_to_dest3, 2,  0,  'fixed'  ],
+  [ "stream_all_to_all_fixed_0x2", stream_all_to_all,    0,  2,  'fixed'  ],
+  [ "stream_all_to_all_fixed_2x0", stream_all_to_all,    2,  0,  'fixed'  ],
+
+  [ "stream_from_src0_rand_delay", stream_from_src0,     3, 20,  'random' ],
+  [ "stream_from_src1_rand_delay", stream_from_src1,     3, 20,  'random' ],
+  [ "stream_from_src2_rand_delay", stream_from_src2,     3, 20,  'random' ],
+  [ "stream_from_all_rand_delay",  stream_from_all,      3, 20,  'random' ],
+  [ "stream_all_to_dest0_rand_delay", stream_all_to_dest0, 3, 20, 'random' ],
+  [ "stream_all_to_dest1_rand_delay", stream_all_to_dest1, 3, 20, 'random' ],
+  [ "stream_all_to_dest2_rand_delay", stream_all_to_dest2, 3, 20, 'random' ],
+  [ "stream_all_to_dest3_rand_delay", stream_all_to_dest3, 3, 20, 'random' ],
+  [ "stream_all_to_all_rand_delay", stream_all_to_all,    3, 20, 'random' ],
+])
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-])
 
 #-------------------------------------------------------------------------
 # test
@@ -129,6 +320,19 @@ test_case_table = mk_test_case_table([
 def test( test_params, cmdline_opts ):
 
   th = TestHarness()
+
+  src_indices = [1, 2, 0]  
+  src_buffers = {
+      0: [m for m in test_params.msgs if m.src == 0],
+      1: [m for m in test_params.msgs if m.src == 1],
+      2: [m for m in test_params.msgs if m.src == 2]
+  }
+
+  expected_msgs = []
+  while any(src_buffers.values()):
+      for src in src_indices:
+          if src_buffers[src]:
+              expected_msgs.append(src_buffers[src].pop(0))
 
   th.set_param("top.srcs[0].construct",
     msgs                = [ m for m in test_params.msgs if m.src == 0 ],
@@ -149,7 +353,7 @@ def test( test_params, cmdline_opts ):
     interval_delay      = test_params.src_delay )
 
   th.set_param("top.sink.construct",
-    msgs                = test_params.msgs,
+    msgs                = expected_msgs,
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay )

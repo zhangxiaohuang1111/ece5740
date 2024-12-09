@@ -50,7 +50,7 @@ class SingleCoreTestHarness(Component):
   #-----------------------------------------------------------------------
 
   def construct( s, Sys ):
-    s.commit_inst = OutPort()
+    s.commit_inst = OutPort(Bits4)
 
     s.src  = StreamSourceFL( Bits32, [] )
     s.sink = StreamSinkFL( Bits32, [] )
@@ -202,7 +202,7 @@ class MultiCoreTestHarness(Component):
   #-----------------------------------------------------------------------
 
   def construct( s, Sys ):
-    s.commit_inst = OutPort()
+    s.commit_inst = OutPort(Bits4)
 
     s.srcs  = [ StreamSourceFL( Bits32, [] ) for _ in range(4) ]
     s.sinks = [ StreamSinkFL( Bits32, [] )   for _ in range(4) ]

@@ -59,7 +59,7 @@ class TestHarness( Component ):
 
 def test_basic( cmdline_opts ):
 
-  th = TestHarness()
+  th = TestHarness(router_id=0)
 
   msgs = [
     #           src  dest opaq  payload
@@ -67,13 +67,24 @@ def test_basic( cmdline_opts ):
     NetMsgType( 2,   1,   0x11, 0x11111111 ),
     NetMsgType( 0,   2,   0x12, 0x12121212 ),
   ]
+  router_id = 0
+
+  msgs_to_sink_0 = [
+  m for m in msgs
+  if m.dest != router_id and ((m.dest - router_id) & 3) >= ((router_id - m.dest) & 3)
+  ]  # Left
+  msgs_to_sink_1 = [
+  m for m in msgs
+  if m.dest != router_id and ((m.dest - router_id) & 3) < ((router_id - m.dest) & 3)
+  ]  # Right
+  msgs_to_sink_2 = [m for m in msgs if m.dest == router_id] # Local
 
   th.set_param("top.srcs[0].construct",  msgs=[ m for m in msgs if m.src  == 0 ] )
   th.set_param("top.srcs[1].construct",  msgs=[ m for m in msgs if m.src  == 1 ] )
   th.set_param("top.srcs[2].construct",  msgs=[ m for m in msgs if m.src  == 2 ] )
-  th.set_param("top.sinks[0].construct", msgs=[ m for m in msgs if m.dest == 0 ] )
-  th.set_param("top.sinks[1].construct", msgs=[ m for m in msgs if m.dest != 0 ] )
-  th.set_param("top.sinks[2].construct", msgs=[] )
+  th.set_param("top.sinks[0].construct", msgs=msgs_to_sink_0)
+  th.set_param("top.sinks[1].construct", msgs=msgs_to_sink_1)
+  th.set_param("top.sinks[2].construct", msgs=msgs_to_sink_2)
 
   th.elaborate()
 
@@ -157,6 +168,103 @@ all_to_dest3 = [
 # Change above tests if necessary; add more directed and random tests
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream to One Destination
+#-------------------------------------------------------------------------
+
+stream_to_dest0 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=i, payload=i )
+  stream_to_dest0.append( msg )
+
+stream_to_dest1 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=1, opaque=i, payload=i )
+  stream_to_dest1.append( msg )
+
+stream_to_dest2 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=2, opaque=i, payload=i )
+  stream_to_dest2.append( msg )
+
+stream_to_dest3 = []
+for i in range(16):
+  msg = NetMsgType( src=0, dest=3, opaque=i, payload=i )
+  stream_to_dest3.append( msg )
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream All to Each Destination
+#-------------------------------------------------------------------------
+
+stream_all_to_dest0 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=0, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest0.append(msg)
+
+stream_all_to_dest1 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=1, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest1.append(msg)
+
+stream_all_to_dest2 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=0, dest=2, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest2.append(msg)
+
+stream_all_to_dest3 = []
+
+for i in range(16):
+  msg = NetMsgType( src=1, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+
+for i in range(16):
+  msg = NetMsgType( src=2, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+  
+for i in range(16):
+  msg = NetMsgType( src=0, dest=3, opaque=0x00+i, payload=0x0000+i )
+  stream_all_to_dest3.append(msg)
+
+
+#-------------------------------------------------------------------------
+# Test Cases: Stream All to All Ports
+#-------------------------------------------------------------------------
+
+stream_all_to_all = []
+stream_all_to_all.extend( stream_all_to_dest0 )
+stream_all_to_all.extend( stream_all_to_dest1 )
+stream_all_to_all.extend( stream_all_to_dest2 )
+stream_all_to_all.extend( stream_all_to_dest3 )
+
+
 #-------------------------------------------------------------------------
 # Test Case Table
 #-------------------------------------------------------------------------
@@ -172,11 +280,54 @@ test_case_table = mk_test_case_table([
   [ "all_to_dest1",                   all_to_dest1,        0,  0,  'fixed',   True  ],
   [ "all_to_dest2",                   all_to_dest2,        0,  0,  'fixed',   True  ],
   [ "all_to_dest3",                   all_to_dest3,        0,  0,  'fixed',   True  ],
+  [ "stream_to_dest0",                stream_to_dest0,     0,  0,  'fixed',   True ],
+  [ "stream_to_dest1",                stream_to_dest1,     0,  0,  'fixed',   True ],
+  [ "stream_to_dest2",                stream_to_dest2,     0,  0,  'fixed',   True ],
+  [ "stream_to_dest3",                stream_to_dest3,     0,  0,  'fixed',   True ],
+  [ "stream_all_to_dest0",            stream_all_to_dest0, 0,  0,  'fixed',   True ],
+  [ "stream_all_to_dest1",            stream_all_to_dest1, 0,  0,  'fixed',   True ],
+  [ "stream_all_to_dest2",            stream_all_to_dest2, 0,  0,  'fixed',   True ],
+  [ "stream_all_to_dest3",            stream_all_to_dest3, 0,  0,  'fixed',   True ],
+  [ "stream_all_to_all",              stream_all_to_all,   0,  0,  'fixed',   True ],
 
-  #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  [ "stream_to_dest0_fixed_2x0",      stream_to_dest0,     2,  0,  'fixed',   True ],
+  [ "stream_to_dest1_fixed_2x0",      stream_to_dest1,     2,  0,  'fixed',   True ],
+  [ "stream_to_dest2_fixed_2x0",      stream_to_dest2,     2,  0,  'fixed',   True ],
+  [ "stream_to_dest3_fixed_2x0",      stream_to_dest3,     2,  0,  'fixed',   True ],
 
+  [ "stream_all_to_dest0_fixed_0x2",  stream_all_to_dest0, 0,  2,  'fixed',   True ],
+  [ "stream_all_to_dest1_fixed_0x2",  stream_all_to_dest1, 0,  2,  'fixed',   True ],
+  [ "stream_all_to_dest2_fixed_0x2",  stream_all_to_dest2, 0,  2,  'fixed',   True ],
+  [ "stream_all_to_dest3_fixed_0x2",  stream_all_to_dest3, 0,  2,  'fixed',   True ],
+  [ "stream_all_to_all_fixed_0x2",    stream_all_to_all,   0,  2,  'fixed',   True ],
+
+  [ "stream_all_to_dest0_rand_delay", stream_all_to_dest0, 0, 20,  'random',  True ],
+  [ "stream_all_to_dest1_rand_delay", stream_all_to_dest1, 0, 20,  'random',  True ],
+  [ "stream_all_to_dest2_rand_delay", stream_all_to_dest2, 0, 20,  'random',  True ],
+  [ "stream_all_to_dest3_rand_delay", stream_all_to_dest3, 0, 20,  'random',  True ],
+  [ "stream_all_to_all_rand_delay",   stream_all_to_all,   0, 20,  'random',  False ], # too hard to be ordered
 ])
 
+def sort_by_round_robin(msgs, src_order):
+    """
+    Sort messages based on Round-Robin order of src.
+    :param msgs: List of messages to sort.
+    :param src_order: List of src indices in Round-Robin order.
+    :return: Sorted list of messages.
+    """
+    # Create buffers for each src
+    src_buffers = {int(src): [] for src in src_order}  # Ensure src_order keys are integers
+    for msg in msgs:
+        src_buffers[int(msg.src)].append(msg)  # Convert msg.src to int before accessing src_buffers
+
+    # Merge messages based on Round-Robin order
+    sorted_msgs = []
+    while any(src_buffers.values()):
+        for src in src_order:
+            if src_buffers[src]:
+                sorted_msgs.append(src_buffers[src].pop(0))
+
+    return sorted_msgs
 #-------------------------------------------------------------------------
 # test w/ router id == 0
 #-------------------------------------------------------------------------
@@ -185,7 +336,7 @@ test_case_table = mk_test_case_table([
 def test_router_id_0( test_params, cmdline_opts ):
 
   th = TestHarness( router_id=0 )
-
+  router_id=0
   th.set_param("top.srcs[0].construct",
     msgs                = [ m for m in test_params.msgs if m.src == 0 ],
     interval_delay_mode = test_params.delay_mode,
@@ -205,21 +356,30 @@ def test_router_id_0( test_params, cmdline_opts ):
     interval_delay      = test_params.src_delay )
 
   th.set_param("top.sinks[0].construct",
-    msgs                = [ m for m in test_params.msgs if m.dest == 0 ],
+    msgs                = sort_by_round_robin(
+                            [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) >= ((router_id - m.dest) & 3)) ],
+                            src_order=[1, 2, 0]  # Round-Robin priority for src
+                          ),    
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay,
     ordered             = test_params.ordered )
 
   th.set_param("top.sinks[1].construct",
-    msgs                = [ m for m in test_params.msgs if m.dest != 0 ],
+    msgs                = sort_by_round_robin(
+                            [ m for m in test_params.msgs if (m.dest != router_id and ((m.dest - router_id) & 3) < ((router_id - m.dest) & 3)) ],
+                            src_order=[1, 2, 0]  # Round-Robin priority for src
+                          ),    
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay,
     ordered             = test_params.ordered )
 
   th.set_param("top.sinks[2].construct",
-    msgs                = [],
+    msgs                = sort_by_round_robin(
+                            [ m for m in test_params.msgs if m.dest == router_id ],
+                            src_order=[1, 2, 0]  # Round-Robin priority for src
+                          ),    
     interval_delay_mode = test_params.delay_mode,
     initial_delay       = test_params.sink_delay,
     interval_delay      = test_params.sink_delay,
