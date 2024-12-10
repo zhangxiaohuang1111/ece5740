@@ -46,10 +46,6 @@ from lab2_proc.test import inst_bltu
 from lab2_proc.test import inst_jal
 from lab2_proc.test import inst_jalr
 
-#''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Import additional files from lab2_proc.test as necessary
-#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 #-------------------------------------------------------------------------
 # Tests
 #-------------------------------------------------------------------------
