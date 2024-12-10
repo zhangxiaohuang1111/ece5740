@@ -42,15 +42,8 @@ class Tests:
     asm_test( inst_mem_mcore.gen_shared_memory_test ),
     asm_test( inst_mem_mcore.gen_unaligned_access_test ),
     asm_test( inst_mem_mcore.gen_concurrent_access_test ),
-    # asm_test( inst_mem_mcore.gen_random_test     ),
-    # asm_test( inst_mem_mcore.gen_multicore_random_test ),
     asm_test( inst_mem_mcore.gen_basic_random_test ),
 
-
-    #''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    # Add more rows to the test case table to test more complicated
-    # scenarios.
-    #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   ])
   def test_mem_mcore( s, name, test ):
     run_test( s.SysType, test, cmdline_opts=s.__class__.cmdline_opts )

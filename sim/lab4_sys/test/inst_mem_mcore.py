@@ -44,10 +44,6 @@ def gen_basic_test():
     .word 0x31323334
   """
 
-# ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Define additional directed and random test cases.
-# '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 def gen_shared_memory_test():
   return """
     csrr x1, mngr2proc < 0x00002000  # Base address
